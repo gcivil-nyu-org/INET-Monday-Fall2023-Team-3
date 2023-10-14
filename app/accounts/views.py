@@ -17,6 +17,6 @@ class CustomUserCreationForm(UserCreationForm):
         return username
 
 class SignUpView(generic.CreateView):
-    form_class = UserCreationForm
+    form_class = RegisterForm
     success_url = reverse_lazy("login")
     template_name = "registration/signup.html"
