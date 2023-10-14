@@ -4,6 +4,7 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse_lazy
 from django.views import generic
 from .forms import RegisterForm
+from django.shortcuts import render, redirect
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
