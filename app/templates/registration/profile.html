@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Profile Page{% endblock title %}
+{% block content %}
+
+{% if user_form.errors %}
+
+{% endif %}
+
+<div class="form-content">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            <div class="form-group">
+                <label>Username:</label>
+                {{ user_form.username }}
+                <label>Email:</label>
+                {{ user_form.email }}
+            </div>
+        </div>
+        <button type="submit" class="btn">Save Changes</button>
+        <button type="reset" class="btn">Reset</button>
+    </form>
+</div>
+
+{% endblock content %}
