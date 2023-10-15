@@ -5,11 +5,11 @@ import re
 
 class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
+
     class Meta:
         model=User
         fields = ['username','email','password1','password2'] 
 
-    
     def clean_username(self):
         username = self.cleaned_data.get("username")
         if User.objects.filter(username=username).exists():
@@ -28,4 +28,16 @@ class RegisterForm(UserCreationForm):
         return email
     
 
-    
+class UpdateUserInfoForm(forms.ModelForm):
+    username = forms.CharField(required=True, widget=forms.TextInput())
+
+    class Meta:
+        model = User
+        fields = ['username']
+
+    def clean_username(self):
+        username = self.cleaned_data.get("username")
+        if User.objects.filter(username=username).exists():
+            raise forms.ValidationError("Username is already registered")
+        return username
+
