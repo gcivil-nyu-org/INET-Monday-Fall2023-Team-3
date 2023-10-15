@@ -7,11 +7,7 @@ class RegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     class Meta:
         model = CustomUser
-        fields = ['email', 'username', 'password1','password2'] 
-
-    # Overriding the clean_username method to remove the uniqueness check
-    def clean_username(self):
-        return self.cleaned_data.get('username')
+        fields = ['email', 'username', 'password1','password2']
 
     def clean_email(self):
         email = self.cleaned_data.get("email")
