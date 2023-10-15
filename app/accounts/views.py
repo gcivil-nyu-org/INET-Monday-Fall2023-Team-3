@@ -10,17 +10,8 @@ from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.decorators import login_required
 from .forms import UpdateUserInfoForm
+from django.shortcuts import render, redirect
 
-class CustomUserCreationForm(UserCreationForm):
-    class Meta:
-        model = User
-        fields = UserCreationForm.Meta.fields
-
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if User.objects.filter(username=username).exists():
-            raise ValidationError("Username already exists")
-        return username
 
 class SignUpView(generic.CreateView):
     form_class = RegisterForm
