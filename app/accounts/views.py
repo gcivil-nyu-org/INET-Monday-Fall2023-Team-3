@@ -29,4 +29,4 @@ def update_user_information(request):
     else:
         user_form = UpdateUserInfoForm(instance=request.user)
     
-    return render(request, 'registration/profile.html', {'user_form': user_form})
+    return render(request, 'registration/profile.html', {'user_form': user_form, 'user_email': request.user.email})

@@ -3,18 +3,19 @@
 {% block content %}
 
 {% if user_form.errors %}
-
+<div class="alert alert-danger">
+    {{ user_form.errors }}
+</div>
 {% endif %}
 
 <div class="form-content">
+    <div>Hello, user {{ user_email }}</div>
     <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-row">
             <div class="form-group">
                 <label>Username:</label>
                 {{ user_form.username }}
-                <label>Email:</label>
-                {{ user_form.email }}
             </div>
         </div>
         <button type="submit" class="btn">Save Changes</button>
