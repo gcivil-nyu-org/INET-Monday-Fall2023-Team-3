@@ -14,8 +14,20 @@
         {% csrf_token %}
         <div class="form-row">
             <div class="form-group">
-                <label>Username:</label>
+                <label>Please enter new username:</label>
                 {{ user_form.username }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>New Password(Optional):</label>
+                {{ user_form.password1 }}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Confirm New Password(Optional):</label>
+                {{ user_form.password2 }}
             </div>
         </div>
         <button type="submit" class="btn">Save Changes</button>
@@ -24,3 +36,5 @@
 </div>
 
 {% endblock content %}
+
+

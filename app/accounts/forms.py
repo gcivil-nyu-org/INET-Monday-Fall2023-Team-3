@@ -1,3 +1,4 @@
+from typing import Any
 from django import forms
 from .models import CustomUser
 from django.contrib.auth.forms import UserCreationForm
@@ -25,6 +26,8 @@ class RegisterForm(UserCreationForm):
 
 class UpdateUserInfoForm(forms.ModelForm):
     username = forms.CharField(required=True, widget=forms.TextInput())
+    password1 = forms.CharField(required=False, widget=forms.TextInput())
+    password2 = forms.CharField(required=False, widget=forms.TextInput())
 
     class Meta:
         model = CustomUser
@@ -35,5 +38,24 @@ class UpdateUserInfoForm(forms.ModelForm):
         if CustomUser.objects.filter(username=username).exists():
             raise forms.ValidationError("Username is already registered")
         return username
+    
+    def clean_password1(self):
+        password1 = self.cleaned_data.get("password1")
+        return password1
+    
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1:
+            if password2:
+                if password1 != password2:
+                    raise forms.ValidationError("Passwords do not match")
+            else:
+                raise forms.ValidationError("Please confirm your password")
+        else:
+            if password2:
+                raise forms.ValidationError("Please enter a password in the first field")
+        
+        return password2
 
 

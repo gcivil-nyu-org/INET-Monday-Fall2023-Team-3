@@ -23,7 +23,11 @@ def update_user_information(request):
             # logout user for new user info login
             logout(request)
             # save new user info
-            user_form.save()
+            user = user_form.save()
+            password = user_form.cleaned_data.get("password2")
+            if password:
+                user.set_password(password)
+                user.save()
             messages.success(request, 'Your profile has been udpated')
             return redirect(to='login')
     else:
