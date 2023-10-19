@@ -1,0 +1,37 @@
+language: python
+os: linux
+# ubuntu 22.04
+dist: jammy
+python:
+  - "3.10"
+
+install:
+  - gem install webrick
+  - pip install -r requirements.txt
+  - pip install black
+  - pip install flake8
+  - pip install coveralls
+
+before_script:
+  - python manage.py migrate
+
+script:
+  - black . --check
+  - flake8 --max-line-length=88
+  - coverage run --source=ebdjango,polls manage.py test
+
+after_script:
+  - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls --output=debug.json
+  - cat debug.json
+  - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls
+
+deploy:
+  - provider: elasticbeanstalk
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_ACCESS_SECRET
+    region: $AWS_DEPLOY_REGION
+    app: $AWS_APP_NAME
+    env: $AWS_APP_ENV
+    bucket_name: $AWS_BUCKET_NAME
+    on:
+      branch: main
