@@ -52,7 +52,7 @@ def user_signup(request):
     serializer.save()
     token = Token.objects.create(user=serializer.instance)
 
-    return Response({ "token": token.key }, status=status.HTTP_201_CREATED)
+    return Response({"token": token.key}, status=status.HTTP_201_CREATED)
 
 
 # User login
@@ -76,7 +76,7 @@ def user_login(request):
     except Token.DoesNotExist:
         token = Token.objects.create(user=user)
 
-    return Response({ "token": token.key }, status=status.HTTP_200_OK)
+    return Response({"token": token.key}, status=status.HTTP_200_OK)
 
 
 # Update user profile
