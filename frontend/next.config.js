@@ -2,6 +2,9 @@
 const nextConfig = {
   async rewrites() {
     return [{
+      source: "/backend/user/ping",
+      destination: "http://backend:8000/user/ping/",
+    }, {
       source: "/backend/user/login",
       destination: "http://backend:8000/user/login/",
     }, {
