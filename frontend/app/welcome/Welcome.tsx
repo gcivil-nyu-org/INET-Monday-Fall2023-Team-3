@@ -1,6 +1,6 @@
 'use client'
 import { useState } from "react"
-import { Button, Dialog, DialogTitle } from "@mui/material"
+import { Button, Dialog, DialogTitle, ClickAwayListener } from "@mui/material"
 
 import Login from "./components/Login"
 import Signup from "./components/Signup"
@@ -43,7 +43,7 @@ export default function Welcome() {
         </div>
       </div>
       <div className='w-full flex flex-row self-stretch items-stretch justify-between flex-1'>
-        <div className='flex flex-1 bg-gray-500' onClick={onLoginOrSignupCancelled}></div>
+        <div className='flex flex-1 bg-gray-500'></div>
         <Dialog open={login || signup} onClose={onLoginOrSignupCancelled} maxWidth="sm" fullWidth={true}>
           {login && (
             <>

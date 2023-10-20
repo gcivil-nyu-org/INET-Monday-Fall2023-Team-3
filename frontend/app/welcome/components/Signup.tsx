@@ -3,6 +3,7 @@ import { ChangeEvent, useState } from "react"
 import { Button, Alert, TextField } from "@mui/material"
 import { fetchRestful } from "@/app/utils/helpers"
 import { useRouter } from "next/navigation"
+import { userSignup } from "@/app/utils/backendRequests"
 
 export default function Signup() {
   const router = useRouter()
@@ -23,28 +24,21 @@ export default function Signup() {
       return
     }
 
-    fetchRestful("/backend/user/signup", "POST", {
+    userSignup({
       email: email,
       username: username,
       password: password,
-    }).then((response) => {
-      response.json().then((obj) => {
-        if (obj.detail) {
-          setErrorMessage(obj.detail)
-        } else {
-          setErrorMessage("")
-          console.log(obj)
+    }).then((result) => {
+      if (result.status) {
+        setErrorMessage("")
+        console.log(result.value)
 
-          sessionStorage.setItem("token", obj.token)
-          router.push("/user")
-        }
-      }, (err) => {
-        console.error(err)
-        setErrorMessage("Unexpected error process response")
-      })
-    }, (err) => {
-      console.error(err)
-      setErrorMessage("Unexpected error during request")
+        sessionStorage.setItem("token", result.value.token)
+        router.push("/user")
+      } else {
+        setErrorMessage(result.error)
+        console.error(result.error)
+      }
     })
   }
 

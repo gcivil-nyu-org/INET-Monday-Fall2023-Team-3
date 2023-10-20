@@ -13,6 +13,9 @@ const nextConfig = {
     }, {
       source: "/backend/user/update",
       destination: "http://backend:8000/user/update/"
+    }, {
+      source: "/backend/user/get",
+      destination: "http://backend:8000/user/get/",
     }]
   }
 }

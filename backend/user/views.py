@@ -79,12 +79,22 @@ def user_login(request):
     return Response({"token": token.key}, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def user_get(request):
+    serializer = UserSerializer(instance=request.user)
+    data = serializer.data
+    data.pop("password")
+    return Response(data, status=status.HTTP_200_OK)
+
+
 # Update user profile
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def user_update(request):
-    serializer = UserSerializer(data=request.data)
+    serializer = UserSerializer(data=request.data, partial=True)
 
     if not serializer.is_valid():
         return USER_400_RESPONSE
