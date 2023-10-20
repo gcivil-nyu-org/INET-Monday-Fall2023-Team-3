@@ -37,7 +37,7 @@ export default function Welcome() {
 
         <div className='flex h-24 flex-row ml-auto'>
           <div className='flex h-16 m-4'>
-            <Button className='mr-4 w-60 bg-gray-500' size="large" variant='contained' onClick={onSignUpButtonClicked}>Sign Up</Button>
+            <Button className='w-60 mr-4 bg-gray-500' size="large" variant='contained' onClick={onSignUpButtonClicked}>Sign Up</Button>
             <Button className='w-60 bg-blue-400' size="large" variant='contained' onClick={onLoginButtonClicked}>Log In</Button>
           </div>
         </div>
