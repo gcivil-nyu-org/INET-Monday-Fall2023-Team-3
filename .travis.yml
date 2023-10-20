@@ -30,16 +30,16 @@ deploy:
     secret_access_key: $AWS_ACCESS_SECRET
     region: $AWS_DEPLOY_REGION
     app: $AWS_APP_NAME
-    env: $AWS_APP_ENV_PROD
+    env: $AWS_APP_ENV_DEV
     bucket_name: $AWS_BUCKET_NAME
     on:
-      branch: main
+      branch: develop
   - provider: elasticbeanstalk
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_ACCESS_SECRET
     region: $AWS_DEPLOY_REGION
     app: $AWS_APP_NAME
-    env: $AWS_APP_ENV_DEV
+    env: $AWS_APP_ENV_PROD
     bucket_name: $AWS_BUCKET_NAME
     on:
-      branch: develop 
+      branch: master
