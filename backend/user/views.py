@@ -50,13 +50,15 @@ def user_signup(request):
         return USER_409_RESPONSE
 
     serializer.save()
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    token = Token.objects.create(user=serializer.instance)
+
+    return Response({ "token": token.key }, status=status.HTTP_201_CREATED)
 
 
 # User login
 @api_view(["POST"])
 def user_login(request):
-    serializer = UserSerializer(data=request.data)
+    serializer = UserSerializer(data=request.data, partial=True)
 
     if not serializer.is_valid():
         return USER_400_RESPONSE
@@ -74,7 +76,7 @@ def user_login(request):
     except Token.DoesNotExist:
         token = Token.objects.create(user=user)
 
-    return Response(token.key, status=status.HTTP_200_OK)
+    return Response({ "token": token.key }, status=status.HTTP_200_OK)
 
 
 # Update user profile

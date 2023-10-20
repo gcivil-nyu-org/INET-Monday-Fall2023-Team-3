@@ -1,21 +1,43 @@
 'use client'
 import { ChangeEvent, useState } from "react"
-import { Button } from "@mui/material"
-import { TextField } from "@mui/material"
+import { Alert, Button, TextField } from "@mui/material"
+
+import { fetchRestful } from "@/app/utils/helpers"
+import { useRouter } from "next/navigation"
 
 export default function Login() {
+  const router = useRouter()
+
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
 
   const onLoginButtonClicked = () => {
     console.log(`email: ${email}`)
     console.log(`password: ${password}`)
 
-    fetch("/backend/user/ping", { method: "POST" })
-      .then((response) => {
-        response.json().then(console.log)
+    fetchRestful("/backend/user/login", "POST", {
+      email: email,
+      password: password,
+    }).then((response) => {
+      response.json().then((obj) => {
+        if (obj.detail) {
+          setErrorMessage(obj.detail)
+        } else {
+          setErrorMessage("")
+          console.log(obj)
+
+          sessionStorage.setItem("token", obj.token)
+          router.push("/user")
+        }
+      }, (err) => {
+        console.error(err)
+        setErrorMessage("Unexpected error process response")
       })
-      .catch(console.log)
+    }, (err) => {
+      console.error(err)
+      setErrorMessage("Unexpected error during request")
+    })
   }
 
   const onEmailInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
@@ -34,6 +56,11 @@ export default function Login() {
       <div className="h-24 w-full flex">
         <TextField className="h-16 m-4 flex-1" label="Password" type="password" variant="outlined" onChange={onPasswordInputChanged} />
       </div>
+      {errorMessage !== "" && (
+        <div className="h-24 w-full flex">
+          <Alert className="h-16 w-full m-4" severity="error">{errorMessage}</Alert>
+        </div>
+      )}
       <div className="h-24 w-full flex">
         <Button className="w-64 h-16 m-auto bg-blue-400" size="large" variant="contained" onClick={onLoginButtonClicked}>Log In</Button>
       </div>
