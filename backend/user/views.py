@@ -32,7 +32,13 @@ USER_409_RESPONSE = Response(
 )
 
 
-# Create user.
+# Ping
+@api_view(["POST"])
+def ping(request):
+    return Response(data={"message": "pong"}, status=status.HTTP_200_OK)
+
+
+# Create user
 @api_view(["POST"])
 def user_signup(request):
     serializer = UserSerializer(data=request.data)
@@ -47,6 +53,7 @@ def user_signup(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# User login
 @api_view(["POST"])
 def user_login(request):
     serializer = UserSerializer(data=request.data)
@@ -70,6 +77,7 @@ def user_login(request):
     return Response(token.key, status=status.HTTP_200_OK)
 
 
+# Update user profile
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])

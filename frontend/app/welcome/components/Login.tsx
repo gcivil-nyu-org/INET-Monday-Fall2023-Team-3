@@ -10,6 +10,12 @@ export default function Login() {
   const onLoginButtonClicked = () => {
     console.log(`email: ${email}`)
     console.log(`password: ${password}`)
+
+    fetch("/backend/user/ping", { method: "POST" })
+      .then((response) => {
+        response.json().then(console.log)
+      })
+      .catch(console.log)
   }
 
   const onEmailInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
