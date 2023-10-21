@@ -9,23 +9,30 @@ install:
   - gem install webrick
   - mkdir ./tools
   - curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./tools
-  - cd backend
-  - pip install -r requirements.txt
+  - pip install -r ./backend/requirements.txt
 
 before_script:
-  - python manage.py migrate
+  - python ./backend/manage.py migrate
 
 script:
-  - black . --check
-  - flake8 . --max-line-length=88
-  - cd ..
+  - black ./backend --check
+  - flake8 ./backend --max-line-length=88
 
 after_script:
-  - coverage run --source=app manage.py test
+  - coverage run --source=app ./backend/manage.py test
   - coverage xml
-  - ../tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
+  - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
 
 deploy:
+  - provider: elasticbeanstalk
+    access_key_id: $AWS_ACCESS_KEY
+    secret_access_key: $AWS_ACCESS_SECRET
+    region: $AWS_DEPLOY_REGION
+    app: $AWS_APP_NAME
+    env: $AWS_APP_ENV_PROD
+    bucket_name: $AWS_BUCKET_NAME
+    on:
+      branch: main 
   - provider: elasticbeanstalk
     access_key_id: $AWS_ACCESS_KEY
     secret_access_key: $AWS_ACCESS_SECRET
@@ -43,13 +50,5 @@ deploy:
     env: $AWS_APP_ENV_DIRTY
     bucket_name: $AWS_BUCKET_NAME
     on:
-      branch: refactor-add-frontend
-  - provider: elasticbeanstalk
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_ACCESS_SECRET
-    region: $AWS_DEPLOY_REGION
-    app: $AWS_APP_NAME
-    env: $AWS_APP_ENV_PROD
-    bucket_name: $AWS_BUCKET_NAME
-    on:
-      branch: master
+      all_branches: true
+      condition: (! $TRAVIS_BRANCH =~ ^(master|develop)$)
