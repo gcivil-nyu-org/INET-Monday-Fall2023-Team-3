@@ -15,3 +15,4 @@ class UserSerializer(serializers.Serializer):
         instance.password = validated_data.get("password", instance.password)
         instance.save()
         return instance
+ 
