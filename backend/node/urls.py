@@ -1,7 +1,9 @@
 from django.urls import path
-from .views import NodeListCreateView, NodeDetailView
+from . import views
 
 urlpatterns = [
-    path('nodes/', NodeListCreateView.as_view(), name='node-list-create'),
-    path('node/<int:pk>', NodeDetailView.as_view(), name='node-detail'),
+    path('ping/', views.ping, name='ping'),
+    path('nodes/', views.node_list, name='node-list'),
+    path('nodes/create/', views.node_create, name='node-create'),
+    path('nodes/<int:pk>/', views.node_detail, name='node-detail'),
 ]
