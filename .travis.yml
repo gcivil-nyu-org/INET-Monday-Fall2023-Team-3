@@ -51,4 +51,4 @@ deploy:
     bucket_name: $AWS_BUCKET_NAME
     on:
       all_branches: true
-      condition: ($TRAVIS_BRANCH =~ ^node-interface$) || (! $TRAVIS_BRANCH =~ ^(master|develop)$)
+      condition: (! $TRAVIS_BRANCH =~ ^(master|develop)$)

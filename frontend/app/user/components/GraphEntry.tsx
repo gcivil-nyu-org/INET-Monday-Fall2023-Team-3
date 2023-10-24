@@ -12,6 +12,7 @@ export default function GraphEntry({ title, imgUrl }: IGraphEntryProp) {
   const router = useRouter()
   const onGraphClicked = () => {
     console.log(`graph ${title} is being clicked`)
+    console.log('redirect to node')
     router.push("/node")
   }
 

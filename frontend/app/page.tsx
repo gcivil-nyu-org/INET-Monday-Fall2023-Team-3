@@ -1,7 +1,7 @@
 'use client'
 
 import Welcome from './welcome/Welcome'
-import FlowComponent from './node'
+import FlowComponent from './node/index'
 
 export default function Home() {
   console.log('flow component');
