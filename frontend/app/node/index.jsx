@@ -17,10 +17,11 @@ function FlowComponent() {
 
   const handleButtonSubmit = (data) => {
     // upon submit, create a new node based on input data
+    console.log(data)
     const newNode = {
       id: uuid(),
       type: 'default',
-      data: { label: data},
+      data: { label: data.courseName},
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
