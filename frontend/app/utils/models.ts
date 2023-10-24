@@ -19,3 +19,8 @@ export type IUser = {
   username: string
   password: string
 }
+
+export type INode = {
+  name: string
+  description: string
+}

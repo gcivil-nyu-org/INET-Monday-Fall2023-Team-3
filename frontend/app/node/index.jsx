@@ -21,7 +21,7 @@ function FlowComponent() {
     const newNode = {
       id: uuid(),
       type: 'default',
-      data: { label: data.courseName},
+      data: { label: "course_name"},
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
