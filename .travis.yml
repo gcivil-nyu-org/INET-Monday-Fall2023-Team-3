@@ -12,6 +12,7 @@ install:
   - pip install -r ./backend/requirements.txt
 
 before_script:
+  - python ./backend/manage.py makemigrations
   - python ./backend/manage.py migrate
 
 script:

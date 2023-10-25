@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 function NodeDialog({ showDialog, onSubmit, onClose }) {
     const [formData, setFormData] = useState({
-        courseName: '',
+        name: '',
         description: ''
     })
 
@@ -26,15 +26,15 @@ function NodeDialog({ showDialog, onSubmit, onClose }) {
                 <form onSubmit={handleSubmit}>
                     <label>
                         Course Name:
-                        <input type="text" name="courseName" value={formData.courseName} onChange={handleChange} required/>
+                        <input type="text" name="name" value={formData.name} onChange={handleChange}/>
                     </label>
                     <label>
                         Description:
-                        <textarea 
-                            placeholder="Enter Course Description" 
+                        <input 
+                            type="text"
+                            name="description"
                             value={formData.description}
                             onChange={handleChange}
-                            required 
                         />
                     </label>
                     <br />
