@@ -15,7 +15,6 @@ export default function Login() {
   const onLoginButtonClicked = () => {
     console.log(`email: ${email}`)
     console.log(`password: ${password}`)
-    console.log(`welcome back`)
     userLogin({
       email: email,
       password: password,
