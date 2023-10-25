@@ -30,8 +30,8 @@ export default function NodeDialog({ showDialog, onSubmit, onClose }) {
         nodeCreate({
             name: courseName,
             description: description,
-        }).then((result)=>{
-            
+            isPredefined: isPredefined,
+        }).then((result)=>{  
             console.log(result)
         })
     };

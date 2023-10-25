@@ -12,7 +12,19 @@ class NodeSerializer(serializers.ModelSerializer):
         Create and return a new `Node` instance, given the validated data.
         """
         # You can add any custom creation logic here if needed
-        return Node.objects.create(**validated_data)
+        # Assuming you have the name and description values in validated_data
+        name = validated_data["name"]
+        description = validated_data.get(
+            "description", ""
+        )  # Use an empty string if description is not provided
+
+        # Create a new Node instance with AutoField automatically generated node_id
+        new_node = Node(name=name, description=description)
+
+        # Save the new instance to the database
+        new_node.save()
+
+        return new_node
 
     def update(self, instance, validated_data):
         """

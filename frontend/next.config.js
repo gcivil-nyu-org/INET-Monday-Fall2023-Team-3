@@ -19,6 +19,9 @@ const nextConfig = {
     }, {
       source: "/backend/node/create",
       destination: "http://backend:8000/node/create/",
+    }, {
+      source: "/node/create",
+      destination: "http://localhost:8000/node/create/",
     }]
   }
 }

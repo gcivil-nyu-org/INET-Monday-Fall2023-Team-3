@@ -22,5 +22,6 @@ export type IUser = {
 
 export type INode = {
   name: string
-  description: string
+  description: string,
+  isPredefined: boolean
 }
