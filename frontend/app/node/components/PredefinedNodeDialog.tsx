@@ -30,7 +30,8 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
         // Handle submission here
         let courseName = node.courseName;
         let description = node.description
-        onSubmit({courseName, description})
+        let isPredefined = true
+        onSubmit({courseName, description, isPredefined})
     };
     const onSearchChanged = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value)

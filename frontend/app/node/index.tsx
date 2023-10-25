@@ -47,11 +47,14 @@ function FlowComponent() {
     const newNode = {
       id: uuid(),
       type: 'default',
-      data: { label: `${data.courseName} (${data.description})` },
+      data: { 
+            label: `${data.courseName} (${data.description})`, 
+            attribute: {name: data.courseName, description: data.description, isPredefined: data.isPredefined} 
+        },
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
-
+    console.log(newNode.data.attribute)
     setNodes( (existingNodes) => [...existingNodes, newNode])
     setShowDialog(false);
   }
