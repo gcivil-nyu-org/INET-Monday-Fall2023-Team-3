@@ -3,7 +3,7 @@ import { ChangeEvent, useState } from "react"
 import { Button, Alert, TextField } from "@mui/material"
 import { fetchRestful } from "@/app/utils/helpers"
 import { useRouter } from "next/navigation"
-import { userSignup } from "@/app/utils/backendRequests"
+import { nodeCreate } from "@/app/utils/backendRequests"
 
 export default function NodeDialog({ showDialog, onSubmit, onClose }) {
     const [courseName, setCourseName] = useState("")
@@ -24,8 +24,15 @@ export default function NodeDialog({ showDialog, onSubmit, onClose }) {
           alert('Description is required');
           return;
         }
-        // Handle submission here
+        // Handle submission here for now, should be submitted after POST success
         onSubmit({courseName, description})
+        nodeCreate({
+            name: courseName,
+            description: description,
+        }).then((result)=>{
+            
+            console.log(result)
+        })
     };
 
     const onCourseNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
