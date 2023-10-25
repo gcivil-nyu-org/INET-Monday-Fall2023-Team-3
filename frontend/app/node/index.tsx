@@ -7,6 +7,7 @@ import NodeDialog from './components/NodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
 import 'reactflow/dist/style.css'
 import './index.css'
+
 export interface INode {
     courseName: string;
     description: string;
@@ -18,6 +19,7 @@ const predefinedNodes: INode[] = [
     { courseName: 'ECE345', description: 'Data Structures & Algorithms' },
     // Add more nodes as needed
 ];
+
 function FlowComponent() {
   const [showDialog, setShowDialog] = useState(false);
   const [showPredefinedDialog, setShowPredefinedDialog] = useState(false);
@@ -45,7 +47,7 @@ function FlowComponent() {
     const newNode = {
       id: uuid(),
       type: 'default',
-      data: { label: data.courseName},
+      data: { label: `${data.courseName} (${data.description})` },
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
