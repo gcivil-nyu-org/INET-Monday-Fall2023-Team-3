@@ -1,0 +1,16 @@
+.horizontal-list-container {
+    overflow-x: auto; /* Add horizontal scroll if the items overflow the container */
+}
+  
+.horizontal-list {
+    list-style: none;
+    padding: 0;
+    display: flex; /* Make the list items display horizontally */
+    gap: 10px; /* Add spacing between list items */
+}
+  
+.horizontal-list-item {
+    background-color: #f0f0f0;
+    padding: 10px;
+    border-radius: 4px;
+}
