@@ -6,17 +6,17 @@ import { useRouter } from "next/navigation"
 import { nodeCreate } from "@/app/utils/backendRequests"
 
 export default function NodeDialog({ showDialog, onSubmit, onClose }) {
-    const [courseName, setCourseName] = useState("")
+    const [name, setName] = useState("")
     const [description, setDescription] = useState("")
 
     const onAddButtonClicked = () => {
-        console.log(`courseName: ${courseName}`)
+        console.log(`courseName: ${name}`)
         console.log(`description: ${description}`)
-        if (!courseName.trim() && !description.trim()) {
+        if (!name.trim() && !description.trim()) {
             alert('Course name and description are required');
             return;
         }
-        if (!courseName.trim()) {
+        if (!name.trim()) {
             alert('Course name is required');
             return;
         }
@@ -26,9 +26,9 @@ export default function NodeDialog({ showDialog, onSubmit, onClose }) {
         }
         // Handle submission here for now, should be submitted after POST success
         let isPredefined = false
-        onSubmit({courseName, description, isPredefined})
+        onSubmit({name, description, isPredefined})
         nodeCreate({
-            name: courseName,
+            name: name,
             description: description,
             isPredefined: isPredefined,
         }).then((result)=>{  
@@ -37,7 +37,7 @@ export default function NodeDialog({ showDialog, onSubmit, onClose }) {
     };
 
     const onCourseNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-        setCourseName(event.target.value)
+      setName(event.target.value)
     }
     
     const onDescriptionInputChanged = (event: ChangeEvent<HTMLInputElement>) => {

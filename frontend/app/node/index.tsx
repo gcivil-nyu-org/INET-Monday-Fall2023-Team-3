@@ -1,30 +1,41 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import uuid from 'react-uuid'
 import ReactFlow, {useNodesState, Controls, Background} from 'react-flow-renderer';
 import { Button, Dialog, DialogTitle, ClickAwayListener } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
+import { predefinedNodeGet } from "@/app/utils/backendRequests"
 import 'reactflow/dist/style.css'
 import './index.css'
 
 export interface INode {
-    courseName: string;
+    name: string;
     description: string;
+    isPredefined: boolean;
 }
-const predefinedNodes: INode[] = [
-    { courseName: 'ECE244', description: 'Programming Fundamentals' },
-    { courseName: 'ECE297', description: 'Design and Communications' },
-    { courseName: 'ECE361', description: 'Computer Networks' },
-    { courseName: 'ECE345', description: 'Data Structures & Algorithms' },
-    // Add more nodes as needed
-];
 
 function FlowComponent() {
   const [showDialog, setShowDialog] = useState(false);
   const [showPredefinedDialog, setShowPredefinedDialog] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
+  useEffect(() => {
+    // Fetch predefined nodes and add them to the nodes state when the component mounts
+    async function fetchPredefinedNodes() {
+      const response = await predefinedNodeGet(); // You may need to pass any required parameters
 
+      if (response.status) {
+        console.log(response.value)
+        setPredefinedNodes(response.value); // Assuming response.value contains the predefined nodes
+      } else {
+        // Handle the error case
+        console.error('Error fetching predefined nodes:', response.error);
+      }
+    }
+
+    fetchPredefinedNodes();
+  }, []); // Run this effect only once when the component mounts
 
   const handleCreateButtonClick = () => {
       if (!showDialog) setShowDialog(true);
@@ -48,8 +59,8 @@ function FlowComponent() {
       id: uuid(),
       type: 'default',
       data: { 
-            label: `${data.courseName} (${data.description})`, 
-            attribute: {name: data.courseName, description: data.description, isPredefined: data.isPredefined} 
+            label: `${data.name} (${data.description})`, 
+            attribute: {name: data.name, description: data.description, isPredefined: data.isPredefined} 
         },
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true

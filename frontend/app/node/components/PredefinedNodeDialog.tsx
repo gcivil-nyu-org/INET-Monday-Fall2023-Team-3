@@ -9,17 +9,17 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
     const [searchTerm, setSearchTerm] = useState('');
 
     const filteredNodes = predefinedNodes.filter(node =>
-        node.courseName.toLowerCase().includes(searchTerm.toLowerCase())
+        node.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
     const onAddButtonClicked = (node) => {
-        console.log(`courseName: ${node.courseName}`)
+        console.log(`name: ${node.name}`)
         console.log(`description: ${node.description}`)
-        if (!node.courseName.trim() && !node.description.trim()) {
+        if (!node.name.trim() && !node.description.trim()) {
             alert('Course name and description are required');
             return;
         }
-        if (!node.courseName.trim()) {
+        if (!node.name.trim()) {
             alert('Course name is required');
             return;
         }
@@ -28,10 +28,10 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
           return;
         }
         // Handle submission here
-        let courseName = node.courseName;
+        let name = node.name;
         let description = node.description
         let isPredefined = true
-        onSubmit({courseName, description, isPredefined})
+        onSubmit({name, description, isPredefined})
     };
     const onSearchChanged = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value)
@@ -47,8 +47,8 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
         <div className="h-24 w-full flex horizontal-list-container">
           <List className="horizontal-list">
             {filteredNodes.map((node) => (
-                    <ListItem button className="horizontal-list-item" key={node.courseName} onClick={() => onAddButtonClicked(node)} >
-                        {node.courseName}
+                    <ListItem button className="horizontal-list-item" key={node.name} onClick={() => onAddButtonClicked(node)} >
+                        {node.name}
                     </ListItem>
             ))}
           </List>
