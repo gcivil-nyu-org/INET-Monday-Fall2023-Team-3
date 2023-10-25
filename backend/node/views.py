@@ -26,6 +26,16 @@ def node_list(request):
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+@api_view(["GET"])
+@permission_classes(
+    [AllowAny]
+)  # Or use IsAuthenticated if you want to restrict it to logged-in users only.
+def predefined_node_list(request):
+    predefined_nodes = Node.objects.filter(isPredefined=True)
+    serializer = NodeSerializer(predefined_nodes, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def node_create(request):
