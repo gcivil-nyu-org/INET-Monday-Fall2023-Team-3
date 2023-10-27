@@ -1,5 +1,6 @@
 'use client'
 import { Card, CardContent, CardHeader } from "@mui/material"
+import { useRouter } from "next/navigation"
 
 export type IGraphEntryProp = {
   id: string
@@ -8,8 +9,10 @@ export type IGraphEntryProp = {
 }
 
 export default function GraphEntry({ title, imgUrl }: IGraphEntryProp) {
+  const router = useRouter()
   const onGraphClicked = () => {
     console.log(`graph ${title} is being clicked`)
+    router.push("/node")
   }
 
   return (

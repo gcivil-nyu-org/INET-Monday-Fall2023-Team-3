@@ -20,6 +20,24 @@ const nextConfig = {
       source: "/backend/node/create",
       destination: "http://backend:8000/node/create/",
     }, {
+      source: "/user/ping",
+      destination: "http://localhost:8000/user/ping/",
+    }, {
+      source: "/user/login",
+      destination: "http://localhost:8000/user/login/",
+    }, {
+      source: "/user/signup",
+      destination: "http://localhost:8000/user/signup/",
+    }, {
+      source: "/user/update",
+      destination: "http://localhost:8000/user/update/"
+    }, {
+      source: "/user/get",
+      destination: "http://localhost:8000/user/get/",
+    }, {
+      source: "/node/create",
+      destination: "http://localhost:8000/node/create/",
+    }, {
       source: "/node/create",
       destination: "http://localhost:8000/node/create/",
     }, {
