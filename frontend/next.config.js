@@ -40,6 +40,12 @@ const nextConfig = {
     }, {
       source: "/node/predefined-nodes",
       destination: "http://localhost:8000/node/predefined-nodes/",
+    }, {
+      source: "/edge/create",
+      destination: "http://localhost:8000/edge/create/",
+    }, {
+      source: "/edge/delete",
+      destination: "http://localhost:8000/edge/delete/",
     }]
   }
 }

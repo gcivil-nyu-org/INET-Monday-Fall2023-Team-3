@@ -121,34 +121,59 @@ function FlowComponent() {
     setShowDeleteDialog(true);
   };
 
-  const handleDeleteConfirm = () => {
-    setEdges((prevEdges) => prevEdges.filter(edge => edge.id !== selectedEdgeId));
-    setShowDeleteDialog(false);
+  const handleDeleteConfirm = async () => {
     const token = sessionStorage.getItem("token");
     if (!token) {
         setSeverity("error");
         setMessage("Authentication token missing");
         return;
     }
-    edgeDelete({
-        id: selectedEdgeId
-    }, token).then((result) => {
-        if (result.status) {
-            setSeverity("success");
-            setMessage("Edge deletion successful");
-        } else {
-            setSeverity("error");
-            setMessage(result.error);
+    try {
+        // sending delete request to backend
+        const response = await fetch(`http://localhost:8000/edge/delete/${selectedEdgeId}/`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Token ${token}`,  // update the token format
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to delete edge with ID: ${selectedEdgeId}`);
         }
-        setSelectedEdgeId(null);
-    });
-  };
+        // handle the response if needed, e.g., by checking for a 204 status code
+        if (response.status !== 204) {
+            console.warn('Unexpected status code:', response.status);
+        } else {
+            setEdges((prevEdges) => prevEdges.filter(edge => edge.id !== selectedEdgeId));
+            setShowDeleteDialog(false);
+            setSelectedEdgeId(null);
+        }
+    } catch (error) {
+        console.error('Failed to delete edge:', error);
+    }
+};
+
 
   const handleDeleteCancel = () => {
     setShowDeleteDialog(false);
     setSelectedEdgeId(null);
   };
 
+  const createNewEdge = (data: any) => {
+    console.log(data)
+    const newEdge = {
+      id: data.edgeID.toString(),
+      source: data.fromNodeID.toString(),
+      target: data.toNodeID.toString(),
+      style: {
+        strokeWidth: 3,
+      },
+      markerEnd: {
+        type: MarkerType.Arrow,
+      }
+    };
+    setEdges((edges) => [...edges, newEdge]);
+  };
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -189,20 +214,7 @@ function FlowComponent() {
         edges={edges}
         onEdgeClick={handleEdgeClick}
         onConnect={(params) => {
-          const newEdge = {
-            id: `edge-${params.source}-${params.target}`,
-            source: params.source,
-            target: params.target,
-            style: {
-              strokeWidth: 3,
-            },
-            markerEnd: {
-              type: MarkerType.Arrow,
-            }
-          };
-          setEdges((edges) => [...edges, newEdge]);
           console.log(params)
-          console.log(edges)
           // todo: send edge data to backend
           const token = sessionStorage.getItem("token");
           if (!token) {
@@ -211,18 +223,22 @@ function FlowComponent() {
               return;
           }
           edgeCreate({
-            belong_to : 123,
-            source: params.source,
-            target: params.target
+            belongsTo : 123,
+            fromNodeID: params.source,
+            toNodeID: params.target
           }, token).then((result) => {
             if (result.status) {
               setSeverity("success")
               setMessage("Edge creation successful")
+              console.log("success")
+              console.log(result)
+              createNewEdge(result.value)
             } else {
               setSeverity("error")
               setMessage(result.error)
             }
           });
+
         }}style={{ width: '100vw', height: '100vh' }}>
       <Controls />
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
