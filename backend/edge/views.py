@@ -19,8 +19,8 @@ def ping(request):
 
 
 @api_view(["POST"])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def edge_create(request):
     serializer = EdgeSerializer(data=request.data)
     if serializer.is_valid():
@@ -30,8 +30,8 @@ def edge_create(request):
 
 
 @api_view(["GET"])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def edge_get(request, pk):
     try:
         edge = Edge.objects.get(pk=pk)
@@ -42,8 +42,8 @@ def edge_get(request, pk):
 
 
 @api_view(["DELETE"])
-# @authentication_classes([TokenAuthentication])
-# @permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def edge_delete(request, pk):
     try:
         edge = Edge.objects.get(pk=pk)
