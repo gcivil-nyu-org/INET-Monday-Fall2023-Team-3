@@ -1,7 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react';
-import uuid from 'react-uuid'
-import ReactFlow, {useNodesState, Controls, Background} from 'react-flow-renderer';
+import ReactFlow, {useNodesState, Controls, Background, BackgroundVariant} from 'react-flow-renderer';
 import { Button, Dialog, DialogTitle, ClickAwayListener } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
@@ -71,9 +70,9 @@ function FlowComponent() {
     if (showDialog) setShowDialog(false)
     if (showPredefinedDialog) setShowPredefinedDialog(false)
   }
-  const createNodeOnCanvas = (data) => {
+  const createNodeOnCanvas = (data: any) => {
     const newNode = {
-      id: uuid(),
+      id: data.node_id.toString(),
       type: 'default',
       data: { 
             label: `${data.name} (${data.description})`, 
@@ -82,10 +81,9 @@ function FlowComponent() {
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
-    console.log(newNode)
     setNodes( (existingNodes) => [...existingNodes, newNode])
   }
-  const handleButtonSubmit = (data) => {
+  const handleButtonSubmit = (data: any) => {
     console.log(data)
     // upon submit, create a new node based on input data
     if (!data.isPredefined) {
@@ -146,7 +144,7 @@ function FlowComponent() {
       </div>
       <ReactFlow nodes={nodes} onNodesChange={onNodesChange} style={{ width: '100vw', height: '100vh' }}>
       <Controls />
-      <Background variant="dots" gap={12} size={1} />
+      <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
     </ReactFlow>
     </div>
   </div>

@@ -2,14 +2,21 @@
 import { ChangeEvent, useState } from "react"
 import { Button, Alert, TextField, List, ListItem } from "@mui/material"
 
-export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, onClose, predefinedNodes  }) {
+interface Props {
+  showPredefinedDialog: boolean;
+  onSubmit: (node: any) => void;
+  onClose: () => void;
+  predefinedNodes: any[];
+}
+
+export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, onClose, predefinedNodes}: Props) {
     const [searchTerm, setSearchTerm] = useState('');
 
-    const filteredNodes = predefinedNodes.filter(node =>
+    const filteredNodes: any[] = predefinedNodes.filter(node =>
         node.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
-    const onAddButtonClicked = (node) => {
+    const onAddButtonClicked = (node: any) => {
         if (!node.name.trim() && !node.description.trim()) {
             alert('Course name and description are required');
             return;
