@@ -5,7 +5,13 @@ import { fetchRestful } from "@/app/utils/helpers"
 import { useRouter } from "next/navigation"
 import { nodeCreate } from "@/app/utils/backendRequests"
 
-export default function NodeDialog({ showDialog, onSubmit, onClose }) {
+interface Props {
+  showDialog: boolean;
+  onSubmit: (node: any) => void;
+  onClose: () => void;
+}
+
+export default function NodeDialog({ showDialog, onSubmit, onClose }: Props) {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
 
