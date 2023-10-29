@@ -34,8 +34,7 @@ export type Node = {
 }
 
 export type Edge = {
-  edge_id : number;
-  source : number;
-  target : number;
+  source : string;
+  target : string;
   belong_to : number;
 }

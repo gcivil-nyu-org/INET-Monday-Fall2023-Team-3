@@ -5,7 +5,7 @@ import { MarkerType } from 'reactflow';
 import { Button, Dialog, DialogTitle, ClickAwayListener, DialogActions, DialogContent, DialogContentText } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
-import { predefinedNodeGet, nodeCreate } from "@/app/utils/backendRequests"
+import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete } from "@/app/utils/backendRequests"
 import { useRouter } from "next/navigation"
 import 'reactflow/dist/style.css'
 import './index.css'
@@ -27,7 +27,6 @@ function FlowComponent() {
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [message, setMessage] = useState("")
   const [severity, setSeverity] = useState<"error" | "success">("error")
-
 
   const [edges, setEdges] = useState([]);
 
@@ -91,7 +90,6 @@ function FlowComponent() {
     console.log(data)
   }
   const handleButtonSubmit = (data: any) => {
-    console.log(data)
     // upon submit, create a new node based on input data
     if (!data.isPredefined) {
         nodeCreate({
@@ -126,35 +124,30 @@ function FlowComponent() {
   const handleDeleteConfirm = () => {
     setEdges((prevEdges) => prevEdges.filter(edge => edge.id !== selectedEdgeId));
     setShowDeleteDialog(false);
-    setSelectedEdgeId(null);
-    // todo: send delete request to backend
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+        setSeverity("error");
+        setMessage("Authentication token missing");
+        return;
+    }
+    edgeDelete({
+        id: selectedEdgeId
+    }, token).then((result) => {
+        if (result.status) {
+            setSeverity("success");
+            setMessage("Edge deletion successful");
+        } else {
+            setSeverity("error");
+            setMessage(result.error);
+        }
+        setSelectedEdgeId(null);
+    });
   };
 
   const handleDeleteCancel = () => {
     setShowDeleteDialog(false);
     setSelectedEdgeId(null);
   };
-
-  // const sendEdgeDataToBackend = async (edgeData:any) => {
-  //   try {
-  //     const response = await fetch("/api/edge", {  // replace with your API endpoint
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify(edgeData),
-  //     });
-
-  //     if (!response.ok) {
-  //       throw new Error("Network response was not ok");
-  //     }
-
-  //     const responseBody = await response.json();
-  //     console.log("Server response:", responseBody);
-  //   } catch (error) {
-  //     console.error("There was a problem with the fetch operation:", error);
-  //   }
-  // };
 
 
   return (
@@ -207,11 +200,29 @@ function FlowComponent() {
               type: MarkerType.Arrow,
             }
           };
-          setEdges([...edges, newEdge]);
+          setEdges((edges) => [...edges, newEdge]);
           console.log(params)
           console.log(edges)
           // todo: send edge data to backend
-          sendEdgeDataToBackend(params)
+          const token = sessionStorage.getItem("token");
+          if (!token) {
+              setSeverity("error");
+              setMessage("Authentication token missing");
+              return;
+          }
+          edgeCreate({
+            belong_to : 123,
+            source: params.source,
+            target: params.target
+          }, token).then((result) => {
+            if (result.status) {
+              setSeverity("success")
+              setMessage("Edge creation successful")
+            } else {
+              setSeverity("error")
+              setMessage(result.error)
+            }
+          });
         }}style={{ width: '100vw', height: '100vh' }}>
       <Controls />
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
