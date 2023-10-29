@@ -27,13 +27,6 @@ export default function NodeDialog({ showDialog, onSubmit, onClose }) {
         // Handle submission here for now, should be submitted after POST success
         let isPredefined = false
         onSubmit({name, description, isPredefined})
-        nodeCreate({
-            name: name,
-            description: description,
-            isPredefined: isPredefined,
-        }).then((result)=>{  
-            console.log(result)
-        })
     };
 
     const onCourseNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
