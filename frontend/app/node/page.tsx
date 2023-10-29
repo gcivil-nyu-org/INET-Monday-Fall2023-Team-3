@@ -11,9 +11,11 @@ import 'reactflow/dist/style.css'
 import './index.css'
 
 export interface INode {
+    node_id: number; 
     name: string;
     description: string;
     isPredefined: boolean;
+    dependencies: INode[];
 }
 
 function FlowComponent() {
@@ -44,6 +46,7 @@ function FlowComponent() {
     async function fetchPredefinedNodes() {
       const response = await predefinedNodeGet(); // You may need to pass any required parameters
       if (response.status) {
+        console.log(response);
         setPredefinedNodes(response.value); // Assuming response.value contains the predefined nodes
       } else {
         // Handle the error case
@@ -74,15 +77,16 @@ function FlowComponent() {
       type: 'default',
       data: { 
             label: `${data.name} (${data.description})`, 
-            attribute: {id: data.id, name: data.name, description: data.description, isPredefined: data.isPredefined, dependencies: data.dependencies} 
+            attribute: {id: data.node_id, name: data.name, description: data.description, isPredefined: data.isPredefined, dependencies: data.dependencies} 
         },
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
-    
+    console.log(newNode)
     setNodes( (existingNodes) => [...existingNodes, newNode])
   }
   const handleButtonSubmit = (data) => {
+    console.log(data)
     // upon submit, create a new node based on input data
     if (!data.isPredefined) {
         nodeCreate({
@@ -92,7 +96,7 @@ function FlowComponent() {
         if (result.status) {
           setSeverity("success")
           setMessage("User create node successful")
-          createNodeOnCanvas(data)
+          createNodeOnCanvas(result.value)
         } else {
           setSeverity("error")
           setMessage(result.error)

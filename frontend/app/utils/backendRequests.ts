@@ -1,4 +1,4 @@
-import { Ok, Err, IUser, IToken, Result, INode } from "./models"
+import { Ok, Err, IUser, IToken, Result, INode, Node } from "./models"
 import { fetchRestful } from "./helpers"
 
 const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create", 
@@ -76,6 +76,6 @@ export const nodeCreate = async (node: INode, token: string) => {
   return restfulRequest<typeof node, INode>("/node/create", "POST", node, token)
 }
 
-export const predefinedNodeGet = async () : Promise<Result<INode[]>> => {
-  return restfulRequest<undefined, INode[]>("/node/predefined-nodes", "GET")
+export const predefinedNodeGet = async () : Promise<Result<Node[]>> => {
+  return restfulRequest<undefined, Node[]>("/node/predefined-nodes", "GET")
 }

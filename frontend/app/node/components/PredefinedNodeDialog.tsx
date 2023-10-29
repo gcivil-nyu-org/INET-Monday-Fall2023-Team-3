@@ -10,8 +10,6 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
       );
 
     const onAddButtonClicked = (node) => {
-        console.log(`name: ${node.name}`)
-        console.log(`description: ${node.description}`)
         if (!node.name.trim() && !node.description.trim()) {
             alert('Course name and description are required');
             return;
@@ -25,10 +23,7 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
           return;
         }
         // Handle submission here
-        let name = node.name;
-        let description = node.description
-        let isPredefined = true
-        onSubmit({name, description, isPredefined})
+        onSubmit(node)
     };
     const onSearchChanged = (event: ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(event.target.value)

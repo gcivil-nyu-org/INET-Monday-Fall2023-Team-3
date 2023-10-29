@@ -10,8 +10,6 @@ export default function NodeDialog({ showDialog, onSubmit, onClose }) {
     const [description, setDescription] = useState("")
 
     const onAddButtonClicked = () => {
-        console.log(`courseName: ${name}`)
-        console.log(`description: ${description}`)
         if (!name.trim() && !description.trim()) {
             alert('Course name and description are required');
             return;

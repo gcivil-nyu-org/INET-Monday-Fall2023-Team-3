@@ -24,3 +24,11 @@ export type INode = {
   name: string
   description: string
 }
+
+export type Node = {
+  node_id: number; 
+  name: string;
+  description: string;
+  isPredefined: boolean;
+  dependencies: Node[];
+}
