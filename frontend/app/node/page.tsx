@@ -5,7 +5,8 @@ import ReactFlow, {useNodesState, Controls, Background} from 'react-flow-rendere
 import { Button, Dialog, DialogTitle, ClickAwayListener } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
-import { predefinedNodeGet } from "@/app/utils/backendRequests"
+import { predefinedNodeGet, nodeCreate } from "@/app/utils/backendRequests"
+import { useRouter } from "next/navigation"
 import 'reactflow/dist/style.css'
 import './index.css'
 
@@ -16,17 +17,33 @@ export interface INode {
 }
 
 function FlowComponent() {
+  //const router = useRouter()
+  const [token, setToken] = useState("")
   const [showDialog, setShowDialog] = useState(false);
   const [showPredefinedDialog, setShowPredefinedDialog] = useState(false);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
+  const [message, setMessage] = useState("")
+  const [severity, setSeverity] = useState<"error" | "success">("error")
+
   useEffect(() => {
     // Fetch predefined nodes and add them to the nodes state when the component mounts
+    // redirect to welcome page if not logged in
+    /*
+    const currToken = sessionStorage.getItem("token") ?? ""
+
+    if (currToken === undefined || currToken === "") {
+      console.log(`token is ${currToken}, skipping back`)
+      router.push("/")
+      return;
+    }
+
+    setToken(currToken)
+    */
+  
     async function fetchPredefinedNodes() {
       const response = await predefinedNodeGet(); // You may need to pass any required parameters
-
       if (response.status) {
-        console.log(response.value)
         setPredefinedNodes(response.value); // Assuming response.value contains the predefined nodes
       } else {
         // Handle the error case
@@ -51,22 +68,40 @@ function FlowComponent() {
     if (showDialog) setShowDialog(false)
     if (showPredefinedDialog) setShowPredefinedDialog(false)
   }
-
-  const handleButtonSubmit = (data) => {
-    // upon submit, create a new node based on input data
-    console.log(data)
+  const createNodeOnCanvas = (data) => {
     const newNode = {
       id: uuid(),
       type: 'default',
       data: { 
             label: `${data.name} (${data.description})`, 
-            attribute: {name: data.name, description: data.description, isPredefined: data.isPredefined} 
+            attribute: {id: data.id, name: data.name, description: data.description, isPredefined: data.isPredefined, dependencies: data.dependencies} 
         },
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
-    console.log(newNode.data.attribute)
+    
     setNodes( (existingNodes) => [...existingNodes, newNode])
+  }
+  const handleButtonSubmit = (data) => {
+    // upon submit, create a new node based on input data
+    if (!data.isPredefined) {
+        nodeCreate({
+          name: data.name,
+          description: data.description,
+      }, sessionStorage.getItem("token")!).then((result) => {
+        if (result.status) {
+          setSeverity("success")
+          setMessage("User create node successful")
+          createNodeOnCanvas(data)
+        } else {
+          setSeverity("error")
+          setMessage(result.error)
+        }
+      })
+    }
+    else {
+      createNodeOnCanvas(data)
+    }
     setShowDialog(false);
   }
 
