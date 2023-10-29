@@ -29,6 +29,7 @@ ALLOWED_HOSTS = [
     "127.0.0.1",  # localhost
     "localhost",  # localhost
     "backend",  # deployed container name
+    '[::1]'
 ]
 
 
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "node",
-    "corsheaders",
+    "edge"
 ]
 
 MIDDLEWARE = [
@@ -143,4 +144,4 @@ REST_FRAMEWORK = {
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8000"]
+CORS_ALLOWED_ORIGINS = ["http://localhost:8080", "http://127.0.0.1:8000", "http://[::1]:8000"]
