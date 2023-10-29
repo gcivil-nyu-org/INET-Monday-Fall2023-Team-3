@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.decorators import (
+    api_view,
+)
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
-from rest_framework.authtoken.models import Token
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+
 
 from .serializer import EdgeSerializer
 from .models import Edge
@@ -13,6 +11,7 @@ from .models import Edge
 
 def detail(msg: str, status_code=status.HTTP_400_BAD_REQUEST):
     return Response({"detail": msg}, status=status_code)
+
 
 @api_view(["POST", "GET"])
 def ping(request):
@@ -29,6 +28,7 @@ def edge_create(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(["GET"])
 # @authentication_classes([TokenAuthentication])
 # @permission_classes([IsAuthenticated])
@@ -39,6 +39,7 @@ def edge_get(request, pk):
         return detail("Edge does not exist", status_code=status.HTTP_404_NOT_FOUND)
     serializer = EdgeSerializer(edge)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(["DELETE"])
 # @authentication_classes([TokenAuthentication])

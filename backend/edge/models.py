@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Edge(models.Model):
     edgeID = models.AutoField(primary_key=True)
@@ -8,4 +9,11 @@ class Edge(models.Model):
     toNodeID = models.IntegerField()
 
     def __str__(self):
-        return "edgeID: " + self.edgeID + ", from " + str(self.romNodeID) + " to " + str(self.toNodeID)
+        return (
+            "edgeID: "
+            + self.edgeID
+            + ", from "
+            + str(self.romNodeID)
+            + " to "
+            + str(self.toNodeID)
+        )
