@@ -7,6 +7,7 @@ class Node(models.Model):
     name = models.CharField(max_length=60)
     description = models.TextField(blank=True)
     isPredefined = models.BooleanField(default=False)
+    dependencies = models.ManyToManyField("self", symmetrical=False, blank=True)
 
     def __str__(self):
         return self.name
