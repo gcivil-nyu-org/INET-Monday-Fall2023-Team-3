@@ -26,6 +26,7 @@ def ping(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def edge_create(request):
+    print(request.data)
     serializer = EdgeSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
