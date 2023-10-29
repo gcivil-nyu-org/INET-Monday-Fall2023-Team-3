@@ -1,7 +1,8 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import ReactFlow, {useNodesState, Controls, Background, BackgroundVariant} from 'react-flow-renderer';
-import { Button, Dialog, DialogTitle, ClickAwayListener } from "@mui/material"
+import { MarkerType } from 'reactflow';
+import { Button, Dialog, DialogTitle, ClickAwayListener, DialogActions, DialogContent, DialogContentText } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
 import { predefinedNodeGet, nodeCreate } from "@/app/utils/backendRequests"
@@ -10,7 +11,7 @@ import 'reactflow/dist/style.css'
 import './index.css'
 
 export interface INode {
-    node_id: number; 
+    node_id: number;
     name: string;
     description: string;
     isPredefined: boolean;
@@ -27,6 +28,10 @@ function FlowComponent() {
   const [message, setMessage] = useState("")
   const [severity, setSeverity] = useState<"error" | "success">("error")
 
+
+  const [edges, setEdges] = useState([]);
+
+
   useEffect(() => {
     // Fetch predefined nodes and add them to the nodes state when the component mounts
     // redirect to welcome page if not logged in
@@ -41,7 +46,7 @@ function FlowComponent() {
 
     setToken(currToken)
     */
-  
+
     async function fetchPredefinedNodes() {
       const response = await predefinedNodeGet(); // You may need to pass any required parameters
       if (response.status) {
@@ -55,6 +60,7 @@ function FlowComponent() {
 
     fetchPredefinedNodes();
   }, []); // Run this effect only once when the component mounts
+
 
   const handleCreateButtonClick = () => {
       if (!showDialog) setShowDialog(true);
@@ -74,14 +80,15 @@ function FlowComponent() {
     const newNode = {
       id: data.node_id.toString(),
       type: 'default',
-      data: { 
-            label: `${data.name} (${data.description})`, 
-            attribute: {id: data.node_id, name: data.name, description: data.description, isPredefined: data.isPredefined, dependencies: data.dependencies} 
+      data: {
+            label: `${data.name} (${data.description})`,
+            attribute: {id: data.node_id, name: data.name, description: data.description, isPredefined: data.isPredefined, dependencies: data.dependencies}
         },
       position: {x: Math.random()*400, y:Math.random()*400},
       draggable: true
     };
     setNodes( (existingNodes) => [...existingNodes, newNode])
+    console.log(data)
   }
   const handleButtonSubmit = (data: any) => {
     console.log(data)
@@ -106,6 +113,49 @@ function FlowComponent() {
     }
     setShowDialog(false);
   }
+
+  const [selectedEdgeId, setSelectedEdgeId] = useState(null); // 存储被选中的边的ID
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false); // 控制删除对话框的显示
+
+
+  const handleEdgeClick = (event:any, edge:any) => {
+    setSelectedEdgeId(edge.id);
+    setShowDeleteDialog(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setEdges((prevEdges) => prevEdges.filter(edge => edge.id !== selectedEdgeId));
+    setShowDeleteDialog(false);
+    setSelectedEdgeId(null);
+    // todo: send delete request to backend
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteDialog(false);
+    setSelectedEdgeId(null);
+  };
+
+  // const sendEdgeDataToBackend = async (edgeData:any) => {
+  //   try {
+  //     const response = await fetch("/api/edge", {  // replace with your API endpoint
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(edgeData),
+  //     });
+
+  //     if (!response.ok) {
+  //       throw new Error("Network response was not ok");
+  //     }
+
+  //     const responseBody = await response.json();
+  //     console.log("Server response:", responseBody);
+  //   } catch (error) {
+  //     console.error("There was a problem with the fetch operation:", error);
+  //   }
+  // };
+
 
   return (
     <div style={{ width: '100vw', height: '100vh' }}>
@@ -142,10 +192,46 @@ function FlowComponent() {
           )}
         </Dialog>
       </div>
-      <ReactFlow nodes={nodes} onNodesChange={onNodesChange} style={{ width: '100vw', height: '100vh' }}>
+      <ReactFlow nodes={nodes} onNodesChange={onNodesChange}
+        edges={edges}
+        onEdgeClick={handleEdgeClick}
+        onConnect={(params) => {
+          const newEdge = {
+            id: `edge-${params.source}-${params.target}`,
+            source: params.source,
+            target: params.target,
+            style: {
+              strokeWidth: 3,
+            },
+            markerEnd: {
+              type: MarkerType.Arrow,
+            }
+          };
+          setEdges([...edges, newEdge]);
+          console.log(params)
+          console.log(edges)
+          // todo: send edge data to backend
+          sendEdgeDataToBackend(params)
+        }}style={{ width: '100vw', height: '100vh' }}>
       <Controls />
       <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
     </ReactFlow>
+    <Dialog open={showDeleteDialog} onClose={handleDeleteCancel}>
+        <DialogTitle>Delete edge</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this edge?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="primary">
+            confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   </div>
   )

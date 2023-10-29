@@ -1,9 +1,9 @@
-import { Ok, Err, IUser, IToken, Result, INode, Node } from "./models"
+import { Ok, Err, IUser, IToken, Result, INode, Node, Edge } from "./models"
 import { fetchRestful } from "./helpers"
 
-const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create", 
+const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create",
                 "/user/login", "/user/signup", "/user/update", "/user/get", "/node/create",  // for local test
-               "/node/predefined-nodes"] as const // for local test
+               "/node/predefined-nodes", "/edge/create", "/edge/delete"] as const // for local test
 
 export const restfulRequest = async <BodyType extends {} | undefined, ResultType extends {}, Fixed extends boolean = true>(
   endpoint: Fixed extends true ? typeof endpoints[number] : string,
@@ -79,3 +79,15 @@ export const nodeCreate = async (node: INode, token: string) => {
 export const predefinedNodeGet = async () : Promise<Result<Node[]>> => {
   return restfulRequest<undefined, Node[]>("/node/predefined-nodes", "GET")
 }
+
+export const edgeCreate = async (edge: Edge, token: string) => {
+  return restfulRequest<Edge, any>("/edge/create", "POST", edge, token);
+};
+
+interface EdgeDeleteRequest {
+  id: number;  // edge id
+}
+
+export const edgeDelete = async (edgeToDelete: EdgeDeleteRequest, token: string) => {
+  return restfulRequest<EdgeDeleteRequest, any>("/edge/delete", "DELETE", edgeToDelete, token);
+};

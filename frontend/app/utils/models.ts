@@ -26,9 +26,16 @@ export type INode = {
 }
 
 export type Node = {
-  node_id: number; 
+  node_id: number;
   name: string;
   description: string;
   isPredefined: boolean;
   dependencies: Node[];
+}
+
+export type Edge = {
+  edge_id : number;
+  source : number;
+  target : number;
+  belong_to : number;
 }
