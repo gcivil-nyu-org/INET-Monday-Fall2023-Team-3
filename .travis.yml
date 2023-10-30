@@ -20,7 +20,7 @@ script:
   - flake8 ./backend --max-line-length=88
 
 after_script:
-  - coverage run --source=app ./backend/manage.py test
+  - coverage run --source=node,user ./backend/manage.py test
   - coverage xml
   - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
 
