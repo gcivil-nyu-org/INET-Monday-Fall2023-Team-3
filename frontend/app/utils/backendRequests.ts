@@ -69,6 +69,11 @@ export const userGet = async (token: string) => {
   return restfulRequest<undefined, Omit<IUser, "password">>("/backend/user/get", "GET", undefined, token)
 }
 
-export const nodeCreate = async (node: INode) => {
+export const nodeCreate = async (node: INode, token: string) => {
   return restfulRequest<typeof node, INode>("/backend/node/create", "POST", node)
+}
+
+export const predefinedNodeGet = async () : Promise<Result<INode[]>> => {
+  return [] as any
+
 }

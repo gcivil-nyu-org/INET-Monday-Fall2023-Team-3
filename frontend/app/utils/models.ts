@@ -20,7 +20,10 @@ export type IUser = {
   password: string
 }
 
-export type INode = {
-  name: string
-  description: string
+export interface INode {
+  node_id: number;
+  name: string;
+  description: string;
+  isPredefined: boolean;
+  dependencies: INode[];
 }
