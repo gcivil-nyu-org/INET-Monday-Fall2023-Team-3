@@ -20,4 +20,5 @@ class CustomUser(AbstractUser):
             "unique": "A user with this email address already exists",
         }
     )
-    REQUIRED_FIELDS = ["email", "username"]
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["username"]
