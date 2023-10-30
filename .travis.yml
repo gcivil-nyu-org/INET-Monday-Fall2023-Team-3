@@ -12,6 +12,7 @@ install:
   - pip install -r ./backend/requirements.txt
 
 before_script:
+  - python ./backend/manage.py makemigrations
   - python ./backend/manage.py migrate
 
 script:
@@ -19,9 +20,11 @@ script:
   - flake8 ./backend --max-line-length=88
 
 after_script:
-  - coverage run --source=app ./backend/manage.py test
+  - cd backend/
+  - coverage run --source=user,node manage.py test
   - coverage xml
-  - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
+  - cd ..
+  - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./backend/coverage.xml
 
 deploy:
   - provider: elasticbeanstalk

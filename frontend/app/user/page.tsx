@@ -1,6 +1,5 @@
 'use client'
-
-import { Avatar, Dialog, DialogTitle } from "@mui/material"
+import { Button, Avatar, Dialog, DialogTitle } from "@mui/material"
 import { useEffect, useState } from "react"
 import GraphList from "./components/GraphList"
 import { useRouter } from "next/navigation"
@@ -29,11 +28,23 @@ export default function User() {
     setUpdate(false)
   }
 
+  
+  const onCreateGraphButtonClicked = () => {
+    router.push("/node")
+  }
+
   return (
     <div className="w-full h-full flex flex-col min-h-screen">
-      <div className="absolute top-8 right-8 h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60" onClick={() => setUpdate(true)}>
-        <Avatar className="w-12 h-12" src="https://mui.com/static/images/avatar/1.jpg" />
-      </div>
+        <div className='flex h-24 flex-row ml-auto'>
+          <div className='flex h-16 m-4'>
+            <Button className='w-60 mr-4 bg-gray-500' size="large" variant='contained' onClick={onCreateGraphButtonClicked}>Create New Graph</Button>
+            
+            <Button className="h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60" onClick={() => setUpdate(true)}>
+              <Avatar className="w-12 h-12" src="https://mui.com/static/images/avatar/1.jpg" />
+            </Button>
+          </div>
+        </div>
+      
       <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
         <DialogTitle>Update</DialogTitle>
         <Update />

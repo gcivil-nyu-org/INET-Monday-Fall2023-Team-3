@@ -19,3 +19,22 @@ export type IUser = {
   username: string
   password: string
 }
+
+export type INode = {
+  name: string
+  description: string
+}
+
+export type Node = {
+  node_id: number;
+  name: string;
+  description: string;
+  isPredefined: boolean;
+  dependencies: Node[];
+}
+
+export type Edge = {
+  source : string;
+  target : string;
+  belong_to : number;
+}
