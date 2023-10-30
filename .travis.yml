@@ -21,7 +21,7 @@ script:
 
 after_script:
   - cd backend/
-  - coverage run --source=node manage.py test
+  - coverage run --source=user,node manage.py test
   - coverage xml
   - cd ..
   - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./backend/coverage.xml
