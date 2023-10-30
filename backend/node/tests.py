@@ -1,10 +1,15 @@
 from rest_framework import status
 from rest_framework.test import APITestCase
 from .models import Node
-
+from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 class NodeTests(APITestCase):
     def setUp(self):
+        self.test_user = User.objects.create_user(
+            "testuser", "test@example.com", "testpassword"
+        )
+        self.test_user_token = Token.objects.create(user=self.test_user)
         # Set up any objects you need for the tests
         self.predefined_nodes_count = Node.objects.filter(isPredefined=True).count()
         self.total_nodes_count = Node.objects.count()
@@ -40,6 +45,7 @@ class NodeTests(APITestCase):
         self.assertEqual(len(response.data), self.predefined_nodes_count_after_setup)
 
     def test_node_create(self):
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.test_user_token.key)
         # Test the node_create view
         data = {"name": "New Node", "description": "A new node", "isPredefined": False}
         response = self.client.post("/node/create/", data)
