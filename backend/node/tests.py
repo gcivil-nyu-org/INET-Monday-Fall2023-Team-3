@@ -4,6 +4,7 @@ from .models import Node
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 
+
 class NodeTests(APITestCase):
     def setUp(self):
         self.test_user = User.objects.create_user(
