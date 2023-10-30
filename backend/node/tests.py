@@ -45,7 +45,7 @@ class NodeTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), self.predefined_nodes_count_after_setup)
 
-    def test_node_create(self):
+    def test_node_create_authenticated(self):
         self.client.credentials(HTTP_AUTHORIZATION="Token " + self.test_user_token.key)
         # Test the node_create view
         data = {"name": "New Node", "description": "A new node", "isPredefined": False}
@@ -53,3 +53,7 @@ class NodeTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Node.objects.count(), self.total_nodes_count_after_setup + 1)
         self.assertEqual(Node.objects.get(name="New Node").description, "A new node")
+
+    def test_node_create_unauthenticated(self):
+        response = self.client.post("/nodes/create/", {"name": "Node 2"}, format="json")
+        self.assertEqual(response.status_code, 404)  # Unauthorized

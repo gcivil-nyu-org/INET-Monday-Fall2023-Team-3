@@ -13,10 +13,6 @@ from .serializers import NodeSerializer
 from .models import Node
 
 
-def detail(msg: str, status_code=status.HTTP_400_BAD_REQUEST):
-    return Response({"detail": msg}, status=status_code)
-
-
 @api_view(["POST"])
 def ping(request):
     return Response(data={"message": "pong"}, status=status.HTTP_200_OK)
@@ -51,28 +47,3 @@ def node_create(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(["GET", "PUT", "DELETE"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def node_detail(request, pk):
-    try:
-        node = Node.objects.get(pk=pk)
-    except Node.DoesNotExist:
-        return detail("Node does not exist", status_code=status.HTTP_404_NOT_FOUND)
-
-    if request.method == "GET":
-        serializer = NodeSerializer(node)
-        return Response(serializer.data)
-
-    elif request.method == "PUT":
-        serializer = NodeSerializer(node, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return detail("Node data format invalid")
-
-    elif request.method == "DELETE":
-        node.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)

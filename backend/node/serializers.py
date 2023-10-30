@@ -23,19 +23,4 @@ class NodeSerializer(serializers.ModelSerializer):
 
         # Save the new instance to the database
         new_node.save()
-
         return new_node
-
-    def update(self, instance, validated_data):
-        """
-        Update and return an existing `Node` instance, given the validated data.
-        """
-        # Update the Node fields here
-        instance.name = validated_data.get("name", instance.name)
-        instance.description = validated_data.get("description", instance.description)
-
-        # Handle prerequisites
-
-        # Save and return the updated instance
-        instance.save()
-        return instance

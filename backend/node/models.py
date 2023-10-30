@@ -8,6 +8,3 @@ class Node(models.Model):
     description = models.TextField(blank=True)
     isPredefined = models.BooleanField(default=False)
     dependencies = models.ManyToManyField("self", symmetrical=False, blank=True)
-
-    def __str__(self):
-        return self.name

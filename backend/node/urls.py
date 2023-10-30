@@ -5,6 +5,5 @@ urlpatterns = [
     path("ping/", views.ping, name="ping"),
     path("nodes/", views.node_list, name="node-list"),
     path("create/", views.node_create, name="node-create"),
-    path("predefined-nodes/", views.predefined_node_list, name="predefined-node-list")
-    # path("nodes/<int:pk>/", views.node_detail, name="node-detail"),
+    path("predefined-nodes/", views.predefined_node_list, name="predefined-node-list"),
 ]
