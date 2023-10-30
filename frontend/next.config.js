@@ -19,6 +19,10 @@ const nextConfig = {
     }, {
       source: "/backend/node/create",
       destination: "http://backend:8000/node/nodes/create/",
+    },
+    {
+      source: "/backend/node/edit",
+      destination: "http://backend:8000/node/nodes/edit",
     }]
   }
 }

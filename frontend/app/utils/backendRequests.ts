@@ -1,7 +1,7 @@
 import { Ok, Err, IUser, IToken, Result, INode } from "./models"
 import { fetchRestful } from "./helpers"
 
-const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create"] as const
+const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create","/backend/node/edit"] as const
 
 export const restfulRequest = async <BodyType extends {} | undefined, ResultType extends {}, Fixed extends boolean = true>(
   endpoint: Fixed extends true ? typeof endpoints[number] : string,
@@ -72,6 +72,11 @@ export const userGet = async (token: string) => {
 export const nodeCreate = async (node: INode, token: string) => {
   return restfulRequest<typeof node, INode>("/backend/node/create", "POST", node)
 }
+
+export const nodeEdit = async (node: INode, token: string) => {
+  return restfulRequest<typeof node, INode>("/backend/node/create", "POST", node)
+}
+
 
 export const predefinedNodeGet = async () : Promise<Result<INode[]>> => {
   return [] as any
