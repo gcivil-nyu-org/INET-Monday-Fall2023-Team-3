@@ -1,12 +1,14 @@
 from rest_framework import status
-from rest_framework.test import APITestCase
+from rest_framework.test import APIClient
 from .models import Node
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
+from django.test import TestCase
 
 
-class NodeTests(APITestCase):
+class NodeTests(TestCase):
     def setUp(self):
+        self.client = APIClient()
         self.test_user = User.objects.create_user(
             "testuser", "test@example.com", "testpassword"
         )

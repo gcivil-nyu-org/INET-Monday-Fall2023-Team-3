@@ -20,9 +20,11 @@ script:
   - flake8 ./backend --max-line-length=88
 
 after_script:
-  - coverage run --source=node ./backend/manage.py test
+  - cd backend/
+  - coverage run --source=node manage.py test
   - coverage xml
-  - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
+  - cd ..
+  - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./backend/coverage.xml
 
 deploy:
   - provider: elasticbeanstalk
