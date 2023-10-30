@@ -43,6 +43,7 @@ def node_create(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def node_edit(request):
