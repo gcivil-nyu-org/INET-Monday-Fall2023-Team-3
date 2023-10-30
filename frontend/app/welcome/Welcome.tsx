@@ -31,7 +31,7 @@ export default function Welcome() {
         <div className='flex h-24 flex-row'>
           <div className='h-16 w-16 bg-slate-400 m-4'></div>
           <div className='h-16 m-4'>
-            <span className='h-16 flex items-center justify-center text-center m-auto text-lg'>Application Name</span>
+            <span className='h-16 flex items-center justify-center text-center m-auto text-lg'>SMOOTH</span>
           </div>
         </div>
 
