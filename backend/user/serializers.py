@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import User
+from .models import CustomUser
 
 
 class UserSerializer(serializers.Serializer):
@@ -9,7 +9,7 @@ class UserSerializer(serializers.Serializer):
     password = serializers.CharField()
 
     def create(self, validated_data):
-        return User.objects.create(**validated_data)
+        return CustomUser.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.username = validated_data.get("username", instance.username)
