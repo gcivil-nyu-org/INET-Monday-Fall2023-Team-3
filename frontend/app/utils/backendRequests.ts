@@ -2,7 +2,7 @@ import { Ok, Err, IUser, IToken, Result, INode, Node, Edge } from "./models"
 import { fetchRestful } from "./helpers"
 
 const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create",
-                "/user/login", "/user/signup", "/user/update", "/user/get", "/node/create",  // for local test
+                "/user/login", "/user/signup", "/user/update", "/user/get", "/node/create", "/node/edit",  // for local test
                "/node/predefined-nodes", "/edge/create", "/edge/delete"] as const // for local test
 
 export const restfulRequest = async <BodyType extends {} | undefined, ResultType extends {}, Fixed extends boolean = true>(
@@ -74,6 +74,10 @@ export const userGet = async (token: string) => {
 
 export const nodeCreate = async (node: INode, token: string) => {
   return restfulRequest<typeof node, INode>("/node/create", "POST", node, token)
+}
+
+export const nodeEdit = async (node: INode, token: string) => {
+  return restfulRequest<typeof node, INode>("/node/edit", "POST", node, token)
 }
 
 export const predefinedNodeGet = async () : Promise<Result<Node[]>> => {
