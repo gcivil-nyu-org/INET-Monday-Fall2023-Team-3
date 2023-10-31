@@ -36,7 +36,9 @@ class NodeAPITest(APITestCase):
 
     def test_node_create(self):
         invalid_data = {"bob": "peter"}
-        response = self.client.post("/backend/node/create/", invalid_data, format="json")
+        response = self.client.post(
+            "/backend/node/create/", invalid_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, NODE_INVALID_FORMAT_MSG)
 

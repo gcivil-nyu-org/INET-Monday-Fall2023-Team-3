@@ -78,7 +78,8 @@ class CustomUserTest(APITestCase):
     def test_user_get_success(self):
         response = self.client.post("/backend/user/create/", test_user)
         response = self.client.get(
-            "/backend/user/get/", headers={"Authorization": f"token {response.data['token']}"}
+            "/backend/user/get/",
+            headers={"Authorization": f"token {response.data['token']}"},
         )
         self.assertEqual(
             response.data,
