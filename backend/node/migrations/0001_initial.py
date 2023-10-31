@@ -6,7 +6,7 @@ import pandas as pd
 
 
 def load_initial_data(apps, schema_editor):
-    course_df = pd.read_excel("./node/migrations/courseList.xlsx")
+    course_df = pd.read_excel("./backend/node/migrations/courseList.xlsx")
     course_df.drop_duplicates(subset=["name"], inplace=True)
     prerequisiteList = {}
     for _, row in course_df.iterrows():
