@@ -1,3 +1,13 @@
+from django.urls import path
+
+from .views import ping, node_create, node_get, node_update, node_delete
+
 app_name = "node"
 
-urlpatterns = []
+urlpatterns = [
+    path("ping/", ping, name="ping"),
+    path("create/", node_create, name="create"),
+    path("get/<str:node_id>/", node_get, name="get"),
+    path("update/", node_update, name="update"),
+    path("delete/<str:node_id>/", node_delete, name="delete"),
+]
