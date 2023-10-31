@@ -1,8 +1,8 @@
 import { useState } from "react"
 import { Button, Dialog, DialogTitle } from "@mui/material"
 
-import Login from "components/welcome/login/Login"
-import Signup from "components/welcome/signup/SignUp"
+import Login from "components/welcome/Login"
+import Signup from "components/welcome/SignUp"
 
 export default function Welcome() {
   const [login, setLogin] = useState(false)
