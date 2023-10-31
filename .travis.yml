@@ -66,4 +66,5 @@ after_script:
   - zip -r ../deploy.zip . -x '*.git*'
   - cd ..
   # deploy project
-  - beanstalk-deploy $AWS_APP_NAME $AWS_APP_ENV_PROD $EB_DEPLOY_VERSION $AWS_DEPLOY_REGION deploy.zip
+  - chmod +x ./deploy.sh
+  - ./deploy.sh
