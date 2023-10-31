@@ -28,7 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
-    "http://smooth-dirty.us-west-2.elasticbeanstalk.com/",
+    "smooth-dirty.us-west-2.elasticbeanstalk.com",
 ]
 
 
