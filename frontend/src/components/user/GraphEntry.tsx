@@ -16,7 +16,7 @@ export default function GraphEntry({ title, imgUrl }: IGraphEntryProp) {
       <Card>
         <CardHeader title={title} />
         <CardContent>
-          <img src={imgUrl} />
+          <img src={imgUrl} alt="graph"/>
         </CardContent>
       </Card>
     </div>
