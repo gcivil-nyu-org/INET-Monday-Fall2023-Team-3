@@ -3,13 +3,20 @@ from rest_framework import status
 
 from .models import CustomUser
 from .serializers import UserSerializer
-from .views import USER_PONG_MSG, USER_INVALID_FORMAT_MSG, USER_PASSWORD_MISMATCH_MSG, USER_ALREADY_EXISTS_MSG, USER_NOT_FOUND_MSG
+from .views import (
+    USER_PONG_MSG,
+    USER_INVALID_FORMAT_MSG,
+    USER_PASSWORD_MISMATCH_MSG,
+    USER_ALREADY_EXISTS_MSG,
+    USER_NOT_FOUND_MSG,
+)
 
 test_user = {
     "email": "test@gmail.com",
     "username": "test",
     "password": "testpassword",
 }
+
 
 # Create your tests here.
 class CustomUserTest(APITestCase):
@@ -19,20 +26,20 @@ class CustomUserTest(APITestCase):
         self.assertEqual(response.data, USER_PONG_MSG)
 
     def test_user_login_invalid_data(self):
-        data = { "bob": "james" }
+        data = {"bob": "james"}
         response = self.client.post("/user/login/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, USER_INVALID_FORMAT_MSG)
 
     def test_user_login_not_found(self):
-        data = { "email": "not@exist.com", "username": "notfound" }
+        data = {"email": "not@exist.com", "username": "notfound"}
         response = self.client.post("/user/login/", data)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertEqual(response.data, USER_NOT_FOUND_MSG)
 
     def test_user_login_invalid_password(self):
         CustomUser.objects.create(**test_user)
-        data = { "email": test_user["email"], "password": "123" }
+        data = {"email": test_user["email"], "password": "123"}
         response = self.client.post("/user/login/", data)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data, USER_PASSWORD_MISMATCH_MSG)
@@ -46,7 +53,7 @@ class CustomUserTest(APITestCase):
         CustomUser.objects.get(email=test_user["email"]).delete()
 
     def test_user_create_invalid_data(self):
-        data = { "bob": "james" }
+        data = {"bob": "james"}
         response = self.client.post("/user/create/", data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, USER_INVALID_FORMAT_MSG)
@@ -70,22 +77,35 @@ class CustomUserTest(APITestCase):
 
     def test_user_get_success(self):
         response = self.client.post("/user/create/", test_user)
-        response = self.client.get("/user/get/", headers={ "Authorization": f"token {response.data['token']}" })
-        self.assertEqual(response.data, { "email": test_user["email"], "username": test_user["username"] })
+        response = self.client.get(
+            "/user/get/", headers={"Authorization": f"token {response.data['token']}"}
+        )
+        self.assertEqual(
+            response.data,
+            {"email": test_user["email"], "username": test_user["username"]},
+        )
         CustomUser.objects.get(email=test_user["email"]).delete()
 
     def test_user_update_invalid_data(self):
         response = self.client.post("/user/create/", test_user)
-        data = { "bob": "james" }
-        response = self.client.post("/user/update/", data, headers={ "Authorization": f"token {response.data['token']}" })
+        data = {"bob": "james"}
+        response = self.client.post(
+            "/user/update/",
+            data,
+            headers={"Authorization": f"token {response.data['token']}"},
+        )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data, USER_INVALID_FORMAT_MSG)
         CustomUser.objects.get(email=test_user["email"]).delete()
 
     def test_user_update_not_found(self):
         response = self.client.post("/user/create/", test_user)
-        data = { "email": "not@exist.com", "username": "notfound" }
-        response = self.client.post("/user/update/", data, headers={ "Authorization": f"token {response.data['token']}" })
+        data = {"email": "not@exist.com", "username": "notfound"}
+        response = self.client.post(
+            "/user/update/",
+            data,
+            headers={"Authorization": f"token {response.data['token']}"},
+        )
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
         self.assertEqual(response.data, USER_PASSWORD_MISMATCH_MSG)
 
@@ -96,7 +116,11 @@ class CustomUserTest(APITestCase):
             "username": "test-bob",
             "password": "testpassword",
         }
-        response = self.client.post("/user/update/", data, headers={ "Authorization": f"token {response.data['token']}" })
+        response = self.client.post(
+            "/user/update/",
+            data,
+            headers={"Authorization": f"token {response.data['token']}"},
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, data)
 

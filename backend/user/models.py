@@ -4,6 +4,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 
 # Create your models here.
 
+
 class CustomUser(AbstractUser):
     username_validator = UnicodeUsernameValidator()
     username = models.CharField(
@@ -18,7 +19,7 @@ class CustomUser(AbstractUser):
         help_text="Required.",
         error_messages={
             "unique": "A user with this email address already exists",
-        }
+        },
     )
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]

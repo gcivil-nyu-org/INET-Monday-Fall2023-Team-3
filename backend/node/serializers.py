@@ -7,7 +7,9 @@ class NodeSerializer(serializers.Serializer):
     name = serializers.CharField(required=True)
     description = serializers.CharField()
     predefined = serializers.BooleanField()
-    dependencies = serializers.PrimaryKeyRelatedField(many=True, queryset=Node.objects.all())
+    dependencies = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Node.objects.all()
+    )
 
     def validate(self, attrs):
         if attrs.get("name") is None:

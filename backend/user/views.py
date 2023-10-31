@@ -1,5 +1,9 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
@@ -10,8 +14,10 @@ from .serializers import UserSerializer
 
 # Create your views here.
 
+
 def detail(msg: str):
-    return  { "detail": msg }
+    return {"detail": msg}
+
 
 USER_PONG_MSG = detail("pong")
 USER_INVALID_FORMAT_MSG = detail("user data format invalid")
@@ -25,17 +31,15 @@ USER_400_RESPONSE = Response(
 USER_401_RESPONSE = Response(
     USER_PASSWORD_MISMATCH_MSG, status=status.HTTP_401_UNAUTHORIZED
 )
-USER_404_RESPONSE = Response(
-    USER_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND
-)
-USER_409_RESPONSE = Response(
-    USER_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT
-)
+USER_404_RESPONSE = Response(USER_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND)
+USER_409_RESPONSE = Response(USER_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT)
+
 
 # Ping
 @api_view(["GET"])
 def ping(request):
     return Response(USER_PONG_MSG, status=status.HTTP_200_OK)
+
 
 # Create user
 @api_view(["POST"])
@@ -50,7 +54,8 @@ def user_create(request):
 
     serializer.save()
     user_token = Token.objects.create(user=serializer.instance)
-    return Response({ "token": user_token.key }, status=status.HTTP_200_OK)
+    return Response({"token": user_token.key}, status=status.HTTP_200_OK)
+
 
 # User login
 @api_view(["POST"])
@@ -73,7 +78,8 @@ def user_login(request):
         return USER_401_RESPONSE
 
     user_token = Token.objects.get_or_create(user=user)[0]
-    return Response({ "token": user_token.key }, status=status.HTTP_200_OK)
+    return Response({"token": user_token.key}, status=status.HTTP_200_OK)
+
 
 # Get full user information, need authentication
 @api_view(["GET"])
@@ -84,6 +90,7 @@ def user_get(request):
     data = serializer.data
     data.pop("password")
     return Response(data, status=status.HTTP_200_OK)
+
 
 # Update user
 @api_view(["POST"])
