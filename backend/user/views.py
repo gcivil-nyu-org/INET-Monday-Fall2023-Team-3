@@ -115,4 +115,8 @@ def user_update(request):
         user.password = next_password
 
     user.save()
-    return Response(serializer.data, status=status.HTTP_200_OK)
+
+    data = serializer.data
+    data.pop("password")
+
+    return Response(data, status=status.HTTP_200_OK)

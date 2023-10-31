@@ -122,9 +122,13 @@ class CustomUserTest(APITestCase):
             headers={"Authorization": f"token {response.data['token']}"},
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, data)
+        self.assertEqual(response.data["email"], data["email"])
+        self.assertEqual(response.data["username"], data["username"])
 
         modified_user = CustomUser.objects.get(email=test_user["email"])
+
+        self.assertEqual(modified_user.password, data["password"])
+
         modified_user = UserSerializer(instance=modified_user)
         self.assertEqual(modified_user.data, data)
         CustomUser.objects.get(email=test_user["email"]).delete()
