@@ -1,11 +1,12 @@
 import { ChangeEvent, useState } from "react"
 import { Alert, Button, TextField } from "@mui/material"
-import { redirect } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 import { userLogin } from "utils/backendRequests"
 
 
 export default function Login() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [errorMessage, setErrorMessage] = useState("")
@@ -22,7 +23,7 @@ export default function Login() {
         console.log(result.value)
 
         sessionStorage.setItem("token", result.value.token)
-        redirect("/user")
+        navigate("/user")
       } else {
         setErrorMessage(result.error)
         console.error(result.error)

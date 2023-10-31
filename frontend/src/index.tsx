@@ -5,12 +5,17 @@ import Welcome from 'views/Welcome';
 import reportWebVitals from './reportWebVitals';
 
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import User from 'views/User';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Welcome />,
   },
+  {
+    path: "/user",
+    element: <User />
+  }
 ])
 
 const root = ReactDOM.createRoot(

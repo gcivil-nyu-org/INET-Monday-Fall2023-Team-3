@@ -1,9 +1,10 @@
 import { ChangeEvent, useState } from "react"
 import { Button, Alert, TextField } from "@mui/material"
-import { redirect } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { userCreate } from "utils/backendRequests"
 
 export default function SignUp() {
+  const navigate = useNavigate()
   const [email, setEmail] = useState("")
   const [username, setUserName] = useState("")
   const [password, setPassword] = useState("")
@@ -30,7 +31,7 @@ export default function SignUp() {
         console.log(result.value)
 
         sessionStorage.setItem("token", result.value.token)
-        redirect("/user")
+        navigate("/user")
       } else {
         setErrorMessage(result.error)
         console.error(result.error)
