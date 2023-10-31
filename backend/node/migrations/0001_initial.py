@@ -5,7 +5,7 @@ import json
 
 
 def load_initial_data(apps, schema_editor):
-    with open("./node/migrations/courseList.json", "rb") as file:
+    with open("./backend/node/migrations/courseList.json", "rb") as file:
         data = json.load(file)
 
     prerequisiteList = {}

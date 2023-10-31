@@ -53,8 +53,13 @@ def node_create(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def node_edit(request):
-    serializer = NodeSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer = NodeSerializer(data=request.data, partial=True)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        node = Node.objects.get(node_id=request.data["node_id"])
+    except Node.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    serializer.instance = node
+    serializer.save()
+    return Response(serializer.data)

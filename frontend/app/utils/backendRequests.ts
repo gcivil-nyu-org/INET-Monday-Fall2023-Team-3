@@ -3,7 +3,7 @@ import { fetchRestful } from "./helpers"
 
 const endpoints = ["/backend/user/login", "/backend/user/signup", "/backend/user/update", "/backend/user/get", "/backend/node/create",
                 "/user/login", "/user/signup", "/user/update", "/user/get", "/node/create", "/node/edit",  // for local test
-               "/node/predefined-nodes", "/edge/create", "/edge/delete"] as const // for local test
+               "/node/predefined-nodes", "/edge/create", "/edge/delete",] as const // for local test
 
 export const restfulRequest = async <BodyType extends {} | undefined, ResultType extends {}, Fixed extends boolean = true>(
   endpoint: Fixed extends true ? typeof endpoints[number] : string,
@@ -76,8 +76,9 @@ export const nodeCreate = async (node: INode, token: string) => {
   return restfulRequest<typeof node, INode>("/node/create", "POST", node, token)
 }
 
-export const nodeEdit = async (node: INode, token: string) => {
-  return restfulRequest<typeof node, INode>("/node/edit", "POST", node, token)
+
+export const nodeEdit = async (updatedNode: Partial<Node>, token: string) => {
+  return restfulRequest<typeof updatedNode, Node>("/node/edit", "POST", updatedNode, token);
 }
 
 export const predefinedNodeGet = async () : Promise<Result<Node[]>> => {

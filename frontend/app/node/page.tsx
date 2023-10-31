@@ -7,7 +7,7 @@ import NodeDialog from './components/NodeDialog'
 import NodeInfoDialog from './components/NodeInfoDialog'
 import EditNodeDialog from './components/EditNodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
-import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete } from "@/app/utils/backendRequests"
+import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete, nodeEdit } from "@/app/utils/backendRequests"
 import 'reactflow/dist/style.css'
 import './index.css'
 
@@ -207,16 +207,31 @@ function FlowComponent() {
     }
 };
 
+
    const handleEditSubmit = (data: any) => {
-    setNodes((existingNodes) => {
-      const nodeToUpdate = existingNodes.find(node => node.id == data.currentNodeId)
-      if (!nodeToUpdate) return existingNodes;
-      nodeToUpdate.data.attribute.name = data.name;
-      nodeToUpdate.data.attribute.description = data.description;
-      nodeToUpdate.data.label = data.name;
-      return [...existingNodes.filter(node => node.id != nodeToUpdate.id), nodeToUpdate]
-    })
-    setEditDialog(false);
+    nodeEdit({
+      node_id: data.currentNodeId,
+      name: data.name,
+      description: data.description,
+  }, sessionStorage.getItem("token")!).then((result) => {
+    if (result.status) {
+      setSeverity("success")
+      setMessage("User create node successful")
+      setNodes((existingNodes) => {
+        const nodeToUpdate = existingNodes.find(node => node.id == data.currentNodeId)
+        if (!nodeToUpdate) return existingNodes;
+        nodeToUpdate.data.attribute.name = data.name;
+        nodeToUpdate.data.attribute.description = data.description;
+        nodeToUpdate.data.label = data.name;
+        return [...existingNodes.filter(node => node.id != nodeToUpdate.id), nodeToUpdate]
+      })
+  
+      setEditDialog(false);
+    } else {
+      setSeverity("error")
+      setMessage(result.error) // 
+    }
+  })
   }
 
    const handleEditClose = (data: any) => {

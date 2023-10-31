@@ -2,7 +2,6 @@ import { ChangeEvent, useState } from "react"
 import { Button, Alert, TextField } from "@mui/material"
 import { fetchRestful } from "@/app/utils/helpers"
 import { useRouter } from "next/navigation"
-import { nodeCreate } from "@/app/utils/backendRequests"
 
 interface Props {
     showEditDialog: boolean;
@@ -30,16 +29,7 @@ export default function EditNodeDialog({ showEditDialog, currentNodeId, onSubmit
             alert('Description is required');
             return;
         }
-        // Handle submission here for now, should be submitted after POST success
         onSubmit({ name, description, currentNodeId })
-
-        // nodeCreate({
-        //   name: name,
-        //   description: description,
-        //   isPredefined: isPredefined,
-        // }).then((result) => {
-        //   console.log(result)
-        // })
     };
 
     const onCourseNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
