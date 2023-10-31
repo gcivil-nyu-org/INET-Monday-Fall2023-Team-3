@@ -1,24 +1,11 @@
 import { Button, Avatar, Dialog, DialogTitle } from "@mui/material"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { redirect } from "react-router-dom"
 import GraphList from "components/user/GraphList"
 import Update from "components/user/Update"
 
 export default function User() {
-  const [token, setToken] = useState("")
   const [update, setUpdate] = useState(false)
-
-  // redirect to welcome page if not logged in
-  useEffect(() => {
-    const currToken = sessionStorage.getItem("token") ?? ""
-
-    if (currToken === undefined || currToken === "") {
-      console.log(`token is ${currToken}, skipping back`)
-      redirect("/")
-    }
-
-    setToken(currToken)
-  }, [])
 
   const onUpdateCancelled = () => {
     console.log("update cancelled")

@@ -4,7 +4,7 @@ import './index.css';
 import Welcome from 'views/Welcome';
 import reportWebVitals from './reportWebVitals';
 
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, redirect, RouterProvider } from 'react-router-dom';
 import User from 'views/User';
 
 const router = createBrowserRouter([
@@ -14,7 +14,14 @@ const router = createBrowserRouter([
   },
   {
     path: "/user",
-    element: <User />
+    element: <User />,
+    loader: async () => {
+      const currToken = sessionStorage.getItem("token") ?? ""
+      if (currToken === "" && process.env.APP_DEBUG === "false") {
+        return redirect("/")
+      }
+      return null
+    }
   }
 ])
 
