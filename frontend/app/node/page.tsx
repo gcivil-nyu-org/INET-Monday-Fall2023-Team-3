@@ -7,7 +7,7 @@ import NodeDialog from './components/NodeDialog'
 import NodeInfoDialog from './components/NodeInfoDialog'
 import EditNodeDialog from './components/EditNodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
-import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete, nodeEdit } from "@/app/utils/backendRequests"
+import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete, nodeEdit, nodeDelete } from "@/app/utils/backendRequests"
 import 'reactflow/dist/style.css'
 import './index.css'
 
@@ -143,9 +143,50 @@ function FlowComponent() {
     setShowNodeInfoDialog(true);
   }
 
-  const handleNodeDelete = () => {
+  const deleteNodeOnCanvas =  () => {
     setShowNodeInfoDialog(false);
+    if (selectedNode) {
+      
+      if (selectedNode.isPredefined) {
+        const updatedPredefinedNodes = predefinedNodes.map((node) => 
+          node.name === selectedNode.name ? { ...node, onCanvas: false } : node
+        );
+        setPredefinedNodes(updatedPredefinedNodes);
+        setNodes((nodes) => nodes.filter((node) => node.id !== selectedNode.node_id.toString()))
+        setSelectedNode(null);
+      }
+      else {
+        
+        // if it's not predefined node, we need to delete it on database as well 
+        
+        nodeEdit({
+          node_id: selectedNode.node_id,
+          name: selectedNode.name,
+          description: selectedNode.description,
+      }, sessionStorage.getItem("token")!).then((result) => {
+        if (result.status) {
+          setSeverity("success")
+          setMessage("User create node successful")
+          if (selectedNode) setNodes((nodes) => nodes.filter((node) => node.id !== selectedNode.node_id.toString()))
+          setSelectedNode(null);
+        } else {
+          setSeverity("error")
+          setMessage(result.error) // 
+        }
+      })
+      }
+    }
+    
   }
+
+  const handleNodeDelete = (node: any) => {
+    console.log(node)
+    deleteNodeOnCanvas();
+  }
+
+  const deleteNodeByButton = () => {
+    deleteNodeOnCanvas();
+  };
 
   const handleButtonEdit = () => {
     if (showDialog) setShowDialog(false);
@@ -163,12 +204,6 @@ function FlowComponent() {
     setShowNodeInfoDialog(false);
     setSelectedNode(null);
   }
-
-  const deleteNodeByButton = () => {
-    setShowNodeInfoDialog(false);
-    if (selectedNode) setNodes((nodes) => nodes.filter((node) => node.id !== selectedNode.node_id.toString()))
-    setSelectedNode(null);
-  };
 
   const handleEdgeClick = (event:any, edge:any) => {
     setSelectedEdgeId(edge.id);

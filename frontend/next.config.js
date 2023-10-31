@@ -41,6 +41,9 @@ const nextConfig = {
       source: "/node/edit",
       destination: "http://localhost:8000/node/edit/",
     }, {
+      source: "/node/delete",
+      destination: "http://localhost:8000/node/delete/",
+    }, {
       source: "/node/predefined-nodes",
       destination: "http://localhost:8000/node/predefined-nodes/",
     }, {

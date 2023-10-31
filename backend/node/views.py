@@ -13,6 +13,10 @@ from .serializers import NodeSerializer
 from .models import Node
 
 
+def detail(msg: str):
+    return {"detail": msg}
+
+
 @api_view(["POST"])
 def ping(request):
     return Response(data={"message": "pong"}, status=status.HTTP_200_OK)
@@ -63,3 +67,18 @@ def node_edit(request):
     serializer.instance = node
     serializer.save()
     return Response(serializer.data)
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_delete(request):
+    print(request.data)
+    try:
+        node = Node.objects.get(node_id=request.data["node_id"])
+    except Node.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    node.delete()
+    return Response(
+        detail("Node deleted successfully"), status=status.HTTP_204_NO_CONTENT
+    )
