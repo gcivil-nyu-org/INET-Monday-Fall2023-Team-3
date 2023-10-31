@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import *
+from .views import ping, user_create, user_get, user_login, user_update
 
 app_user = "user"
 
