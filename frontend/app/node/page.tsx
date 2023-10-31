@@ -4,9 +4,9 @@ import ReactFlow, {useNodesState, Controls, Background, BackgroundVariant} from 
 import { MarkerType } from 'reactflow';
 import { Button, Dialog, DialogTitle, ClickAwayListener, DialogActions, DialogContent, DialogContentText } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
+import NodeInfoDialog from './components/NodeInfoDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
 import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete } from "@/app/utils/backendRequests"
-import { useRouter } from "next/navigation"
 import 'reactflow/dist/style.css'
 import './index.css'
 
@@ -16,6 +16,7 @@ export interface INode {
     description: string;
     isPredefined: boolean;
     dependencies: INode[];
+    onCanvas?: boolean;
 }
 
 function FlowComponent() {
@@ -23,12 +24,14 @@ function FlowComponent() {
   const [token, setToken] = useState("")
   const [showDialog, setShowDialog] = useState(false);
   const [showPredefinedDialog, setShowPredefinedDialog] = useState(false);
+  const [showNodeInfoDialog, setShowNodeInfoDialog] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<INode | null>(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [message, setMessage] = useState("")
   const [severity, setSeverity] = useState<"error" | "success">("error")
 
-  const [edges, setEdges] = useState([]);
+  const [edges, setEdges] = useState<any[]>([]);
 
 
   useEffect(() => {
@@ -50,7 +53,12 @@ function FlowComponent() {
       const response = await predefinedNodeGet(); // You may need to pass any required parameters
       if (response.status) {
         console.log(response);
-        setPredefinedNodes(response.value); // Assuming response.value contains the predefined nodes
+        const predefinedNodesWithAttribute = response.value.map((node) => ({
+          ...node,
+          onCanvas: false,  // Manually set the isPredefined attribute
+        }));
+        setPredefinedNodes(predefinedNodesWithAttribute);
+        // setPredefinedNodes(response.value); // Assuming response.value contains the predefined nodes
       } else {
         // Handle the error case
         console.error('Error fetching predefined nodes:', response.error);
@@ -80,7 +88,7 @@ function FlowComponent() {
       id: data.node_id.toString(),
       type: 'default',
       data: {
-            label: `${data.name} (${data.description})`,
+            label: `${data.name}`,
             attribute: {id: data.node_id, name: data.name, description: data.description, isPredefined: data.isPredefined, dependencies: data.dependencies}
         },
       position: {x: Math.random()*400, y:Math.random()*400},
@@ -102,11 +110,15 @@ function FlowComponent() {
           createNodeOnCanvas(result.value)
         } else {
           setSeverity("error")
-          setMessage(result.error)
+          setMessage(result.error) // 
         }
       })
     }
     else {
+      const updatedPredefinedNodes = predefinedNodes.map((node) => 
+        node.name === data.name ? { ...node, onCanvas: true } : node
+      );
+      setPredefinedNodes(updatedPredefinedNodes);
       createNodeOnCanvas(data)
     }
     setShowDialog(false);
@@ -115,6 +127,38 @@ function FlowComponent() {
   const [selectedEdgeId, setSelectedEdgeId] = useState(null); // 存储被选中的边的ID
   const [showDeleteDialog, setShowDeleteDialog] = useState(false); // 控制删除对话框的显示
 
+  const handleNodeClick = (event: any, node: any) => {
+    console.log(node.data.attribute);
+    setSelectedNode({
+      node_id: Number(node.data.attribute.id),
+      name: node.data.attribute.name,
+      description: node.data.attribute.description,
+      isPredefined: node.data.attribute.isPredefined,
+      dependencies: node.data.attribute.dependencies,
+      onCanvas: true,
+    });
+    setShowNodeInfoDialog(true);
+  }
+
+  const handleNodeDelete = () => {
+    setShowNodeInfoDialog(false);
+  }
+
+  const handleButtonEdit = () => {
+    console.log("edit");
+    setShowNodeInfoDialog(false);
+  }
+
+  const handleCloseInfoButtonClick = () => {
+    setShowNodeInfoDialog(false);
+    setSelectedNode(null);
+  }
+
+  const deleteNodeByButton = () => {
+    setShowNodeInfoDialog(false);
+    if (selectedNode) setNodes((nodes) => nodes.filter((node) => node.id !== selectedNode.node_id.toString()))
+    setSelectedNode(null);
+  };
 
   const handleEdgeClick = (event:any, edge:any) => {
     setSelectedEdgeId(edge.id);
@@ -209,8 +253,17 @@ function FlowComponent() {
             </>
           )}
         </Dialog>
+        <Dialog open={showNodeInfoDialog} onSubmit={handleButtonEdit} onClose={() => setShowNodeInfoDialog(false)} maxWidth="sm" fullWidth={true}>
+        {showNodeInfoDialog && (
+            <>
+              <DialogTitle>Node Info</DialogTitle>
+              <NodeInfoDialog showNodeInfoDialog={showNodeInfoDialog} onEdit={handleButtonEdit} onDelete={deleteNodeByButton} onClose={handleCloseInfoButtonClick} node={selectedNode}/>
+            </>
+          )}
+        </Dialog>
+
       </div>
-      <ReactFlow nodes={nodes} onNodesChange={onNodesChange}
+      <ReactFlow nodes={nodes} onNodesChange={onNodesChange} onNodeClick={handleNodeClick} onNodesDelete={handleNodeDelete}
         edges={edges}
         onEdgeClick={handleEdgeClick}
         onConnect={(params) => {
@@ -222,10 +275,11 @@ function FlowComponent() {
               setMessage("Authentication token missing");
               return;
           }
+          
           edgeCreate({
-            belongsTo : 123,
-            fromNodeID: params.source,
-            toNodeID: params.target
+            belong_to : 123,
+            source: params.source!,
+            target: params.target!
           }, token).then((result) => {
             if (result.status) {
               setSeverity("success")

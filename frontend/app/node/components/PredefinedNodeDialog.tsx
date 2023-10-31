@@ -43,12 +43,15 @@ export default function PredefinedNodeDialog({ showPredefinedDialog, onSubmit, o
         <div className="h-24 w-full flex">
           <TextField className="h-16 m-4 flex-1" label="Search" variant="outlined" fullWidth onChange={onSearchChanged}/>
         </div>
-        <div className="w-full flex flex-col items-center bg-white overflow-y-auto max-h-screen p-4">
-          <div className="grid grid-cols-3 gap-4 w-full">
+        <div className="w-full flex flex-col items-center bg-white overflow-y-auto max-h-[19rem] p-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
             {filteredNodes.map((node) => (
-                    < button className="flex items-center justify-center h-24 bg-gray-200 rounded-md" key={node.name} onClick={() => onAddButtonClicked(node)} >
-                        {node.name}
-                    </button>
+                    < Button className="flex items-center justify-center min-h-[6rem] min-w-[8rem] bg-gray-200 rounded-md p-4 text-center overflow-hidden" 
+                      key={node.name} 
+                      onClick={() => onAddButtonClicked(node)} 
+                      disabled={node.onCanvas}>
+                        <span className="whitespace-normal text-sm">{node.name}</span>
+                    </Button>
             ))}
           </div>
         </div>

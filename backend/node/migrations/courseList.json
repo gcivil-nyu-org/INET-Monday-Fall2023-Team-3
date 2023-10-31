@@ -1,0 +1,202 @@
+﻿[
+    {
+        "name": "CS-GY 6063 Software Engineering I",
+        "description": "The course emphasizes the full software-engineering approach with alternative approaches. Technical emphasis is on requirements, design, development, and modeling. Management issues include software cost estimate and project management. Understanding the processes applicable to the software development/ integration cycle and maintenance along with technology changes on quality and development activities is highlighted.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6083 Principles of Database Systems",
+        "description": "This course broadly introduces database systems, including the relational data model, query languages, database design, index and file structures, query processing and optimization, concurrency and recovery, transaction management and database design. Students acquire hands-on experience in working with database systems and in building web-accessible database applications.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6133 Computer Architecture I",
+        "description": "Computer architecture design: Instruction set design techniques, performance and cost; Extensions to traditional instruction sets. An instruction set studied in detail. Processor implementations: Unpipelined execution and its improvement by means of pipelining. Advanced pipelining, including branch prediction, out-of-order execution and superscalar execution, is introduced. Alternatives to traditional computing, such as VLIW and vector computation are described. Improving computer capacity, by improving the memory hierarchy is studied, including advanced cache memory, main memory and virtual memory implementations. An introduction to high-performance computing, including multi-core processors.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6233 Introduction to Operating Systems",
+        "description": "This course introduces basic issues in operating systems. Topics: Threads, processes, concurrency, memory management, I/O Control and case studies.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6313 Information Visualization",
+        "description": "An introductory course on Information Visualization based on a modern and cohesive view of the area. Topics include visualization design, data principles, visual encoding principles, interaction principles, single/multiple view methods, item/attribute, attribute reduction methods, toolkits, and evaluation. Overviews and examples from state-of-the-art research will be provided. The course is designed as a first course in information visualization for students both intending to specialize in visualization as well as students who are interested in understanding and applying visualization principles and existing techniques.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6533 Interactive Computer Graphics",
+        "description": "This course introduces the fundamentals of computer graphics with hands-on graphics programming experiences. Topics include graphics software and hardware, 2D line segment-scan conversion, 2D and 3D transformations, viewing, clipping, polygon-scan conversion, hidden surface removal, illumination and shading, compositing, texture mapping, ray tracing, radiosity and scientific visualization.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6763 Algorithmic Machine Learning and Data Science",
+        "description": "This course gives a behind-the-scenes look into the algorithms and computational methods that make machine learning and data science work at large scale. How does a service like Shazam match a sound clip to a library of 10 million songs in under a second? How do scientists find patterns in terabytes of genetic data? How can we efficiently train neural networks with millions of parameters on millions of labeled images? We will address these questions and others by studying advanced algorithmic techniques like randomization, approximation, sketching, continuous optimization, spectral methods, and Fourier methods. Students will learn how to theoretically analyze and apply these techniques to problems in machine learning and data science. They will also have the opportunity to explore recent research in algorithms for data through a final project and optional reading group. This course is mathematically rigorous and is intended for graduate students or strong, advanced undergraduates.",
+        "dependencies": "CS-GY 6923,CS-GY 6033,CS-GY 6043"
+    },
+    {
+        "name": "CS-GY 6033 Design and Analysis of Algorithms I",
+        "description": "This course reviews basic data structures and mathematical tools. Topics: Data structures: priority queues, binary search trees, balanced search trees. Btrees. Algorithm design and analysis techniques illustrated in searching and sorting: heapsort, quicksort, sorting in linear time, medians and order statistics. Design and analysis techniques: dynamic programming, greedy algorithms. Graph algorithms: elementary graph algorithms (breadth-first search, depth-first search, topological sort, connected components, strongly connected components), minimum spanning tree, shortest path. String algorithms. Geometric algorithms. Linear programming. Brief introduction to NP completeness.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6003 Foundations of Computer Science",
+        "description": "This course covers logic, sets, functions, relations, asymptotic notation, proof techniques, induction, combinatorics, discrete probability, recurrences, graphs, trees, mathematical models of computation and undecidability.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6043 Design and Analysis of Algorithms II",
+        "description": "This course covers techniques in advanced design and analysis. Topics: Amortized analysis of algorithms. Advanced data structures: binomial heaps, Fibonacci heaps, data structures for disjoint sets, analysis of union by rank with path compression. Graph algorithms: elementary graph algorithms, maximum flow, matching algorithms. Randomized algorithms. Theory of NPcompleteness and approach to finding (approximate) solutions to NPcomplete problems. Selected additional topics that may vary.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6843 Computer Networking",
+        "description": "This course takes a top-down approach to computer networking. After an overview of computer networks and the Internet, the course covers the application layer, transport layer, network layer and link layers. Topics at the application layer include client-server architectures, P2P architectures, DNS and HTTP and Web applications. Topics at the transport layer include multiplexing, connectionless transport and UDP, principles or reliable data transfer, connection-oriented transport and TCP and TCP congestion control. Topics at the network layer include forwarding, router architecture, the IP protocol and routing protocols including OSPF and BGP. Topics at the link layer include multiple access protocols, ALOHA, CSMA/CD, Ethernet, CSMA/CA, wireless 802.11 networks and link layer switches. The course includes simple quantitative delay and throughput modeling, socket programming and network application development and Ethereal labs.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6923 Machine Learning",
+        "description": "This course is an introduction to the field of machine learning, covering fundamental techniques for classification, regression, dimensionality reduction, clustering, and model selection. A broad range of algorithms will be covered, such as linear and logistic regression, neural networks, deep learning, support vector machines, tree-based methods, expectation maximization, and principal components analysis. The course will include hands-on exercises with real data from different application areas (e.g. text, audio, images). Students will learn to train and validate machine learning models and analyze their performance.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6053 Foundation of Data Science",
+        "description": "This course offers students a practical, hands-on introduction to the growing field of “Data Science,” and will equip them with the fundamental quantitative and computational analytics used to derive meaningful insight from large, real-world data. The focus of the course is problem-based and brings together skills across statistics, data mining and machine learning alongside effective visualization and communication. The course will equip students to solve data-driven problems from diverse domain applications, and with real-world data. Students are assumed to have an understanding of basic statistics and have experience in programming.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6243 Operating Systems II",
+        "description": "This course surveys recent important commercial and research trends in operating systems. Topics may include virtualization, network server design and characterization, scheduling and resource optimization, file systems, memory management, advanced debugging techniques, data-center design and energy utilization.",
+        "dependencies": "CS-GY 6233"
+    },
+    {
+        "name": "CS-GY 6253 Distributed Operating Systems",
+        "description": "This course introduces distributed-networked computer systems. Topics: Distributed control and consensus. Notions of time in distributed systems. Client/Server communications protocols. Middleware. Distributed File Systems and Services. Fault tolerance, replication and transparency. Peer-to-peer systems. Case studies of modern commercial systems and research efforts.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6613 Artificial Intelligence I",
+        "description": "Artificial Intelligence (AI) is an important topic in computer science and offers many diversified applications. It addresses one of the ultimate puzzles humans are trying to solve: How is it possible for a slow, tiny brain, whether biological or electronic, to perceive, understand, predict and manipulate a world far larger and more complicated than itself? And how do people create a machine (or computer) with those properties? to that end, AI researchers try to understand how seeing, learning, remembering and reasoning can, or should, be done. This course introduces students to the many AI concepts and techniques.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6643 Computer Vision",
+        "description": "An important goal of artificial intelligence (AI) is to equip computers with the capability of interpreting visual inputs. Computer vision is an area in AI that deals with the construction of explicit, meaningful descriptions of physical objects from images. It includes as parts many techniques from image processing, pattern recognition, geometric modeling, and cognitive processing. This course introduces students to the fundamental concepts and techniques in computer vision.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 9163 Application Security",
+        "description": "This course addresses the design and implementation of secure applications. Concentration is on writing software programs that make it difficult for intruders to exploit security holes. The course emphasizes writing secure distributed programs in Java. The security ramifications of class, field and method visibility are emphasized.",
+        "dependencies": "CS-GY 6813"
+    },
+    {
+        "name": "CS-GY 9223 Special Topics in Computer Science: Distributed Systems",
+        "description": "",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6093 Advanced Database Systems",
+        "description": "Students in this advanced course on database systems and data management are assumed to have a solid background in databases. The course typically covers a selection from the following topics: (1) advanced relational query processing and optimization, (2) OLAP and data warehousing, (3) data mining, (4) stream databases and other emerging database architectures and applications, (5) advanced transaction processing, (6) databases and the Web: text, search and semistructured data, or (7) geographic information systems. Topics are taught based on a reading list of selected research papers. Students work on a course project and may have to present in class.",
+        "dependencies": "CS-GY 6083"
+    },
+    {
+        "name": "CS-GY 6323 Large-Scale Visual Analytics",
+        "description": "Visual analytics combines interactive visual interfaces and information visualization techniques with automatic algorithms to support analytical reasoning through human-computer interaction. People use visual analytics tools and techniques to synthesize information and derive insight from massive, dynamic, ambiguous, and often conflicting data, and to communicate their findings effectively for decision-making. This course will serve as an introduction to the science and technology of visual analytics and will include lectures on both theoretical foundations and application methodologies. The goals of this course are for students to develop a comprehensive understanding of this emerging, multidisciplinary field, and apply that understanding toward a focused research problem in a real-world application or a domain of personal interest.",
+        "dependencies": "CS-GY 6313"
+    },
+    {
+        "name": "CS-GY 6373 Programming Languages",
+        "description": "This course covers the structures, notations and semantics of programming languages. Topics: Issues of scope, type structure and parameter passing. Control structures, including support for exception handling and concurrency. Abstract data types and object oriented languages. Programming in the large. Implementation issues. Functional, logic programming languages. Examples from a variety of languages.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6413 Compiler Design and Construction",
+        "description": "This course covers compiler organization. Topics: Lexical analysis, syntax analysis, abstract syntax trees, symbol table organization, code generation. Introduction to code optimization techniques.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6513 Big Data",
+        "description": "Big Data requires the storage, organization, and processing of data at a scale and efficiency that go well beyond the capabilities of conventional information technologies. In this course, we will study the state of art in big data management: we will learn about algorithms, techniques and tools needed to support big data processing. In addition, we will examine real applications that require massive data analysis and how they can be implemented on Big Data platforms. The course will consist of lectures based both on textbook material and scientific papers. It will include programming assignments that will provide students with hands-on experience on building data-intensive applications using existing Big Data platforms, including Amazon AWS. Besides lectures given by the instructor, we will also have guest lectures by experts in some of the topics we will cover.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6543 Human Computer Interaction",
+        "description": "Designing a successful interactive experience or software system takes more than technical savvy and vision–it also requires a deep understanding of how to serve people’s needs and desires through the experience of the system, and knowledge about how to weave this understanding into the development process. This course introduces key topics and methods for creating and evaluating human-computer interfaces/digital user experiences. Students apply these practices to a system of their choosing (I encourage application to prototype systems that students are currently working on in other contexts, at any stage of development). The course builds toward a final write-up and presentation in which students detail how they tackled HCI/user experience design and evaluation of their system, and results from their investigations. Some experience creating/participating in the production of interactive experiences/software is recommended.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6553 Game Design",
+        "description": "This course is about experimental game design. Design in this context pertains to every aspect of the game, and these can be broadly characterized as the game system, control, visuals, audio, and resulting theme. We will explore these aspects through the creation of a few very focused game prototypes using a variety of contemporary game engines and frameworks, high-level programming languages, and physical materials. This will allow us to obtain a better understanding of what makes games appealing, and how game mechanics, systems, and a variety of player experiences can be designed and iteratively improved by means of rapid prototyping and play-testing. The course combines the technology, design, and philosophy in support of game creation, as well as the real-world implementation and design challenges faced by practicing game designers. Students will learn design guidelines and principles by which games can be conceived, prototyped, and fully developed within a one-semester course, and will create a game from start to finish. The course is a lot of (team)work, but it’s also a lot of fun. Programming skills are helpful, but not a hard requirement. Artistic skills, or a willingness to learn them are a plus.",
+        "dependencies": "CS-GY 6533"
+    },
+    {
+        "name": "CS-GY 6573 Penetration Testing and Vulnerability Analysis",
+        "description": "This advanced course in computer and network security focuses on penetration testing and vulnerability analysis. It introduces methodologies, techniques and tools to analyze and identify vulnerabilities in standalone and networked applications.",
+        "dependencies": "CS-GY 6823"
+    },
+    {
+        "name": "CS-GY 6703 Computational Geometry",
+        "description": "This course introduces data structures and algorithms for geometric data. Topics include intersection, polygon triangulation, linear programming, orthogonal range searching, point location, Voronoi diagrams, Delaunay triangulations, arrangements and duality, geometric data structures, convex hulls, binary space partitions, robot motion planning, quadtrees, visibility graphs, simplex range searching.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6753 Theory of Computation",
+        "description": "This course introduces the theory of computation. Topics: Formal languages and automata theory. Deterministic and non-deterministic finite automata, regular expressions, regular languages, context-free languages. Pumping theorems for regular and context-free languages. Turing machines, recognizable and decidable languages. Limits of computability: the Halting Problem, undecidable and unrecognizable languages, reductions to prove undecidability. Time complexity, P and NP, Cook-Levin theorem, NP completeness.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 997X M.S. Thesis in Computer Science",
+        "description": "Exceptional students may elect to write a master’s thesis for which no more than 6 credits may be earned toward the degree. Such research should demonstrate adequately the student’s proficiency in the subject material. Also required: oral thesis defense before at least three professors, plus a formal, bound thesis volume. Thesis registration must be continuous.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 9963 Advanced Project in Computer Science",
+        "description": "This course permits the student to perform research in computer science with a narrower scope than a master’s thesis. Acceptance of a student by a faculty adviser is required before registration. A project report and an oral examination on it are required.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 9053 Special Topics in Computer Science: Intro to Java",
+        "description": "",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6963 Digital Forensics",
+        "description": "This course introduces information-technology professionals to the application of forensic science principles and practices for collecting, preserving, examining, analyzing and presenting digital evidence. The course includes selected topics from the legal, forensic and information-technology domains and uses lecture, laboratory and written projects to illustrate these topics.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6953 Deep Learning",
+        "description": "This course provides an overview of deep neural network learning (covering mathematical foundations as well as example applications in NLP, computer vision, and reinforcement learning). Upon successful completion, students will be able to grasp the mathematical basics of deep learning, solve practical machine learning problems in applications, and implement software prototypes of deep learning solutions to these problems.",
+        "dependencies": "CS-GY 6923"
+    },
+    {
+        "name": "CS-GY 6943 Artificial Intelligence for Games",
+        "description": "This course covers artificial intelligence techniques used with games. The course is an advanced course that presupposes a good understanding of standard AI techniques, and much of the course material will consists of recent research papers. While the course will cover recent methods for playing games, in particular for general game playing, it will also go beyond that application domain to cover methods for generating games and game content and for modeling players. Many of these methods are based on evolutionary computation, others on stochastic tree search, cellular automata or grammar expansion. Approximately the first half of the course will consist of lectures, and the second half of the group projects.",
+        "dependencies": "CS-GY 6613"
+    },
+    {
+        "name": "CS-GY 6913 Web Search Engines",
+        "description": "This course covers the basic technology underlying Web search engines and related tools. The main focus is on large-scale Web search engines (such as Google, Yahoo and MSN Search) and their underlying architectures and techniques. Students learn how search engines work and get hands-on experience in how to build search engines from the ground up. Topics are based on a reading list of recent research papers. Students must work on a course project and may have to present in class.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6903 Applied Cryptography",
+        "description": "This course examines Modern Cryptography from a both theoretical and applied perspective, with emphasis on “provable security” and “application case studies”. The course looks particularly at cryptographic primitives that are building blocks of various cryptographic applications. The course studies notions of security for a given cryptographic primitive, its various constructions and respective security analysis based on the security notion. The cryptographic primitives covered include pseudorandom functions, symmetric encryption (block ciphers), hash functions and random oracles, message authentication codes, asymmetric encryption, digital signatures and authenticated key exchange. The course covers how to build provably secure cryptographic protocols (e.g., secure message transmission, identification schemes, secure function evaluation, etc.), and various number-theoretic assumptions upon which cryptography is based. Also covered: implementation issues (e.g., key lengths, key management, standards, etc.) and, as application case studies, a number of real-life scenarios currently using solutions from modern cryptography.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6823 Network Security",
+        "description": "This course begins by covering attacks and threats in computer networks, including network mapping, port scanning, sniffing, DoS, DDoS, reflection attacks, attacks on DNS and leveraging P2P deployments for attacks. The course continues with cryptography topics most relevant to secure networking protocols. Topics covered are block ciphers, stream ciphers, public key cryptography, RSA, Diffie Hellman, certification authorities, digital signatures and message integrity. After surveying basic cryptographic techniques, the course examines several secure networking protocols, including PGP, SSL, IPsec and wireless security protocols. The course examines operational security, including firewalls and intrusion-detection systems. Students read recent research papers on network security and participate in an important lab component that includes packet sniffing, network mapping, firewalls, SSL and IPsec.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6813 Information, Security and Privacy",
+        "description": "This course introduces Information Systems Security and covers cryptography, capability and access control mechanisms, authentication models, security models, operating systems security, malicious code, securitypolicy formation and enforcement, vulnerability analysis, evaluating secure systems.",
+        "dependencies": ""
+    },
+    {
+        "name": "CS-GY 6803 Information Systems Security Engineering and Management",
+        "description": "This course presents a system and management view of information security: what it is, what drives the requirements for information security, how to integrate it into the systems-design process and life-cycle security management of information systems. A second goal is to cover basic federal policies on government information security and methodologies. Topics include information-security risk management, security policies, security in the systems-engineering process, laws related to information security and management of operational systems.",
+        "dependencies": ""
+    }
+]
