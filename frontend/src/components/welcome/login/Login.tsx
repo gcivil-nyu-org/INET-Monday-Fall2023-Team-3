@@ -2,7 +2,7 @@ import { ChangeEvent, useState } from "react"
 import { Alert, Button, TextField } from "@mui/material"
 import { redirect } from "react-router-dom"
 
-import { userLogin } from "@utils/backendRequests"
+import { userLogin } from "utils/backendRequests"
 
 
 export default function Login() {

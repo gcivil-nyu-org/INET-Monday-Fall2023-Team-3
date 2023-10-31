@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from "react"
 import { Button, Alert, TextField } from "@mui/material"
 import { redirect } from "react-router-dom"
-import { userSignup } from "@utils/backendRequests"
+import { userSignup } from "utils/backendRequests"
 
 export default function SignUp() {
   const [email, setEmail] = useState("")
