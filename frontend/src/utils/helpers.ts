@@ -1,3 +1,5 @@
+import { Result } from "./models"
+
 /**
  * Convert input camel cased string to snake case string
  *
@@ -48,5 +50,46 @@ export const fetchRestful = <T extends {}>(url: string, method: string, body?: T
       headers: headers,
       body: JSON.stringify(snakeCasedBody),
     })
+  }
+}
+
+
+export const parseResponse = async <ResultType extends {} | undefined>(response: Response | undefined): Promise<Result<ResultType>> => {
+  if (response === undefined) {
+    return {
+      status: false,
+      error: "Unexpected error during request",
+    }
+  }
+
+  if (!response.ok) {
+    return {
+      status: false,
+      error: `Server side error ${response.status}`,
+    }
+  }
+
+  const responseObject = await response.json().catch((err) => {
+    console.error(err)
+    return undefined
+  })
+
+  if (responseObject === undefined) {
+    return {
+      status: false,
+      error: "Unexpected error during json parsing",
+    }
+  }
+
+  if (responseObject.detail !== undefined) {
+    return {
+      status: false,
+      error: responseObject.detail as string,
+    }
+  }
+
+  return {
+    status: true,
+    value: responseObject as ResultType,
   }
 }

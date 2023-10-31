@@ -19,6 +19,10 @@ export type IToken = {
   token: string
 }
 
+export type IMessage = {
+  detail: string
+}
+
 /**
  * Represents a user in backend
  */
@@ -31,10 +35,19 @@ export type IUser = {
 /**
  * Represents a node in backend
  */
-export interface INode {
-  id: string;
-  name: string;
-  description: string;
-  isPredefined: boolean;
-  dependencies: string[];
+export type INode = {
+  id: string
+  name: string
+  description: string
+  predefined: boolean
+  dependencies: string[]
+}
+
+/**
+ * Represents a edge in backend
+ */
+export type IEdge = {
+  id: string
+  fromNode: string
+  toNode: string
 }

@@ -1,95 +1,153 @@
-import { IUser, IToken, Result, INode } from "./models"
-import { fetchRestful } from "./helpers"
+import { Result } from "./models"
+import { fetchRestful, parseResponse } from "./helpers"
+import { Endpoints } from "./requests"
 
-// add all backend endpoints to this list for auto code complete
-const endpoints = [
-  "/user/login/", "/user/create/", "/user/update/", "/user/get/",
-  "/node/create/","/node/edit/", "/node/get/predefined/"
-] as const
+// avoid conflict with frontend pages
+const endpointPrefix = "/backend"
 
-/**
- * Send a request to backend and process the result into proper forms
- *
- * @param endpoint backend endpoint
- * @param method request method
- * @param object request body
- * @param token authentication token
- * @returns parsed result from the request
- */
-export const restfulRequest = async <BodyType extends {} | undefined, ResultType extends {}, Fixed extends boolean = true>(
-  endpoint: Fixed extends true ? typeof endpoints[number] : string,
-  method: string,
-  object?: BodyType,
-  token?: string
+type RestfulRequestParams<
+  Endpoint extends keyof Endpoints,
+  BodyType extends Endpoints[Endpoint]["bodyType"] = Endpoints[Endpoint]["bodyType"],
+> = {
+  param: string,
+  body: BodyType,
+  token: string
+}
+
+type UndefinedOmit<Object extends {}, OmitKeys extends keyof Object> =
+  Omit<Object, OmitKeys> & { [Key in OmitKeys]?: undefined }
+
+type RestfulRequestFunc<
+  Endpoint extends keyof Endpoints,
+  RequireParam extends Endpoints[Endpoint]["param"] = Endpoints[Endpoint]["param"],
+  RequireAuthenticate extends Endpoints[Endpoint]["authenticate"] = Endpoints[Endpoint]["authenticate"],
+  Method extends Endpoints[Endpoint]["method"] = Endpoints[Endpoint]["method"],
+  BodyType extends Endpoints[Endpoint]["bodyType"] = Endpoints[Endpoint]["bodyType"],
+  ResultType extends Endpoints[Endpoint]["resultType"] = Endpoints[Endpoint]["resultType"],
+> = RequireParam extends true
+    // param: true
+    ? RequireAuthenticate extends true
+    // authenticate: true
+    ? BodyType extends undefined
+    ? (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "body">) => Promise<Result<ResultType>>
+    : (endpoint: Endpoint, method: Method, params: RestfulRequestParams<Endpoint>) => Promise<Result<ResultType>>
+    // authenticate: false
+    : BodyType extends undefined
+    ? (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "body" | "token">) => Promise<Result<ResultType>>
+    : (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "token">) => Promise<Result<ResultType>>
+    // param: false
+    : RequireAuthenticate extends true
+    // authenticate: true
+    ? BodyType extends undefined
+    ? (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "param" | "body">) => Promise<Result<ResultType>>
+    : (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "param">) => Promise<Result<ResultType>>
+    // authenticate: false
+    : BodyType extends undefined
+    ? (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "param" | "body" | "token">) => Promise<Result<ResultType>>
+    : (endpoint: Endpoint, method: Method, params: UndefinedOmit<RestfulRequestParams<Endpoint>, "param" | "token">) => Promise<Result<ResultType>>
+
+export const restfulRequest = async <
+  Endpoint extends keyof Endpoints,
+  Method extends Endpoints[Endpoint]["method"] = Endpoints[Endpoint]["method"],
+  ResultType extends Endpoints[Endpoint]["resultType"] = Endpoints[Endpoint]["resultType"],
+>(
+  endpoint: Endpoint,
+  method: Method,
+  params: Parameters<RestfulRequestFunc<Endpoint>>[2]
 ): Promise<Result<ResultType>> => {
-  const response = await fetchRestful(endpoint, method, object, token).catch((err) => {
+  const { param, body, token } = params
+  const url = param === undefined ? `${endpointPrefix}${endpoint}` : `${endpointPrefix}${endpoint}${param}/`
+  const response = await fetchRestful(url, method, body, token).catch((err) => {
     console.error(err)
     return undefined
   })
-
-  if (response === undefined) {
-    return {
-      status: false,
-      error: "Unexpected error during request",
-    }
-  }
-
-  if (!response.ok) {
-    return {
-      status: false,
-      error: `Server side error ${response.status}`,
-    }
-  }
-
-  const responseObject = await response.json().catch((err) => {
-    console.error(err)
-    return undefined
-  })
-
-  if (responseObject === undefined) {
-    return {
-      status: false,
-      error: "Unexpected error during json parsing",
-    }
-  }
-
-  if (responseObject.detail !== undefined) {
-    return {
-      status: false,
-      error: responseObject.detail as string,
-    }
-  }
-
-  return {
-    status: true,
-    value: responseObject as ResultType,
-  }
+  return parseResponse(response)
 }
 
-export const userLogin = async (user: Omit<IUser, "username">) => {
-  return restfulRequest<typeof user, IToken>("/user/login/", "POST", user)
+type RestfulRequestHelper<
+  Endpoint extends keyof Endpoints,
+  RequireParam extends Endpoints[Endpoint]["param"] = Endpoints[Endpoint]["param"],
+  RequireAuthenticate extends Endpoints[Endpoint]["authenticate"] = Endpoints[Endpoint]["authenticate"],
+  BodyType extends Endpoints[Endpoint]["bodyType"] = Endpoints[Endpoint]["bodyType"],
+  ResultType extends Endpoints[Endpoint]["resultType"] = Endpoints[Endpoint]["resultType"],
+> = RequireParam extends true
+    // param: true
+    ? RequireAuthenticate extends true
+    // authenticate: true
+    ? BodyType extends undefined
+    ?(param: string, token: string) => Promise<Result<ResultType>>
+    :(param: string, body: BodyType, token: string) => Promise<Result<ResultType>>
+    // authenticate: false
+    : BodyType extends undefined
+    ?(param: string) => Promise<Result<ResultType>>
+    :(param: string, body: BodyType) => Promise<Result<ResultType>>
+    // param: false
+    : RequireAuthenticate extends true
+    // authenticate: true
+    ? BodyType extends undefined
+    ?(token: string) => Promise<Result<ResultType>>
+    :(body: BodyType, token: string) => Promise<Result<ResultType>>
+    // authenticate: true
+    : BodyType extends undefined
+    ?() => Promise<Result<ResultType>>
+    :(body: BodyType) => Promise<Result<ResultType>>
+
+export const userPing: RestfulRequestHelper<"/user/ping/"> = () => {
+  return restfulRequest("/user/ping/", "GET", {})
 }
 
-export const userSignup = async (user: IUser) => {
-  return restfulRequest<IUser, IToken>("/user/create/", "POST", user)
+export const userCreate: RestfulRequestHelper<"/user/create/"> = (body) => {
+  return restfulRequest("/user/create/", "POST", { body })
 }
 
-export const userUpdate = async (user: Partial<IUser> & Pick<IUser, "email">, token: string) => {
-  return restfulRequest<typeof user, Partial<IUser> & Pick<IUser, "email">>("/user/update/", "POST", user, token)
+export const userLogin: RestfulRequestHelper<"/user/login/"> = (body) => {
+  return restfulRequest("/user/login/", "POST", { body })
 }
 
-export const userGet = async (token: string) => {
-  return restfulRequest<undefined, Omit<IUser, "password">>("/user/get/", "GET", undefined, token)
+export const userGet: RestfulRequestHelper<"/user/get/"> = (token) => {
+  return restfulRequest("/user/get/", "GET", { token })
 }
 
-export const nodeCreate = async (node: INode, token: string) => {
-  return restfulRequest<INode, INode>("/node/create/", "POST", node, token)
+export const userUpdate: RestfulRequestHelper<"/user/update/"> = (body, token) => {
+  return restfulRequest("/user/update/", "POST", { body, token })
 }
 
-export const nodeEdit = async (node: INode, token: string) => {
-  return restfulRequest<INode, INode>("/node/create/", "POST", node, token)
+export const nodePing: RestfulRequestHelper<"/node/ping/"> = () => {
+  return restfulRequest("/node/ping/", "GET", {})
 }
 
-export const nodeGetPredefined = async (token: string) => {
-  return restfulRequest<undefined, INode[]>("/node/get/predefined/", "GET", undefined, token)
+export const nodeCreate: RestfulRequestHelper<"/node/create/"> = (body, token) => {
+  return restfulRequest("/node/create/", "POST", { body, token })
+}
+
+export const nodeGet: RestfulRequestHelper<"/node/get/"> = (param, token) => {
+  return restfulRequest("/node/get/", "GET", { param, token })
+}
+
+export const nodeUpdate: RestfulRequestHelper<"/node/update/"> = (body, token) => {
+  return restfulRequest("/node/update/", "PUT", { body, token })
+}
+
+export const nodeDelete: RestfulRequestHelper<"/node/delete/"> = (param, token) => {
+  return restfulRequest("/node/delete/", "DELETE", { param, token })
+}
+
+export const edgePing: RestfulRequestHelper<"/edge/ping/"> = () => {
+  return restfulRequest("/edge/ping/", "GET", {})
+}
+
+export const edgeCreate: RestfulRequestHelper<"/edge/create/"> = (body, token) => {
+  return restfulRequest("/edge/create/", "POST", { body, token })
+}
+
+export const edgeGet: RestfulRequestHelper<"/edge/get/"> = (param, token) => {
+  return restfulRequest("/edge/get/", "GET", { param, token })
+}
+
+export const edgeUpdate: RestfulRequestHelper<"/edge/update/"> = (body, token) => {
+  return restfulRequest("/edge/update/", "PUT", { body, token })
+}
+
+export const edgeDelete: RestfulRequestHelper<"/edge/delete/"> = (param, token) => {
+  return restfulRequest("/edge/delete/", "DELETE", { param, token })
 }
