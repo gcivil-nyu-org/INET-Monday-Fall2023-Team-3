@@ -1,8 +1,6 @@
 from rest_framework import serializers
 from .models import Edge
 
-import uuid
-
 from node.models import Node
 
 

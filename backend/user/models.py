@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
     username = models.CharField(
         "username",
         max_length=150,
-        help_text="Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.",
+        help_text="Required. max 150 characters. Letters, digits and @/./+/-/_ only.",
         validators=[username_validator],
     )
     email = models.EmailField(
