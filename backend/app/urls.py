@@ -17,10 +17,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from django.views.static import serve
+
+from .settings import STATIC_URL
+
+
 urlpatterns = [
-    path("admin/", admin.site.urls),
-    path("user/", include("user.urls")),
-    path("node/", include("node.urls")),
-    path("edge/", include("edge.urls")),
-    path("graph/", include("graph.urls")),
+    path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
+    path("backend/admin/", admin.site.urls),
+    path("backend/user/", include("user.urls")),
+    path("backend/node/", include("node.urls")),
+    path("backend/edge/", include("edge.urls")),
+    path("backend/graph/", include("graph.urls")),
 ]
