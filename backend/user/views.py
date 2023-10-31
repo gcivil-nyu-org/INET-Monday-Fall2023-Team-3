@@ -13,23 +13,29 @@ from .serializers import UserSerializer
 def detail(msg: str):
     return  { "detail": msg }
 
+USER_PONG_MSG = detail("pong")
+USER_INVALID_FORMAT_MSG = detail("user data format invalid")
+USER_PASSWORD_MISMATCH_MSG = detail("user mismatch")
+USER_NOT_FOUND_MSG = detail("user does not exist on server")
+USER_ALREADY_EXISTS_MSG = detail("user already exists")
+
 USER_400_RESPONSE = Response(
-    detail("user data format invalid"), status=status.HTTP_400_BAD_REQUEST
+    USER_INVALID_FORMAT_MSG, status=status.HTTP_400_BAD_REQUEST
 )
 USER_401_RESPONSE = Response(
-    detail("user password does not match"), status=status.HTTP_401_UNAUTHORIZED
+    USER_PASSWORD_MISMATCH_MSG, status=status.HTTP_401_UNAUTHORIZED
 )
 USER_404_RESPONSE = Response(
-    detail("user does not exist on server"), status=status.HTTP_404_NOT_FOUND
+    USER_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND
 )
 USER_409_RESPONSE = Response(
-    detail("user already exists"), status=status.HTTP_409_CONFLICT
+    USER_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT
 )
 
 # Ping
 @api_view(["GET"])
 def ping(request):
-    return Response(detail("pong"), status=status.HTTP_200_OK)
+    return Response(USER_PONG_MSG, status=status.HTTP_200_OK)
 
 # Create user
 @api_view(["POST"])
@@ -49,7 +55,7 @@ def user_create(request):
 # User login
 @api_view(["POST"])
 def user_login(request):
-    serializer = UserSerializer(data=request.data)
+    serializer = UserSerializer(data=request.data, partial=True)
 
     if not serializer.is_valid():
         return USER_400_RESPONSE
@@ -58,6 +64,13 @@ def user_login(request):
         user = CustomUser.objects.get(email=serializer.validated_data.get("email"))
     except CustomUser.DoesNotExist:
         return USER_404_RESPONSE
+
+    password = serializer.validated_data.get("password")
+    if password is None:
+        return USER_400_RESPONSE
+
+    if user.password != password:
+        return USER_401_RESPONSE
 
     user_token = Token.objects.get_or_create(user=user)[0]
     return Response({ "token": user_token.key }, status=status.HTTP_200_OK)
@@ -77,16 +90,22 @@ def user_get(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def user_update(request):
+    user: CustomUser = request.user
     serializer = UserSerializer(data=request.data, partial=True)
 
     if not serializer.is_valid():
         return USER_400_RESPONSE
 
-    try:
-        user = CustomUser.objects.get(email=serializer.validated_data.get("email"))
-    except CustomUser.DoesNotExist:
-        return USER_404_RESPONSE
+    if user.email != serializer.validated_data.get("email"):
+        return USER_401_RESPONSE
 
-    serializer.instance = user
-    serializer.save()
+    next_username = serializer.validated_data.get("username")
+    if next_username is not None:
+        user.username = next_username
+
+    next_password = serializer.validated_data.get("password")
+    if next_password is not None:
+        user.password = next_password
+
+    user.save()
     return Response(serializer.data, status=status.HTTP_200_OK)
