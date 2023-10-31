@@ -5,7 +5,7 @@ os: linux
 dist: jammy
 
 python:
-  - "3.10"
+  - "3.11"
 
 env:
   global:
@@ -53,7 +53,7 @@ script:
   # backend lint check
   - cd ./backend
   - black . --check
-  - flake8 . --max-line-length=88
+  - flake8 .
   # backend coverage report
   - coverage run --source=app,user,node,edge manage.py test
   - coverage xml
