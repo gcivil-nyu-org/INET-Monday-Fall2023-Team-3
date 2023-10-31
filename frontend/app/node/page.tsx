@@ -4,6 +4,7 @@ import ReactFlow, {useNodesState, Controls, Background, BackgroundVariant} from 
 import { MarkerType } from 'reactflow';
 import { Button, Dialog, DialogTitle, ClickAwayListener, DialogActions, DialogContent, DialogContentText } from "@mui/material"
 import NodeDialog from './components/NodeDialog'
+import EditNodeDialog from './components/EditNodeDialog'
 import PredefinedNodeDialog from './components/PredefinedNodeDialog'
 import { predefinedNodeGet, nodeCreate, edgeCreate, edgeDelete } from "@/app/utils/backendRequests"
 import { useRouter } from "next/navigation"
@@ -23,6 +24,8 @@ function FlowComponent() {
   const [token, setToken] = useState("")
   const [showDialog, setShowDialog] = useState(false);
   const [showPredefinedDialog, setShowPredefinedDialog] = useState(false);
+  const [showEditDialog, setEditDialog] = useState(false);
+  const [currentNodeId, setCurrentNodeId] = useState(0);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [message, setMessage] = useState("")
@@ -153,6 +156,23 @@ function FlowComponent() {
     }
 };
 
+   const handleEditSubmit = (data: any) => {
+    setNodes((existingNodes) => {
+      const nodeToUpdate = existingNodes.find(node => node.id == data.currentNodeId)
+      if (!nodeToUpdate) return existingNodes;
+      nodeToUpdate.data.attribute.name = data.name
+      nodeToUpdate.data.attribute.description = data.description
+      nodeToUpdate.data.label = `${data.name} (${data.description})`
+      return [...existingNodes.filter(node => node.id != nodeToUpdate.id), nodeToUpdate]
+    })
+    setEditDialog(false);
+  }
+
+   const handleEditClose = (data: any) => {
+    if (showDialog) setShowDialog(false)
+    if (showPredefinedDialog) setShowPredefinedDialog(false)
+    if (showEditDialog) setEditDialog(false)
+  }
 
   const handleDeleteCancel = () => {
     setShowDeleteDialog(false);
@@ -210,7 +230,7 @@ function FlowComponent() {
           )}
         </Dialog>
       </div>
-      <ReactFlow nodes={nodes} onNodesChange={onNodesChange}
+      <ReactFlow nodes={nodes} onNodesChange={onNodesChange} onNodeDoubleClick={onNodeDoubleClickListener}
         edges={edges}
         onEdgeClick={handleEdgeClick}
         onConnect={(params) => {
@@ -259,6 +279,14 @@ function FlowComponent() {
           </Button>
         </DialogActions>
       </Dialog>
+       <Dialog open={showEditDialog} onSubmit={handleEditSubmit} onClose={handleEditClose} maxWidth="sm" fullWidth={true}>
+          {showEditDialog && (
+            <>
+              <DialogTitle>Edit Node</DialogTitle>
+              <EditNodeDialog showEditDialog={showEditDialog} currentNodeId={currentNodeId} onSubmit={handleEditSubmit} onClose={() => setEditDialog(false)} />
+            </>
+          )}
+        </Dialog>
     </div>
   </div>
   )
