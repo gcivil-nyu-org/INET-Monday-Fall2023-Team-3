@@ -58,9 +58,11 @@ export default function Graph() {
   const onNodeSubmit = (submittedNode: INode) => {
     closeAllNodePanels();
 
+    // update nodes accordingly
     setNodes((nodes) => {
       const node = nodes.find((node) => node.id === submittedNode.id);
 
+      // new node
       if (node === undefined) {
         return nodes.concat({
           id: submittedNode.id,
@@ -70,6 +72,7 @@ export default function Graph() {
         });
       }
 
+      // existing ndoe
       node.data = submittedNode;
       return nodes;
     });
