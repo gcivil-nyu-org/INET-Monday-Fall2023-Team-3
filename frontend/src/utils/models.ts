@@ -48,6 +48,6 @@ export type INode = {
  */
 export type IEdge = {
   id: string;
-  fromNode: string;
-  toNode: string;
+  source: string;
+  target: string;
 };
