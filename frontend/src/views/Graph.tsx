@@ -7,6 +7,8 @@ import ReactFlow, {
   Connection,
   useEdgesState,
   addEdge,
+  getConnectedEdges,
+  getOutgoers,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll } from "@mui/icons-material";
@@ -16,7 +18,7 @@ import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
-import { edgeCreate } from "utils/backendRequests";
+import { edgeCreate, edgeDelete, nodeDelete, nodeUpdate } from "utils/backendRequests";
 
 export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
@@ -65,43 +67,49 @@ export default function Graph() {
     closeAllNodePanels();
   };
 
-  const onNodeSubmit = useCallback((submittedNode: INode) => {
-    closeAllNodePanels();
+  const onNodeSubmit = useCallback(
+    (submittedNode: INode) => {
+      closeAllNodePanels();
 
-    // update nodes accordingly
-    setNodes((nodes) => {
-      const node = nodes.find((node) => node.id === submittedNode.id);
+      // update nodes accordingly
+      setNodes((nodes) => {
+        const node = nodes.find((node) => node.id === submittedNode.id);
 
-      // new node
-      if (node === undefined) {
-        return nodes.concat({
-          id: submittedNode.id,
-          type: "smoothNode",
-          position: { x: 0, y: 0 },
-          data: submittedNode,
-        });
+        // new node
+        if (node === undefined) {
+          return nodes.concat({
+            id: submittedNode.id,
+            type: "smoothNode",
+            position: { x: 0, y: 0 },
+            data: submittedNode,
+          });
+        }
+
+        // existing ndoe
+        node.data = submittedNode;
+        return nodes;
+      });
+    },
+    [setNodes]
+  );
+
+  const onEdgeConnect = useCallback(
+    async ({ source, target }: Connection) => {
+      if (source == null) {
+        console.error("source of edge is null");
+        return;
+      }
+      if (target == null) {
+        console.error("target of edge is null");
+        return;
       }
 
-      // existing ndoe
-      node.data = submittedNode;
-      return nodes;
-    });
-  }, [setNodes]);
+      console.log(`create new edge between ${source} and ${target}`);
 
-  const onEdgeConnect = ({ source, target }: Connection) => {
-    if (source == null) {
-      console.error("source of edge is null");
-      return;
-    }
-    if (target == null) {
-      console.error("target of edge is null");
-      return;
-    }
-
-    console.log(`create new edge between ${source} and ${target}`);
-
-    edgeCreate({ source, target }, sessionStorage.getItem("token")!).then((result) => {
+      const result = await edgeCreate({ source, target }, sessionStorage.getItem("token")!);
       if (result.status) {
+        console.log(`created edge with id ${result.value.id}`);
+
         setEdges((edges) =>
           addEdge(
             {
@@ -112,11 +120,53 @@ export default function Graph() {
             edges
           )
         );
+      } else {
+        onError(result.error);
       }
-    });
-  };
+    },
+    [setEdges]
+  );
 
-  const onNodeError = (err: string) => {
+  const onNodesDelete = useCallback(
+    async (deleted: Node[]) => {
+      // no need to update edges because we use foreign keys
+      // in backend, therefore deleting node will delete
+      // corresponding edges as well
+
+      // get all attached edges
+      const invalidEdges = deleted.flatMap((node) => getConnectedEdges([node], edges));
+      // update edges
+      setEdges((edges) => {
+        return edges.filter((edge) => !invalidEdges.includes(edge));
+      });
+
+      const nodeUpdatePromises = deleted.map(async (node) => {
+        // get all nodes that depend on current node
+        const outgoers = getOutgoers(node, nodes, edges);
+        // update dependencies of these nodes
+        const dependencyUpdatePromises = outgoers.map((targetNode) =>
+          nodeUpdate(
+            {
+              ...targetNode.data,
+              // remove dependency of current node
+              dependencies: targetNode.data.dependencies.filter(
+                (parentNodeId) => parentNodeId !== node.id
+              ),
+            },
+            sessionStorage.getItem("token")!
+          )
+        );
+        await Promise.all(dependencyUpdatePromises).then(() =>
+          // remove current node after success
+          nodeDelete(node.id, sessionStorage.getItem("token")!)
+        );
+      });
+      await Promise.all(nodeUpdatePromises).catch(onError);
+    },
+    [nodes, edges, setEdges]
+  );
+
+  const onError = (err: string) => {
     setErrorMessage(err);
     setShowError(true);
   };
@@ -135,16 +185,17 @@ export default function Graph() {
         </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Add Node</DialogTitle>
-          <AddNode onSubmit={onNodeSubmit} onError={onNodeError} />
+          <AddNode onSubmit={onNodeSubmit} onError={onError} />
         </Dialog>
         <Dialog open={showEditNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Edit Node</DialogTitle>
-          <EditNode node={currNode!} onSubmit={onNodeSubmit} onError={onNodeError} />
+          <EditNode node={currNode!} onSubmit={onNodeSubmit} onError={onError} />
         </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}
           nodes={nodes}
           onNodesChange={onNodesChange}
+          onNodesDelete={onNodesDelete}
           onNodeDoubleClick={onNodeDoubleClick}
           edges={edges}
           onEdgesChange={onEdgesChange}

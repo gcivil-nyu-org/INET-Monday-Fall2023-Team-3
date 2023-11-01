@@ -13,8 +13,8 @@ env:
     - EB_DEPLOY_VERSION=travis-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER
 
 before_install:
-  # configure nodejs latest lts version
-  - nvm install --lts
+  # configure nodejs 18
+  - nvm install 18
   - npm install -g npm@latest
   # configure coverage report tools
   - mkdir ./tools
@@ -29,7 +29,7 @@ install:
   - cd ..
   # install frontend dependencies
   - cd ./frontend
-  - npm install
+  - npm ci
   - cd ..
 
 before_script:
