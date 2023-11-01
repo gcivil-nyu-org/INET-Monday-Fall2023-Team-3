@@ -1,36 +1,36 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import Welcome from 'views/Welcome';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./index.css";
+import Welcome from "views/Welcome";
+import reportWebVitals from "./reportWebVitals";
 
-import { createBrowserRouter, redirect, RouterProvider } from 'react-router-dom';
-import User from 'views/User';
-import Graph from 'views/Graph';
+import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom";
+import User from "views/User";
+import Graph from "views/Graph";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Welcome />,
-  }, {
+  },
+  {
     path: "/user",
     element: <User />,
     loader: async () => {
-      const currToken = sessionStorage.getItem("token") ?? ""
+      const currToken = sessionStorage.getItem("token") ?? "";
       if (currToken === "" && process.env.APP_DEBUG === "false") {
-        return redirect("/")
+        return redirect("/");
       }
-      return null
-    }
-  }, {
+      return null;
+    },
+  },
+  {
     path: "/graph",
     element: <Graph />,
-  }
-])
+  },
+]);
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
 root.render(
   <React.StrictMode>
     <RouterProvider router={router} />
