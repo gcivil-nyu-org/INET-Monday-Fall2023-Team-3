@@ -1,13 +1,22 @@
-import React, { useState, useMemo } from "react";
-import ReactFlow, { useNodesState, Controls, Panel, Node } from "reactflow";
+import React, { useState, useMemo, useCallback } from "react";
+import ReactFlow, {
+  useNodesState,
+  Controls,
+  Panel,
+  Node,
+  Connection,
+  useEdgesState,
+  addEdge,
+} from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll } from "@mui/icons-material";
 
-import { INode } from "utils/models";
+import { IEdge, INode } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
+import { edgeCreate } from "utils/backendRequests";
 
 export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
@@ -18,6 +27,7 @@ export default function Graph() {
 
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
 
   const onAddButtonClicked = () => {
     console.log("add button clicked");
@@ -55,7 +65,7 @@ export default function Graph() {
     closeAllNodePanels();
   };
 
-  const onNodeSubmit = (submittedNode: INode) => {
+  const onNodeSubmit = useCallback((submittedNode: INode) => {
     closeAllNodePanels();
 
     // update nodes accordingly
@@ -75,6 +85,34 @@ export default function Graph() {
       // existing ndoe
       node.data = submittedNode;
       return nodes;
+    });
+  }, []);
+
+  const onEdgeConnect = ({ source, target }: Connection) => {
+    if (source == null) {
+      console.error("source of edge is null");
+      return;
+    }
+    if (target == null) {
+      console.error("target of edge is null");
+      return;
+    }
+
+    console.log(`create new edge between ${source} and ${target}`);
+
+    edgeCreate({ source, target }, sessionStorage.getItem("token")!).then((result) => {
+      if (result.status) {
+        setEdges((edges) =>
+          addEdge(
+            {
+              id: result.value.id,
+              source: result.value.source,
+              target: result.value.target,
+            },
+            edges
+          )
+        );
+      }
     });
   };
 
@@ -108,6 +146,7 @@ export default function Graph() {
           nodes={nodes}
           onNodesChange={onNodesChange}
           onNodeDoubleClick={onNodeDoubleClick}
+          onConnect={onEdgeConnect}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
