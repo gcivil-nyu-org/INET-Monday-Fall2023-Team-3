@@ -29,7 +29,7 @@ install:
   - cd ..
   # install frontend dependencies
   - cd ./frontend
-  - npm install
+  - npm ci
   - cd ..
 
 before_script:
