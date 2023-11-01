@@ -15,7 +15,7 @@ export default function User() {
 
 
   const onCreateGraphButtonClicked = () => {
-    navigate("/node")
+    navigate("/graph")
   }
 
   return (
