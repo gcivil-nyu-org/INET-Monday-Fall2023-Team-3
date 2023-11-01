@@ -1,15 +1,25 @@
 import { Result } from "./models";
 
 /**
- * Convert input camel cased string to snake case string
+ * Convert input camel case string to snake case string
  *
  * @param str string you want to convert
- * @returns str converted to snake case
+ * @returns string converted to snake case
  */
 const snakeCase = (str: string) => {
   return str
     .replace(/-/g, "_")
     .replace(/.[A-Z]+/g, (str) => str[0] + "_" + str.slice(1).toLowerCase());
+};
+
+/**
+ * Convert input snake case string to camel case string
+ *
+ * @param str string you want to convert
+ * @returns string converted to camel case
+ */
+const camelCase = (str: string) => {
+  return str.replace(/[_-][a-z]/g, (str) => str.slice(1).toUpperCase());
 };
 
 /**
@@ -83,15 +93,20 @@ export const parseResponse = async <ResultType extends {} | undefined>(
     };
   }
 
+  const camelCasedBody: Record<string, unknown> = {};
+  Object.entries(responseObject).forEach(([key, value]) => {
+    camelCasedBody[camelCase(key)] = value;
+  });
+
   if (response.ok) {
     return {
       status: true,
-      value: responseObject as ResultType,
+      value: camelCasedBody as ResultType,
     };
   }
 
   return {
     status: false,
-    error: `Server side error ${responseObject.detail}`,
+    error: `Server side error ${camelCasedBody.detail}`,
   };
 };
