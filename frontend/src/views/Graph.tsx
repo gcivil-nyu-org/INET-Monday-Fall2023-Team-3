@@ -86,7 +86,7 @@ export default function Graph() {
       node.data = submittedNode;
       return nodes;
     });
-  }, []);
+  }, [setNodes]);
 
   const onEdgeConnect = ({ source, target }: Connection) => {
     if (source == null) {
