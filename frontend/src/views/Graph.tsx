@@ -146,6 +146,8 @@ export default function Graph() {
           nodes={nodes}
           onNodesChange={onNodesChange}
           onNodeDoubleClick={onNodeDoubleClick}
+          edges={edges}
+          onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
         >
           <Panel className="bg-transparent" position="top-left">
