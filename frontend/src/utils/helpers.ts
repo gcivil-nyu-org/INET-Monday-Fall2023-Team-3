@@ -62,13 +62,6 @@ export const parseResponse = async <ResultType extends {} | undefined>(response:
     }
   }
 
-  if (!response.ok) {
-    return {
-      status: false,
-      error: `Server side error ${response.status}`,
-    }
-  }
-
   const responseObject = await response.json().catch((err) => {
     console.error(err)
     return undefined
@@ -81,15 +74,15 @@ export const parseResponse = async <ResultType extends {} | undefined>(response:
     }
   }
 
-  if (responseObject.detail !== undefined) {
+  if (response.ok) {
     return {
-      status: false,
-      error: responseObject.detail as string,
+      status: true,
+      value: responseObject as ResultType,
     }
   }
 
   return {
-    status: true,
-    value: responseObject as ResultType,
+    status: false,
+    error: `Server side error ${responseObject.detail}`,
   }
 }
