@@ -29,6 +29,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     "smooth-dirty.us-west-2.elasticbeanstalk.com",
+    "smooth-dev.us-west-2.elasticbeanstalk.com",
+    "smooth-main.us-west-2.elasticbeanstalk.com",
 ]
 
 
