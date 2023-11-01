@@ -1,10 +1,11 @@
 import { Button, Avatar, Dialog, DialogTitle } from "@mui/material"
 import { useState } from "react"
-import { redirect } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import GraphList from "components/user/GraphList"
 import Update from "components/user/Update"
 
 export default function User() {
+  const navigate = useNavigate()
   const [update, setUpdate] = useState(false)
 
   const onUpdateCancelled = () => {
@@ -14,7 +15,7 @@ export default function User() {
 
 
   const onCreateGraphButtonClicked = () => {
-    redirect("/node")
+    navigate("/node")
   }
 
   return (
