@@ -6,13 +6,13 @@ import reportWebVitals from './reportWebVitals';
 
 import { createBrowserRouter, redirect, RouterProvider } from 'react-router-dom';
 import User from 'views/User';
+import Graph from 'views/Graph';
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Welcome />,
-  },
-  {
+  }, {
     path: "/user",
     element: <User />,
     loader: async () => {
@@ -22,6 +22,9 @@ const router = createBrowserRouter([
       }
       return null
     }
+  }, {
+    path: "/graph",
+    element: <Graph />,
   }
 ])
 
