@@ -50,7 +50,7 @@ class EdgeAPITest(APITestCase):
         invalid_id1 = uuid.uuid4()
         invalid_id2 = uuid.uuid4()
 
-        invalid_data = {"from_node": invalid_id1, "to_node": invalid_id2}
+        invalid_data = {"source": invalid_id1, "target": invalid_id2}
         response = self.client.post(
             "/backend/edge/create/", data=invalid_data, format="json"
         )
@@ -65,14 +65,14 @@ class EdgeAPITest(APITestCase):
         node1 = Node.objects.create(**valid_data1)
         node2 = Node.objects.create(**valid_data2)
 
-        valid_edge = {"from_node": node1.id, "to_node": node2.id}
+        valid_edge = {"source": node1.id, "target": node2.id}
         response = self.client.post(
             "/backend/edge/create/", data=valid_edge, format="json"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["from_node"], node1.id)
-        self.assertEqual(response.data["to_node"], node2.id)
+        self.assertEqual(response.data["source"], node1.id)
+        self.assertEqual(response.data["target"], node2.id)
 
         # test recreate same edge raise already exist error
         edge_data = response.data
@@ -98,7 +98,7 @@ class EdgeAPITest(APITestCase):
         node1 = Node.objects.create(**valid_data1)
         node2 = Node.objects.create(**valid_data2)
 
-        valid_edge = {"from_node": node1.id, "to_node": node2.id}
+        valid_edge = {"source": node1.id, "target": node2.id}
         response = self.client.post(
             "/backend/edge/create/", data=valid_edge, format="json"
         )
@@ -108,8 +108,8 @@ class EdgeAPITest(APITestCase):
         response = self.client.get(f"/backend/edge/get/{edge_id}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["from_node"], node1.id)
-        self.assertEqual(response.data["to_node"], node2.id)
+        self.assertEqual(response.data["source"], node1.id)
+        self.assertEqual(response.data["target"], node2.id)
 
     def test_edge_update(self):
         # test invalid data raise format error
@@ -128,7 +128,7 @@ class EdgeAPITest(APITestCase):
         node1 = Node.objects.create(**valid_data1)
         node2 = Node.objects.create(**valid_data2)
 
-        invalid_data = {"id": uuid.uuid4(), "from_node": node1.id, "to_node": node2.id}
+        invalid_data = {"id": uuid.uuid4(), "source": node1.id, "target": node2.id}
         response = self.client.put(
             "/backend/edge/update/", data=invalid_data, format="json"
         )
@@ -137,7 +137,7 @@ class EdgeAPITest(APITestCase):
         self.assertEqual(response.data, EDGE_NOT_FOUND_MSG)
 
         # test update edge ok
-        valid_edge = {"from_node": node1.id, "to_node": node2.id}
+        valid_edge = {"source": node1.id, "target": node2.id}
         response = self.client.post(
             "/backend/edge/create/", data=valid_edge, format="json"
         )
@@ -146,17 +146,17 @@ class EdgeAPITest(APITestCase):
         node3 = Node.objects.create(**valid_data3)
 
         valid_edge["id"] = response.data["id"]
-        valid_edge["from_node"] = node3.id
+        valid_edge["source"] = node3.id
         response = self.client.put(
             "/backend/edge/update/", data=valid_edge, format="json"
         )
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["from_node"], node3.id)
-        self.assertEqual(response.data["to_node"], node2.id)
+        self.assertEqual(response.data["source"], node3.id)
+        self.assertEqual(response.data["target"], node2.id)
 
         # test invalid node id (missing node instance) raise format error
-        valid_edge["from_node"] = uuid.uuid4()
+        valid_edge["source"] = uuid.uuid4()
         response = self.client.put(
             "/backend/edge/update/", data=valid_edge, format="json"
         )
@@ -177,7 +177,7 @@ class EdgeAPITest(APITestCase):
         node1 = Node.objects.create(**valid_data1)
         node2 = Node.objects.create(**valid_data2)
 
-        valid_edge = {"from_node": node1.id, "to_node": node2.id}
+        valid_edge = {"source": node1.id, "target": node2.id}
         response = self.client.post(
             "/backend/edge/create/", data=valid_edge, format="json"
         )
