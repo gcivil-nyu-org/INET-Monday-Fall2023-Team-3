@@ -20,16 +20,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-wq#0ua)j4c#tgk)23um8piosic(c*(0#gfe=ku+od*lky-xu8#"
+SECRET_KEY = "django-insecure-_09rj67ibwr97bkq6dmf@583sj=g=mjmw)sanghf)!13h0)j5d"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "127.0.0.1",  # localhost
-    "localhost",  # localhost
-    "backend",  # deployed container name
-    "[::1]",
+    "localhost",
+    "127.0.0.1",
+    "smooth-dirty.us-west-2.elasticbeanstalk.com",
 ]
 
 
@@ -44,8 +43,11 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework.authtoken",
+    "app",
+    "user",
     "node",
     "edge",
+    "graph",
 ]
 
 MIDDLEWARE = [
@@ -90,6 +92,8 @@ DATABASES = {
     }
 }
 
+# Change anth user model
+AUTH_USER_MODEL = "user.CustomUser"
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -126,6 +130,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+    BASE_DIR / "static" / "static",
+    BASE_DIR / "static" / "static" / "js",
+    BASE_DIR / "static" / "static" / "css",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -136,16 +146,5 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
-    "DEFAULT_PERMISSION_CLASSES": [],
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
-    ],
+    "DEFAULT_PERMISSION_CLASSES": []
 }
-
-CORS_ALLOW_ALL_ORIGINS = True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",
-    "http://127.0.0.1:8000",
-    "http://[::1]:8000",
-]

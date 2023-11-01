@@ -1,9 +1,14 @@
 from django.urls import path
-from . import views
+
+from .views import ping, edge_create, edge_get, edge_update, edge_delete
+
+
+app_name = "edge"
 
 urlpatterns = [
-    path("ping/", views.ping, name="ping"),
-    path("create/", views.edge_create, name="edge-create"),
-    path("delete/<int:pk>/", views.edge_delete, name="edge-delete"),
-    path("getedge/<int:pk>/", views.edge_get, name="edge-get"),
+    path("ping/", ping, name="ping"),
+    path("create/", edge_create, name="create"),
+    path("get/<str:edge_id>/", edge_get, name="get"),
+    path("update/", edge_update, name="update"),
+    path("delete/<str:edge_id>/", edge_delete, name="delete"),
 ]

@@ -2,25 +2,33 @@ from rest_framework import serializers
 from .models import Node
 
 
-class NodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Node
-        fields = "__all__"  # This will include all fields in the serializer
+class NodeSerializer(serializers.Serializer):
+    id = serializers.UUIDField()
+    name = serializers.CharField(required=True)
+    description = serializers.CharField()
+    predefined = serializers.BooleanField()
+    dependencies = serializers.PrimaryKeyRelatedField(
+        many=True, queryset=Node.objects.all()
+    )
+
+    def validate(self, attrs):
+        if attrs.get("name") is None:
+            raise serializers.ValidationError("name is required")
+        return attrs
 
     def create(self, validated_data):
-        """
-        Create and return a new `Node` instance, given the validated data.
-        """
-        # You can add any custom creation logic here if needed
-        # Assuming you have the name and description values in validated_data
-        name = validated_data["name"]
-        description = validated_data.get(
-            "description", ""
-        )  # Use an empty string if description is not provided
+        dependencies = validated_data.pop("dependencies", None)
+        node = Node.objects.create(**validated_data)
+        if dependencies is not None:
+            node.dependencies.set(dependencies)
+        return node
 
-        # Create a new Node instance with AutoField automatically generated node_id
-        new_node = Node(name=name, description=description)
-
-        # Save the new instance to the database
-        new_node.save()
-        return new_node
+    def update(self, instance, validated_data):
+        instance.name = validated_data.get("name", instance.name)
+        instance.description = validated_data.get("description", instance.description)
+        instance.predefined = validated_data.get("predefined", instance.predefined)
+        instance.dependencies.clear()
+        dependencies = validated_data.get("dependencies", [])
+        for dependency in dependencies:
+            instance.dependencies.add(dependency)
+        return instance

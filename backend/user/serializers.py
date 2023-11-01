@@ -1,14 +1,21 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+
+from .models import CustomUser
 
 
 class UserSerializer(serializers.Serializer):
-    email = serializers.CharField()
+    email = serializers.CharField(required=True)
     username = serializers.CharField()
     password = serializers.CharField()
 
+    def validate(self, attrs):
+        email = attrs.get("email")
+        if email is None or email == "":
+            raise serializers.ValidationError("email is required")
+        return attrs
+
     def create(self, validated_data):
-        return User.objects.create(**validated_data)
+        return CustomUser.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         instance.username = validated_data.get("username", instance.username)

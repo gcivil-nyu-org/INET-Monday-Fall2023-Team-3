@@ -1,57 +1,70 @@
 language: python
-os: linux
-# ubuntu 22.04
-dist: jammy
-python:
-  - "3.10"
 
-install:
-  - gem install webrick
+# ubuntu 22.04
+os: linux
+dist: jammy
+
+python:
+  - "3.11"
+
+env:
+  global:
+    # keep track of current deployed version source
+    - EB_DEPLOY_VERSION=travis-$TRAVIS_BRANCH-$TRAVIS_BUILD_NUMBER
+
+before_install:
+  # configure nodejs latest lts version
+  - nvm install --lts
+  - npm install -g npm@latest
+  # configure coverage report tools
   - mkdir ./tools
   - curl -L https://coveralls.io/coveralls-linux.tar.gz | tar -xz -C ./tools
-  - pip install -r ./backend/requirements.txt
+  # install deploy tools
+  - npm install -g beanstalk-deploy
+
+install:
+  # install backend dependencies
+  - cd ./backend
+  - pip install -r requirements.txt
+  - cd ..
+  # install frontend dependencies
+  - cd ./frontend
+  - npm install
+  - cd ..
 
 before_script:
-  - python ./backend/manage.py makemigrations
-  - python ./backend/manage.py migrate
+  # build frontend project
+  - cd ./frontend
+  - npm run build
+  - cd ..
+  # create backend static
+  - cd ./backend
+  - mkdir static
+  - cd ..
+  # copy frontend files to backend
+  - cp -r ./frontend/build/* ./backend/static
+  # backend migration
+  - cd ./backend
+  - python manage.py makemigrations
+  - python manage.py migrate
+  - cd ..
 
 script:
-  - black ./backend --check
-  - flake8 ./backend --max-line-length=88
+  # backend lint check
+  - cd ./backend
+  - black . --check
+  - flake8 .
+  # backend coverage report
+  - coverage run --source=app,user,node,edge manage.py test
+  - coverage xml
+  - ../tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
+  - cd ..
 
 after_script:
-  - cd backend/
-  - coverage run --source=user,node manage.py test
-  - coverage xml
+  # prepare deploy zip file
+  - cd ./backend
+  - zip -r ../deploy.zip . -x '*.git*'
   - cd ..
-  - ./tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./backend/coverage.xml
-
-deploy:
-  - provider: elasticbeanstalk
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_ACCESS_SECRET
-    region: $AWS_DEPLOY_REGION
-    app: $AWS_APP_NAME
-    env: $AWS_APP_ENV_PROD
-    bucket_name: $AWS_BUCKET_NAME
-    on:
-      branch: main 
-  - provider: elasticbeanstalk
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_ACCESS_SECRET
-    region: $AWS_DEPLOY_REGION
-    app: $AWS_APP_NAME
-    env: $AWS_APP_ENV_DEV
-    bucket_name: $AWS_BUCKET_NAME
-    on:
-      branch: develop
-  - provider: elasticbeanstalk
-    access_key_id: $AWS_ACCESS_KEY
-    secret_access_key: $AWS_ACCESS_SECRET
-    region: $AWS_DEPLOY_REGION
-    app: $AWS_APP_NAME
-    env: $AWS_APP_ENV_DIRTY
-    bucket_name: $AWS_BUCKET_NAME
-    on:
-      all_branches: true
-      condition: (! $TRAVIS_BRANCH =~ ^(master|develop)$)
+  # deploy project
+  - chmod +x ./deploy.sh
+  - ./deploy.sh
