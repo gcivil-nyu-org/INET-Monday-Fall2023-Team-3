@@ -26,7 +26,7 @@ export type INodeDeleteBody = undefined;
 // edge
 export type IEdgePingBody = undefined;
 
-export type IEdgeCreateBody = IEdge;
+export type IEdgeCreateBody = Omit<IEdge, "id">;
 
 export type IEdgeGetBody = undefined;
 
