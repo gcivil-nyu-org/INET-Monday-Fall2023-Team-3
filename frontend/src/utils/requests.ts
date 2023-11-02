@@ -7,6 +7,7 @@ import {
   INodeCreateBody,
   INodeDeleteBody,
   INodeGetBody,
+  INodesGetBody,
   INodePingBody,
   INodeUpdateBody,
   IUserCreateBody,
@@ -24,6 +25,7 @@ import {
   INodeCreateResponse,
   INodeDeleteResponse,
   INodeGetResponse,
+  INodesGetResponse,
   INodePingResponse,
   INodeUpdateResponse,
   IUserCreateResponse,
@@ -108,7 +110,13 @@ export type Endpoints = {
     bodyType: INodeDeleteBody;
     resultType: INodeDeleteResponse;
   };
-
+  "/node/predefined-nodes/": {
+    param: false;
+    authenticate: true;
+    method: "GET";
+    bodyType: INodesGetBody;
+    resultType: INodesGetResponse;
+  };
   "/edge/ping/": {
     param: false;
     authenticate: false;

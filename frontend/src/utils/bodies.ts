@@ -19,6 +19,8 @@ export type INodeCreateBody = Partial<INode> & Pick<INode, "name">;
 
 export type INodeGetBody = undefined;
 
+export type INodesGetBody = undefined;
+
 export type INodeUpdateBody = Partial<INode> & Pick<INode, "name" | "id">;
 
 export type INodeDeleteBody = undefined;

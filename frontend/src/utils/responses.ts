@@ -19,6 +19,8 @@ export type INodeCreateResponse = INode;
 
 export type INodeGetResponse = INode;
 
+export type INodesGetResponse = INode[];
+
 export type INodeUpdateResponse = INode;
 
 export type INodeDeleteResponse = undefined;

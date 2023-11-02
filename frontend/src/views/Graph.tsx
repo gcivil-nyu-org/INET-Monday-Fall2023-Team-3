@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import ReactFlow, {
   useNodesState,
   Controls,
@@ -11,30 +11,65 @@ import ReactFlow, {
   getOutgoers,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
-import { Add, Share, DoneAll } from "@mui/icons-material";
+import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 
 import { IEdge, INode } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
+import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
-import { edgeCreate, edgeDelete, nodeDelete, nodeUpdate } from "utils/backendRequests";
+import {
+  edgeCreate,
+  edgeDelete,
+  nodeDelete,
+  nodeUpdate,
+  nodeGetPredefined,
+} from "utils/backendRequests";
 
 export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
+  const [showPredefinedNode, setShowPredefinedNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
+  const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
+
+  useEffect(() => {
+    async function fetchPredefinedNodes() {
+      const response = await nodeGetPredefined(sessionStorage.getItem("token")!);
+      if (response.status) {
+        const nodesArray = Object.values(response.value);
+        // Sort the array based on the 'name' property
+        const sortedNodes = nodesArray.sort((a, b) => {
+          if (a.name < b.name) return -1;
+          if (a.name > b.name) return 1;
+          return 0;
+        });
+        setPredefinedNodes(sortedNodes);
+      } else {
+        console.error("Error fetching predefined nodes:", response.error);
+      }
+    }
+    fetchPredefinedNodes();
+  }, []);
 
   const onAddButtonClicked = () => {
     console.log("add button clicked");
 
     setShowAddNode(true);
+    setShowEditNode(false);
+  };
+
+  const onAddPredefinedButtonClicked = () => {
+    console.log("add predefined button clicked");
+    setShowPredefinedNode(true);
     setShowEditNode(false);
   };
 
@@ -61,6 +96,7 @@ export default function Graph() {
   const closeAllNodePanels = () => {
     setShowAddNode(false);
     setShowEditNode(false);
+    setShowPredefinedNode(false);
   };
 
   const onCancel = () => {
@@ -77,6 +113,9 @@ export default function Graph() {
 
         // new node
         if (node === undefined) {
+          if (submittedNode.predefined) {
+            setOnCanvasNodeIds((prevIds) => [...prevIds, submittedNode.id]);
+          }
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
@@ -133,6 +172,11 @@ export default function Graph() {
       // in backend, therefore deleting node will delete
       // corresponding edges as well
 
+      // delete from onCanvasNodeIds
+      setOnCanvasNodeIds((currentIds) =>
+        currentIds.filter((id) => !deleted.some((node) => node.id === id))
+      );
+
       // get all attached edges
       const invalidEdges = deleted.flatMap((node) => getConnectedEdges([node], edges));
       // update edges
@@ -156,10 +200,13 @@ export default function Graph() {
             sessionStorage.getItem("token")!
           )
         );
-        await Promise.all(dependencyUpdatePromises).then(() =>
+        await Promise.all(dependencyUpdatePromises).then(() => {
           // remove current node after success
-          nodeDelete(node.id, sessionStorage.getItem("token")!)
-        );
+          if (node.data.predefined == false) {
+            // do not delete predefined data
+            nodeDelete(node.id, sessionStorage.getItem("token")!);
+          }
+        });
       });
       await Promise.all(nodeUpdatePromises).catch(onError);
     },
@@ -187,6 +234,15 @@ export default function Graph() {
           <DialogTitle>Add Node</DialogTitle>
           <AddNode onSubmit={onNodeSubmit} onError={onError} />
         </Dialog>
+        <Dialog open={showPredefinedNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
+          <DialogTitle>NYU Courses</DialogTitle>
+          <AddPredefinedNode
+            predefinedNodes={predefinedNodes}
+            onCanvasNodeIds={onCanvasNodeIds}
+            onSubmit={onNodeSubmit}
+            onClose={onCancel}
+          />
+        </Dialog>
         <Dialog open={showEditNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Edit Node</DialogTitle>
           <EditNode node={currNode!} onSubmit={onNodeSubmit} onError={onError} />
@@ -209,6 +265,13 @@ export default function Graph() {
                 onClick={onAddButtonClicked}
               >
                 <Add />
+              </Button>
+              <Button
+                variant="outlined"
+                sx={{ padding: "8px", minWidth: "32px" }}
+                onClick={onAddPredefinedButtonClicked}
+              >
+                <Storage />
               </Button>
               <Button
                 variant="outlined"
