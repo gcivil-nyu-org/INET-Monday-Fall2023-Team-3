@@ -112,9 +112,6 @@ def node_delete(request, node_id):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def node_get_predefined(request):
-    try:
-        predefined_nodes = Node.objects.filter(predefined=True)
-        serializer = NodeSerializer(predefined_nodes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Node.DoesNotExist:
-        return NODE_NOT_FOUND_RESPONSE
+    predefined_nodes = Node.objects.filter(predefined=True)
+    serializer = NodeSerializer(predefined_nodes, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
