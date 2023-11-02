@@ -23,10 +23,12 @@ from .settings import STATIC_URL
 
 
 urlpatterns = [
-    path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("backend/admin/", admin.site.urls),
     path("backend/user/", include("user.urls")),
     path("backend/node/", include("node.urls")),
     path("backend/edge/", include("edge.urls")),
     path("backend/graph/", include("graph.urls")),
+    path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
+    path("user/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
+    path("graph/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
 ]
