@@ -202,7 +202,7 @@ export default function Graph() {
         );
         await Promise.all(dependencyUpdatePromises).then(() => {
           // remove current node after success
-          if (node.data.predefined == false) {
+          if (node.data.predefined === false) {
             // do not delete predefined data
             nodeDelete(node.id, sessionStorage.getItem("token")!);
           }
