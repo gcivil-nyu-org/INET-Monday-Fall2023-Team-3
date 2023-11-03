@@ -52,37 +52,44 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
 
   return (
     <div className="w-full flex flex-col items-center bg-white">
-      <div className="h-24 w-full flex">
+      <div className="w-full flex">
         <TextField
-          className="h-16 m-4 flex-1"
+          value={name}
+          className="m-4 flex-1"
           label="Course Name"
           variant="outlined"
           onChange={onNameInputChanged}
           required
+          disabled={node.predefined}
         />
       </div>
-      <div className="h-24 w-full flex">
+      <div className="w-full flex my-4">
         <TextField
-          className="h-16 m-4 flex-1"
+          value={description}
+          className="flex-1 mx-4 min-h-[6rem]"
           label="Description"
           variant="outlined"
           onChange={onDescriptionInputChanged}
           required
+          disabled={node.predefined}
+          multiline
+          rows={4}
         />
       </div>
       {errorMessage !== "" && (
-        <div className="h-24 w-full flex">
+        <div className="w-full my-4">
           <Alert className="h-16 w-full m-4" severity="error">
             {errorMessage}
           </Alert>
         </div>
       )}
-      <div className="h-24 w-full flex">
+      <div className="w-full flex">
         <Button
-          className="w-64 h-16 m-auto bg-blue-400"
+          className="w-64 h-16 m-auto my-4 bg-blue-400"
           size="large"
           variant="contained"
           onClick={onSave}
+          disabled={node.predefined}
         >
           Save
         </Button>
