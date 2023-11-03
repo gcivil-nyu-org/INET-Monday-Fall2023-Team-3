@@ -5,6 +5,7 @@ from rest_framework.test import APITestCase
 from rest_framework.authtoken.models import Token
 from user.models import CustomUser
 from .models import Graph
+from node.models import Node
 # from node.models import Node
 # from edge.models import Edge
 
@@ -17,8 +18,6 @@ test_user = {
 class GraphTests(APITestCase):
 
     def setUp(self) -> None:
-        graph1 = Graph.objects.create()
-        graph2 = Graph.objects.create()
         user = CustomUser.objects.create(**test_user)
         token = Token.objects.create(user=user)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
@@ -40,3 +39,12 @@ class GraphTests(APITestCase):
         response = self.client.post("/backend/graph/create/")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         print(response.data)
+
+    def test_add_nodes(self):
+        testgraph = Graph.objects.create()
+        node1 = Node.objects.create(name="node1", graph=testgraph)
+        node2 = Node.objects.create(name="node2", graph=testgraph)
+        nodes_in_testgraph = testgraph.nodes.all()
+        self.assertEqual(len(nodes_in_testgraph), 2)
+        self.assertIn(node1, nodes_in_testgraph)
+        self.assertIn(node2, nodes_in_testgraph)
