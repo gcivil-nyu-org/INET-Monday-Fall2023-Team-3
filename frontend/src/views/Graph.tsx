@@ -134,6 +134,8 @@ export default function Graph() {
 
   const onEdgeConnect = useCallback(
     async ({ source, target }: Connection) => {
+      console.log(source + " ; " + target);
+      console.log(nodes);
       if (source == null) {
         console.error("source of edge is null");
         return;
@@ -159,11 +161,37 @@ export default function Graph() {
             edges
           )
         );
+        // set dependencies if not predefined
+        setNodes((currentNodes) => {
+          return currentNodes.map((node) => {
+            if (node.id === target && node.data.predefined === false) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  dependencies: [...node.data.dependencies, source],
+                },
+              };
+            }
+            return node;
+          });
+        });
+        // After the state is set, find the target node again and update the database.
+        const updatedTargetNode = nodes.find((node) => node.id === target);
+        if (updatedTargetNode && updatedTargetNode.data.predefined === false) {
+          nodeUpdate(
+            {
+              ...updatedTargetNode.data,
+              dependencies: [...updatedTargetNode.data.dependencies, source],
+            },
+            sessionStorage.getItem("token")!
+          );
+        }
       } else {
         onError(result.error);
       }
     },
-    [setEdges]
+    [nodes, setEdges]
   );
 
   const onNodesDelete = useCallback(
@@ -188,18 +216,32 @@ export default function Graph() {
         // get all nodes that depend on current node
         const outgoers = getOutgoers(node, nodes, edges);
         // update dependencies of these nodes
-        const dependencyUpdatePromises = outgoers.map((targetNode) =>
+        const dependencyUpdatePromises = outgoers.map(async (targetNode) => {
+          const newDependencies = targetNode.data.dependencies.filter(
+            (parentNodeId) => parentNodeId !== node.id
+          );
           nodeUpdate(
             {
               ...targetNode.data,
               // remove dependency of current node
-              dependencies: targetNode.data.dependencies.filter(
-                (parentNodeId) => parentNodeId !== node.id
-              ),
+              dependencies: newDependencies,
             },
             sessionStorage.getItem("token")!
-          )
-        );
+          );
+          setNodes((currentNodes) =>
+            currentNodes.map((node) => {
+              return node.id === targetNode.id
+                ? {
+                    ...node,
+                    data: {
+                      ...node.data,
+                      dependencies: newDependencies,
+                    },
+                  }
+                : node;
+            })
+          );
+        });
         await Promise.all(dependencyUpdatePromises).then(() => {
           // remove current node after success
           if (node.data.predefined === false) {
