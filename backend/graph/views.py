@@ -66,7 +66,11 @@ def graph_get(request, graph_id):
 # @permission_classes([AllowAny])
 def graph_create(request):
     serializer = GraphSerializer(data=request.data)
+    print("entered graph_create")
     if serializer.is_valid():
+        print("serializer is valid!! not my fault")
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        print(serializer.errors)
     return GRAPH_400_RESPONSE

@@ -19,8 +19,8 @@ test_user = {
 class GraphTests(APITestCase):
 
     def setUp(self) -> None:
-        user = CustomUser.objects.create(**test_user)
-        token = Token.objects.create(user=user)
+        self.user = CustomUser.objects.create(**test_user)
+        token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
     def test_ping(self):
@@ -35,9 +35,13 @@ class GraphTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         print(response.data)
 
-    def test__create(self):
+    def test_create(self):
         # Test the graph_create view
-        response = self.client.post("/backend/graph/create/")
+        request_data = {
+            "user_id": self.user.id
+        }
+        print("printing user id from test user side", self.user.id)
+        response = self.client.post("/backend/graph/create/", request_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         print(response.data)
 
@@ -58,3 +62,6 @@ class GraphTests(APITestCase):
         edges_in_testgraph = testgraph.edges.all()
         self.assertEqual(len(edges_in_testgraph), 1)
         self.assertIn(edge, edges_in_testgraph)
+
+    def test_create_by_user(self):
+        pass
