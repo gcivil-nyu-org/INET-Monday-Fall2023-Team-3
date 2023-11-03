@@ -3,8 +3,8 @@ from django.db import models
 
 # Create your models here.
 
-class Graph(models.Model):
 
+class Graph(models.Model):
     graph_id = models.AutoField(primary_key=True)
     editingEnabled = models.BooleanField(default=False)
 
@@ -14,10 +14,5 @@ class Graph(models.Model):
 
     # nodePositions =
 
-
     def __str__(self):
-        return(
-            "This is graph #" + str(self.graph_id)
-        )
-
-
+        return "This is graph #" + str(self.graph_id)

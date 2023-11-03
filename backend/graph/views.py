@@ -32,7 +32,7 @@ GRAPH_409_RESPONSE = Response(
 )
 
 
-@api_view(["POST"])
+@api_view(["GET"])
 def ping(request):
     return Response(data={"message": "pong"}, status=status.HTTP_200_OK)
 
@@ -70,6 +70,3 @@ def graph_create(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return GRAPH_400_RESPONSE
-
-
-
