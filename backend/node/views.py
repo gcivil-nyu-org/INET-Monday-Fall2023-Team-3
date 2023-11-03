@@ -105,3 +105,13 @@ def node_delete(request, node_id):
         return Response(status=status.HTTP_200_OK)
     except Node.DoesNotExist:
         return NODE_NOT_FOUND_RESPONSE
+
+
+# Get predefined node
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_get_predefined(request):
+    predefined_nodes = Node.objects.filter(predefined=True)
+    serializer = NodeSerializer(predefined_nodes, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)

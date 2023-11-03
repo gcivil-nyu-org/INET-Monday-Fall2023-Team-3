@@ -158,6 +158,10 @@ export const nodeGet: RestfulRequestHelper<"/node/get/"> = (param, token) => {
   return restfulRequest("/node/get/", "GET", { param, token });
 };
 
+export const nodeGetPredefined: RestfulRequestHelper<"/node/predefined-nodes/"> = (token) => {
+  return restfulRequest("/node/predefined-nodes/", "GET", {token});
+}
+
 export const nodeUpdate: RestfulRequestHelper<"/node/update/"> = (body, token) => {
   return restfulRequest("/node/update/", "PUT", { body, token });
 };
