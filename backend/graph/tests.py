@@ -15,9 +15,6 @@ test_user = {
 }
 
 class GraphTests(APITestCase):
-    # def setUp(self):
-    #     graph1 = Graph.objects.create()
-    #     graph2 = Graph.objects.create()
 
     def setUp(self) -> None:
         graph1 = Graph.objects.create()

@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from .serializers import NodeSerializer
 from .models import Node
+from graph.models import Graph
 
 
 # Create your views here.
@@ -50,6 +51,16 @@ def node_create(request):
 
     if not serializer.is_valid():
         return NODE_INVALID_FORMAT_RESPONSE
+
+    # Extract the 'graph_id' from the request data, assuming it's provided in the POST request.
+    graph_id = serializer.validated_data.get("graph_id")
+
+    # Check if the specified Graph exists.
+    try:
+        graph = Graph.objects.get(pk=graph_id)
+    except Graph.DoesNotExist:
+        return Response({"message": "Graph does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+    serializer.validated_data["graph"] = graph
 
     node_id = serializer.validated_data.get("id")
     if Node.objects.filter(id=node_id).exists():
