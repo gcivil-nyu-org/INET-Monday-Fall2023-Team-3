@@ -75,3 +75,25 @@ def graph_create(request):
     else:
         print(serializer.errors)
     return GRAPH_400_RESPONSE
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_update(request):
+    serializer = GraphSerializer(data=request.data, partial=True)
+    if not serializer.is_valid():
+        return GRAPH_400_RESPONSE
+    graph_id = serializer.validated_data.get("id")
+    try:
+        instance = Graph.objects.get(id=graph_id)
+        if "nodes" in serializer.validated_data:
+            new_nodes = serializer.validated_data.get("nodes")
+            instance.nodes += new_nodes
+        if "edges" in serializer.validated_data:
+            new_edges = serializer.validated_data.get("edges")
+            instance.edges += new_edges
+        update_serializer = GraphSerializer(instance = instance)
+        update_serializer.instance.save()
+    except Graph.DoesNotExist:
+        return GRAPH_404_RESPONSE
+
