@@ -185,3 +185,24 @@ export const edgeUpdate: RestfulRequestHelper<"/edge/update/"> = (body, token) =
 export const edgeDelete: RestfulRequestHelper<"/edge/delete/"> = (param, token) => {
   return restfulRequest("/edge/delete/", "DELETE", { param, token });
 };
+
+export const graphPing: RestfulRequestHelper<"/graph/ping/"> = () => {
+  return restfulRequest("/graph/ping/", "GET", {});
+};
+
+export const graphCreate: RestfulRequestHelper<"/graph/create/"> = (body, token) => {
+  return restfulRequest("/graph/create/", "POST", { body, token });
+}
+
+export const graphGet: RestfulRequestHelper<"/graph/get/"> = (param, token) => {
+  return restfulRequest("/graph/get/", "GET", { param, token });
+};
+
+export const graphUpdate: RestfulRequestHelper<"/graph/update/"> = (body, token) => {
+  return restfulRequest("/graph/update/", "PUT", { body, token });
+};
+
+export const graphDelete: RestfulRequestHelper<"/graph/delete/"> = (param, token) => {
+  return restfulRequest("/graph/delete/", "DELETE", { param, token });
+};
+
