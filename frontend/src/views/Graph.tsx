@@ -30,7 +30,6 @@ import {
 export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
-  const [showPredefinedNode, setShowPredefinedNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -67,12 +66,6 @@ export default function Graph() {
     setShowEditNode(false);
   };
 
-  const onAddPredefinedButtonClicked = () => {
-    console.log("add predefined button clicked");
-    setShowPredefinedNode(true);
-    setShowEditNode(false);
-  };
-
   const onShareButtonClicked = () => {
     console.log("share button clicked");
   };
@@ -96,7 +89,6 @@ export default function Graph() {
   const closeAllNodePanels = () => {
     setShowAddNode(false);
     setShowEditNode(false);
-    setShowPredefinedNode(false);
   };
 
   const onCancel = () => {
@@ -142,6 +134,7 @@ export default function Graph() {
         console.error("target of edge is null");
         return;
       }
+      // check cycle
 
       console.log(`create new edge between ${source} and ${target}`);
 
@@ -272,15 +265,11 @@ export default function Graph() {
         </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Add Node</DialogTitle>
-          <AddNode onSubmit={onNodeSubmit} onError={onError} />
-        </Dialog>
-        <Dialog open={showPredefinedNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
-          <DialogTitle>NYU Courses</DialogTitle>
-          <AddPredefinedNode
+          <AddNode
             predefinedNodes={predefinedNodes}
             onCanvasNodeIds={onCanvasNodeIds}
             onSubmit={onNodeSubmit}
-            onClose={onCancel}
+            onError={onError}
           />
         </Dialog>
         <Dialog open={showEditNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
@@ -309,13 +298,6 @@ export default function Graph() {
               <Button
                 variant="outlined"
                 sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onAddPredefinedButtonClicked}
-              >
-                <Storage />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
                 onClick={onShareButtonClicked}
               >
                 <Share />
@@ -332,7 +314,9 @@ export default function Graph() {
           <Controls />
         </ReactFlow>
       </div>
-      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500"></div>
+      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500">
+        {/* add comment page */}
+      </div>
     </div>
   );
 }
