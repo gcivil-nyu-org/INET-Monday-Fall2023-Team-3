@@ -1,5 +1,4 @@
 from django.db import models
-from graph.models import Graph
 import uuid
 
 # Create your models here.

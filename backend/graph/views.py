@@ -60,9 +60,9 @@ def graph_get(request, graph_id):
 
 
 @api_view(["POST"])
-@authentication_classes([TokenAuthentication])
+# @authentication_classes([TokenAuthentication])
 # @authentication_classes([AllowAny])
-@permission_classes([IsAuthenticated])
+# @permission_classes([IsAuthenticated])
 # @permission_classes([AllowAny])
 def graph_create(request):
     serializer = GraphSerializer(data=request.data)

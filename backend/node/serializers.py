@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Node
-from graph.models import Graph
 
 
 class NodeSerializer(serializers.Serializer):
@@ -19,15 +18,7 @@ class NodeSerializer(serializers.Serializer):
         return attrs
 
     def create(self, validated_data):
-        # # Extract the 'graph_id' from validated data.
-        # graph_id = validated_data.pop("graph_id", None)
-        # try:
-        #     graph = Graph.objects.get(pk=graph_id)
-        # except Graph.DoesNotExist:
-        #     raise serializers.ValidationError("Graph does not exist")
-
         dependencies = validated_data.pop("dependencies", None)
-        # node = Node.objects.create(**validated_data, graph=graph)
         node = Node.objects.create(**validated_data)
         if dependencies is not None:
             node.dependencies.set(dependencies)
