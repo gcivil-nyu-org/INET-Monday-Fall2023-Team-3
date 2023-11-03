@@ -14,12 +14,13 @@ import ReactFlow, {
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 
-import { IEdge, INode } from "utils/models";
+import { IEdge, INode, IMissingDependency } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
+import MissingDepsInfo from "components/node/MissingDepsInfo";
 import {
   edgeCreate,
   edgeDelete,
@@ -32,11 +33,15 @@ export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
+  const [showMissingDeps, setShowMissingDeps] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
+  const [missingDeps, setMissingDeps] = useState<IMissingDependency[]>([]);
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
@@ -65,6 +70,7 @@ export default function Graph() {
 
     setShowAddNode(true);
     setShowEditNode(false);
+    setShowMissingDeps(false);
   };
 
   const onShareButtonClicked = () => {
@@ -73,6 +79,37 @@ export default function Graph() {
 
   const onDoneButtonClicked = () => {
     console.log("done button clicked");
+    // validate missing dependencies
+    const tmpMissingDeps: IMissingDependency[] = [];
+
+    // Create a map for quick ID to name resolution
+    const predefinedNodeMap = new Map<string, string>();
+    predefinedNodes.forEach((node) => {
+      predefinedNodeMap.set(node.id, node.name);
+    });
+
+    // Filter nodes that are marked as predefined
+    const onCanvasPredefinedNodes = nodes.filter((node) => node.data.predefined);
+    // Check each node for missing dependencies
+    onCanvasPredefinedNodes.forEach((node) => {
+      node.data.dependencies.forEach((depId) => {
+        if (!nodes.some((n) => n.id === depId)) {
+          // If the dependency ID is not in the map, then it's missing
+          const depName = predefinedNodeMap.get(depId) || `Unknown Dependency (ID: ${depId})`;
+          tmpMissingDeps.push({
+            nodeName: node.data.name,
+            missingDep: depName,
+          });
+        }
+      });
+    });
+    setMissingDeps(tmpMissingDeps);
+    if (tmpMissingDeps.length === 0 && nodes.length > 0) {
+      setShowSuccess(true);
+      setSuccessMessage("No missing depedencies!");
+    } else if (tmpMissingDeps.length > 0 && nodes.length > 0) {
+      setShowMissingDeps(true);
+    }
   };
 
   const onEditNodeClicked = () => {
@@ -80,6 +117,7 @@ export default function Graph() {
 
     setShowAddNode(false);
     setShowEditNode(true);
+    setShowMissingDeps(false);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -90,6 +128,7 @@ export default function Graph() {
   const closeAllNodePanels = () => {
     setShowAddNode(false);
     setShowEditNode(false);
+    setShowMissingDeps(false);
   };
 
   const onCancel = () => {
@@ -306,6 +345,7 @@ export default function Graph() {
   const onSnackBarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason !== "clickaway") {
       setShowError(false);
+      setShowSuccess(false);
     }
   };
 
@@ -314,6 +354,9 @@ export default function Graph() {
       <div className="flex self-stretch basis-3/4">
         <Snackbar open={showError} autoHideDuration={6000} onClose={onSnackBarClose}>
           <Alert severity="error">{errorMessage}</Alert>
+        </Snackbar>
+        <Snackbar open={showSuccess} autoHideDuration={6000} onClose={onSnackBarClose}>
+          <Alert severity="success">{successMessage}</Alert>
         </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Add Node</DialogTitle>
@@ -327,6 +370,10 @@ export default function Graph() {
         <Dialog open={showEditNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Edit Node</DialogTitle>
           <EditNode node={currNode!} onSubmit={onNodeSubmit} onError={onError} />
+        </Dialog>
+        <Dialog open={showMissingDeps} onClose={onCancel} maxWidth="md" fullWidth={true}>
+          <DialogTitle>Missing Dependencies</DialogTitle>
+          <MissingDepsInfo missingDeps={missingDeps} />
         </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}

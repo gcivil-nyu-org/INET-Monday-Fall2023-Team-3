@@ -51,3 +51,11 @@ export type IEdge = {
   source: string;
   target: string;
 };
+
+/**
+ * a type define missing dependencies
+ */
+export type IMissingDependency = {
+  nodeName: string;
+  missingDep: string;
+} 
