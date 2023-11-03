@@ -189,7 +189,7 @@ export default function Graph() {
         onError(result.error);
       }
     },
-    [nodes, setEdges]
+    [nodes, setEdges, setNodes]
   );
 
   const onNodesDelete = useCallback(
@@ -250,7 +250,7 @@ export default function Graph() {
       });
       await Promise.all(nodeUpdatePromises).catch(onError);
     },
-    [nodes, edges, setEdges]
+    [nodes, edges, setEdges, setNodes]
   );
 
   const onError = (err: string) => {
