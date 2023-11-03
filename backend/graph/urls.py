@@ -1,7 +1,7 @@
-app_name = "graph"
-
 from django.urls import path
 from . import views
+
+app_name = "graph"
 
 urlpatterns = [
     path("ping/", views.ping, name="ping"),

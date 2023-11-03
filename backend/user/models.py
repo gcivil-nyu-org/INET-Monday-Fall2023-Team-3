@@ -23,6 +23,7 @@ class CustomUser(AbstractUser):
     )
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
+    graphs = None
 
     def set_username(self, username):
         self.username = username

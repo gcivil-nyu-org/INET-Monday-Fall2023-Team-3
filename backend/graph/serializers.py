@@ -1,17 +1,23 @@
 from rest_framework import serializers
-from graph.models import Graph
+from user.models import CustomUser
+from .models import Graph
 
 
 class GraphSerializer(serializers.ModelSerializer):
+    user_id = serializers.CharField(write_only=True)  # Define the user_id field
+
     class Meta:
         model = Graph
         fields = "__all__"
 
     def create(self, validated_data):
-        # Create a new Graph instance
-        new_graph = Graph.objects.create(**validated_data)
-
-        return new_graph
+        user_id = validated_data.pop("user_id")
+        try:
+            user = CustomUser.objects.get(pk=user_id)
+        except CustomUser.DoesNotExist:
+            raise serializers.ValidationError("User does not exist")
+        graph = Graph.objects.create(**validated_data, user=user)
+        return graph
 
     def update(self, instance, validated_data):
         pass

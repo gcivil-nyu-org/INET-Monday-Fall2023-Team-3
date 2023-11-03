@@ -15,7 +15,9 @@ class Edge(models.Model):
     target = models.ForeignKey(
         Node, on_delete=models.CASCADE, related_name="incomming_edges"
     )
-    # graph = models.ForeignKey(Graph, on_delete=models.CASCADE, related_name='edges')
+    graph = models.ForeignKey(
+        Graph, on_delete=models.CASCADE, related_name="edges", null=True
+    )
 
     def __str__(self) -> str:
         return f"Edge {self.id}: source: {self.source.id}, to: {self.target.id}"
