@@ -7,6 +7,7 @@ from user.models import CustomUser
 from .models import Graph
 from node.models import Node
 from edge.models import Edge
+
 # from node.models import Node
 # from edge.models import Edge
 
@@ -16,8 +17,8 @@ test_user = {
     "password": "testpassword",
 }
 
-class GraphTests(APITestCase):
 
+class GraphTests(APITestCase):
     def setUp(self) -> None:
         self.user = CustomUser.objects.create(**test_user)
         token = Token.objects.create(user=self.user)
@@ -37,9 +38,7 @@ class GraphTests(APITestCase):
 
     def test_create(self):
         # Test the graph_create view
-        request_data = {
-            "user_id": self.user.id
-        }
+        request_data = {"user_id": self.user.id}
         print("printing user id from test user side", self.user.id)
         response = self.client.post("/backend/graph/create/", request_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)

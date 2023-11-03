@@ -15,7 +15,9 @@ class Graph(models.Model):
     # foreign key in node.models already implicitly set the relationship here
     nodes = None
     edges = None
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='graphs', null=True)
+    user = models.ForeignKey(
+        CustomUser, on_delete=models.CASCADE, related_name="graphs", null=True
+    )
 
     # nodePositions =
 

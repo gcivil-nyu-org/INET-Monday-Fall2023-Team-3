@@ -13,7 +13,6 @@ class NodeSerializer(serializers.Serializer):
     )
     graph_id = serializers.UUIDField(write_only=True)
 
-
     def validate(self, attrs):
         if attrs.get("name") is None:
             raise serializers.ValidationError("name is required")

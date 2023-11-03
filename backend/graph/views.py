@@ -12,11 +12,11 @@ from rest_framework.authentication import TokenAuthentication
 
 from .serializers import GraphSerializer
 from .models import Graph
-from user.models import CustomUser
 
 
 def detail(msg: str):
     return {"detail": msg}
+
 
 GRAPH_400_RESPONSE = Response(
     detail("invalid request"), status=status.HTTP_400_BAD_REQUEST
