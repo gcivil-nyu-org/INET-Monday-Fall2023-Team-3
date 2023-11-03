@@ -6,6 +6,7 @@ from rest_framework.authtoken.models import Token
 from user.models import CustomUser
 from .models import Graph
 from node.models import Node
+from edge.models import Edge
 # from node.models import Node
 # from edge.models import Edge
 
@@ -48,3 +49,12 @@ class GraphTests(APITestCase):
         self.assertEqual(len(nodes_in_testgraph), 2)
         self.assertIn(node1, nodes_in_testgraph)
         self.assertIn(node2, nodes_in_testgraph)
+
+    def test_add_edges(self):
+        testgraph = Graph.objects.create()
+        node1 = Node.objects.create(name="node1", graph=testgraph)
+        node2 = Node.objects.create(name="node2", graph=testgraph)
+        edge = Edge.objects.create(source=node1, target=node2, graph=testgraph)
+        edges_in_testgraph = testgraph.edges.all()
+        self.assertEqual(len(edges_in_testgraph), 1)
+        self.assertIn(edge, edges_in_testgraph)
