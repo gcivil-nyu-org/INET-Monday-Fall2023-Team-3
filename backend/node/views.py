@@ -50,17 +50,18 @@ def node_create(request):
     serializer = NodeSerializer(data=request.data, partial=True)
 
     if not serializer.is_valid():
+        print(1)
         return NODE_INVALID_FORMAT_RESPONSE
+    # # Extract the 'graph_id' from the request data, assuming it's provided in the POST request.
+    # graph_id = serializer.validated_data.get("graph_id")
 
-    # Extract the 'graph_id' from the request data, assuming it's provided in the POST request.
-    graph_id = serializer.validated_data.get("graph_id")
-
-    # Check if the specified Graph exists.
-    try:
-        graph = Graph.objects.get(pk=graph_id)
-    except Graph.DoesNotExist:
-        return Response({"message": "Graph does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-    serializer.validated_data["graph"] = graph
+    # # Check if the specified Graph exists.
+    # try:
+    #     graph = Graph.objects.get(pk=graph_id)
+    # except Graph.DoesNotExist:
+    #     print(2)
+    #     return Response({"message": "Graph does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+    # serializer.validated_data["graph"] = graph
 
     node_id = serializer.validated_data.get("id")
     if Node.objects.filter(id=node_id).exists():

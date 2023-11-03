@@ -13,7 +13,7 @@ class Node(models.Model):
     description = models.TextField(blank=True)
     predefined = models.BooleanField(default=False)
     dependencies = models.ManyToManyField("self", symmetrical=False, blank=True)
-    graph = models.ForeignKey(Graph, on_delete=models.CASCADE, related_name='nodes')
+    # graph = models.ForeignKey(Graph, on_delete=models.CASCADE, related_name='nodes')
 
     def __str__(self) -> str:
         return f"Node {self.name}: id={self.id} is_predefined={self.predefined}"
