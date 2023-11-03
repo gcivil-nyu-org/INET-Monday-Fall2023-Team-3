@@ -125,30 +125,6 @@ export default function Graph() {
     [setNodes]
   );
 
-  async function hasCycle({ source, target }: { source: Node; target: Node }) {
-    const stack = [source];
-
-    while (stack.length > 0) {
-      const currentNode = stack.pop();
-      // If the current node is the target, we have a cycle.
-      if (!currentNode) {
-        continue;
-      }
-      if (currentNode === target) {
-        return true;
-      }
-
-      const incomers = await getIncomers(currentNode, nodes, edges);
-      // Add all incomers to the stack for further processing
-      for (let incomer of incomers) {
-        stack.push(incomer);
-      }
-    }
-
-    // If we exhaust all nodes without finding the target, there's no cycle
-    return false;
-  }
-
   const onEdgeConnect = useCallback(
     async ({ source, target }: Connection) => {
       if (source == null) {
@@ -170,6 +146,36 @@ export default function Graph() {
         console.error("target node not found");
         return;
       }
+
+      const hasCycle = async ({
+        source,
+        target,
+      }: {
+        source: Node;
+        target: Node;
+      }): Promise<boolean> => {
+        const stack = [source];
+
+        while (stack.length > 0) {
+          const currentNode = stack.pop();
+          // If the current node is the target, we have a cycle.
+          if (!currentNode) {
+            continue;
+          }
+          if (currentNode === target) {
+            return true;
+          }
+
+          const incomers = await getIncomers(currentNode, nodes, edges);
+          // Add all incomers to the stack for further processing
+          for (let incomer of incomers) {
+            stack.push(incomer);
+          }
+        }
+
+        // If we exhaust all nodes without finding the target, there's no cycle
+        return false;
+      };
 
       const cycleDetected = await hasCycle({
         source: srcNode,
@@ -228,7 +234,7 @@ export default function Graph() {
         onError(result.error);
       }
     },
-    [nodes, setEdges, setNodes, hasCycle]
+    [nodes, setEdges, setNodes]
   );
 
   const onNodesDelete = useCallback(
