@@ -8,6 +8,7 @@ import ReactFlow, {
   useEdgesState,
   addEdge,
   getConnectedEdges,
+  getIncomers,
   getOutgoers,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
@@ -124,6 +125,30 @@ export default function Graph() {
     [setNodes]
   );
 
+  async function hasCycle({ source, target }: { source: Node; target: Node }) {
+    const stack = [source];
+
+    while (stack.length > 0) {
+      const currentNode = stack.pop();
+      // If the current node is the target, we have a cycle.
+      if (!currentNode) {
+        continue;
+      }
+      if (currentNode === target) {
+        return true;
+      }
+
+      const incomers = await getIncomers(currentNode, nodes, edges);
+      // Add all incomers to the stack for further processing
+      for (let incomer of incomers) {
+        stack.push(incomer);
+      }
+    }
+
+    // If we exhaust all nodes without finding the target, there's no cycle
+    return false;
+  }
+
   const onEdgeConnect = useCallback(
     async ({ source, target }: Connection) => {
       if (source == null) {
@@ -134,7 +159,28 @@ export default function Graph() {
         console.error("target of edge is null");
         return;
       }
-      // check cycle
+      // check cycle : check incomers of source
+      const srcNode = nodes.find((n) => n.id === source);
+      const targetNode = nodes.find((n) => n.id === target);
+      if (srcNode == null) {
+        console.error("source node not found");
+        return;
+      }
+      if (targetNode == null) {
+        console.error("target node not found");
+        return;
+      }
+
+      const cycleDetected = await hasCycle({
+        source: srcNode,
+        target: targetNode,
+      });
+
+      if (cycleDetected) {
+        // issue error
+        onError("There is a cycle detected");
+        return;
+      }
 
       console.log(`create new edge between ${source} and ${target}`);
 
