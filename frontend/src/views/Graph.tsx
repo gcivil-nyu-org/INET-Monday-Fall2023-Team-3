@@ -234,7 +234,7 @@ export default function Graph() {
         onError(result.error);
       }
     },
-    [nodes, setEdges, setNodes]
+    [nodes, edges, setEdges, setNodes]
   );
 
   const onNodesDelete = useCallback(
