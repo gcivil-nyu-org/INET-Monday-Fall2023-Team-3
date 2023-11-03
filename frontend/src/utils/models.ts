@@ -51,3 +51,14 @@ export type IEdge = {
   source: string;
   target: string;
 };
+
+/**
+ * Represents a graph in backend
+ */
+export type IGraph = {
+  id: string;
+  editingEnabled: boolean;
+  nodes: string[]
+  edges: string[]
+  user: string;
+};

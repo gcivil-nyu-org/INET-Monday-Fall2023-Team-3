@@ -1,4 +1,4 @@
-import { IUser, INode, IEdge } from "./models";
+import { IUser, INode, IEdge, IGraph} from "./models";
 
 // bodies
 // user
@@ -35,3 +35,15 @@ export type IEdgeGetBody = undefined;
 export type IEdgeUpdateBody = IEdge;
 
 export type IEdgeDeleteBody = undefined;
+
+// graph
+
+export type IGraphPingBody = undefined;
+
+export type IGraphCreateBody = Partial<IGraph> & Pick<IGraph, "user">;
+
+export type IGraphGetBody = undefined;
+
+export type IGraphUpdateBody = Partial<IGraph> & Pick<IGraph, "id">;
+
+export type IGraphDeleteBody = undefined;
