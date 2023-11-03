@@ -9,7 +9,7 @@ from edge.models import Edge
 
 
 class Graph(models.Model):
-    graph_id = models.UUIDField(
+    id = models.UUIDField(
         "id", primary_key=True, unique=True, editable=False, default=uuid.uuid4
     )
     editingEnabled = models.BooleanField(default=False)
@@ -23,4 +23,4 @@ class Graph(models.Model):
 
 
     def __str__(self):
-        return "This is graph #" + str(self.graph_id)
+        return "This is graph #" + str(self.id)
