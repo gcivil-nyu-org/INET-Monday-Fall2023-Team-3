@@ -5,6 +5,7 @@ from graph.models import Graph
 
 from node.admin import NodeInline
 
+admin.site.register(Graph)
 
 # this is for testing purpose.
 # Allows you to see the nodes added to a certain graph in /admin

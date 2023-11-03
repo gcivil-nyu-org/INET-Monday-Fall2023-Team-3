@@ -14,28 +14,36 @@ export default function User() {
     console.log("update cancelled");
     setUpdate(false);
   };
-  // get current user email
-  const onCreateGraphButtonClicked = () => {
-    userGet(sessionStorage.getItem("token")!).then((result) => {
+
+  const onCreateGraphButtonClicked = async () => {
+    console.log("Create graph button clicked");
+    try {
+      const result = await userGet(sessionStorage.getItem("token")!);
       if (result.status) {
         const user = result.value;
         setUserEmail(user.email);
-      } else {
-        console.log("Cannot get current user")
-      }
-    });
-    // create graph
-    graphCreate(
-      {user: userEmail, editingEnabled: true},
-      sessionStorage.getItem("token")!).then((result) => {
-        if (result.status) {
-          sessionStorage.setItem("graphId", result.value.id);
-        } else {
-          console.log("Cannot create graph")
-        }
-      });
+        console.log("Current user email: " + user.email);
 
-    navigate("/graph");
+        // Wait until the user email is set before creating the graph
+        const graphResult = await graphCreate(
+          {user: user.email, editingEnabled: true},
+          sessionStorage.getItem("token")!
+        );
+
+        if (graphResult.status) {
+          sessionStorage.setItem("graphId", graphResult.value.id);
+          console.log("Graph created");
+          navigate("/graph");
+        } else {
+          console.log("Cannot create graph");
+        }
+      } else {
+        console.log("Cannot get current user");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+
   };
 
   return (
