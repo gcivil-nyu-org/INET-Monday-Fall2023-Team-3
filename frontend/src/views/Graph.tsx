@@ -134,8 +134,6 @@ export default function Graph() {
 
   const onEdgeConnect = useCallback(
     async ({ source, target }: Connection) => {
-      console.log(source + " ; " + target);
-      console.log(nodes);
       if (source == null) {
         console.error("source of edge is null");
         return;
