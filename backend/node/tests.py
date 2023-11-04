@@ -66,7 +66,6 @@ class NodeAPITest(APITestCase):
         valid_data = {"name": "CSE 101", "description": "CSE 101 class"}
         response = self.client.post("/backend/node/create/", valid_data, format="json")
         node = response.data
-
         response = self.client.get(f"/backend/node/get/{node['id']}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, node)

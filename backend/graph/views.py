@@ -1,5 +1,5 @@
 # Create your views here.
-
+import requests
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
@@ -12,6 +12,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from .serializers import GraphSerializer
 from .models import Graph
+from node.views import node_create, node_delete
 
 
 def detail(msg: str):
@@ -52,7 +53,7 @@ def graph_list(request):
 @permission_classes([IsAuthenticated])
 def graph_get(request, graph_id):
     try:
-        graph = Graph.objects.get(id=graph_id)
+        graph = Graph.objects.get(pk=graph_id)
         serializer = GraphSerializer(instance=graph)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
@@ -68,9 +69,62 @@ def graph_create(request):
     serializer = GraphSerializer(data=request.data)
     print("entered graph_create")
     if serializer.is_valid():
-        print("serializer is valid!! not my fault")
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         print(serializer.errors)
     return GRAPH_400_RESPONSE
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_delete(request, graph_id):
+    try:
+        graph_to_be_deleted = Graph.objects.get(pk=graph_id)
+        graph_to_be_deleted.delete()
+        return Response(status=status.HTTP_200_OK)
+    except Graph.DoesNotExist:
+        return GRAPH_404_RESPONSE
+
+
+# @api_view(["PUT"])
+# @authentication_classes([TokenAuthentication])
+# @permission_classes([IsAuthenticated])
+# def graph_add_node(request, graph_id):
+#     try:
+#         graph = Graph.objects.get(pk=graph_id)
+#         node_data = { # let's just use the dummy data for now
+#             "name": "New Node",
+#             "description": "Description of the new node",
+#         }
+
+#         print("step 1 success")
+
+#         token = request.auth
+#         print("token is views is:", token.key)
+#         headers = {"Authorization": f"Token {token.key}"}
+
+#         response = requests.post(
+#             "http://localhost:8000/backend/node/create/",
+#             headers=headers,
+#             json=node_data,
+#         )
+
+#         print("step 2 success")
+
+#         if response.status_code == 200:
+#             print("step 3 success")
+#             # Update the graph's node_ids with the new node's ID
+#             node_id = response.json().get("id")
+#             graph.node_ids.append(node_id)
+#             graph.save()
+#             return Response(status=status.HTTP_200_OK)
+#         else:
+#             print("step 4 success")
+#             print(response.json())
+#             print(response.status_code)
+#             return Response(response.json(), status=response.status_code)
+
+#     except Graph.DoesNotExist:
+#         return GRAPH_404_RESPONSE
