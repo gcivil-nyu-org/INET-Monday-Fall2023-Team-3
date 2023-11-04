@@ -15,13 +15,13 @@ import ReactFlow, {
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 
-import { IEdge, INode, IMissingDependency } from "utils/models";
+import { IEdge, INode, IMissingDependency, IWrongDepedency } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
-import MissingDepsInfo from "components/node/MissingDepsInfo";
+import ProblematicDepsInfo from "components/node/ProblematicDepsInfo";
 import {
   edgeCreate,
   edgeDelete,
@@ -34,7 +34,7 @@ export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
-  const [showMissingDeps, setShowMissingDeps] = useState(false);
+  const [showProblematicDeps, setShowProblematicDeps] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -43,6 +43,7 @@ export default function Graph() {
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
   const [missingDeps, setMissingDeps] = useState<IMissingDependency[]>([]);
+  const [wrongDeps, setwrongDeps] = useState<IWrongDepedency[]>([]);
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
@@ -71,7 +72,7 @@ export default function Graph() {
 
     setShowAddNode(true);
     setShowEditNode(false);
-    setShowMissingDeps(false);
+    setShowProblematicDeps(false);
   };
 
   const onShareButtonClicked = () => {
@@ -82,6 +83,7 @@ export default function Graph() {
     console.log("done button clicked");
     // validate missing dependencies
     const tmpMissingDeps: IMissingDependency[] = [];
+    const tmpWrongDeps: IWrongDepedency[] = [];
 
     // Create a map for quick ID to name resolution
     const predefinedNodeMap = new Map<string, string>();
@@ -94,22 +96,36 @@ export default function Graph() {
     // Check each node for missing dependencies
     onCanvasPredefinedNodes.forEach((node) => {
       node.data.dependencies.forEach((depId) => {
-        if (!nodes.some((n) => n.id === depId)) {
+        const depName = predefinedNodeMap.get(depId) || `Unknown Dependency (ID: ${depId})`;
+        if (
+          !nodes.some((n) => n.id === depId) ||
+          !edges.some((edge) => edge.source === depId && edge.target === node.id)
+        ) {
           // If the dependency ID is not in the map, then it's missing
-          const depName = predefinedNodeMap.get(depId) || `Unknown Dependency (ID: ${depId})`;
           tmpMissingDeps.push({
             nodeName: node.data.name,
             missingDep: depName,
           });
         }
+        if (edges.some((edge) => edge.source === node.id && edge.target === depId)) {
+          // dependencies wrong
+          tmpWrongDeps.push({
+            sourceName: depName,
+            targetName: node.data.name,
+          });
+        }
       });
     });
     setMissingDeps(tmpMissingDeps);
-    if (tmpMissingDeps.length === 0 && nodes.length > 0) {
+    setwrongDeps(tmpWrongDeps);
+    if (tmpMissingDeps.length === 0 && tmpWrongDeps.length === 0 && nodes.length > 0) {
       setShowSuccess(true);
-      setSuccessMessage("No missing depedencies!");
-    } else if (tmpMissingDeps.length > 0 && nodes.length > 0) {
-      setShowMissingDeps(true);
+      setSuccessMessage("No missing dependencies! All dependencies are correctly connected!");
+    } else if ((tmpMissingDeps.length > 0 || tmpWrongDeps.length > 0) && nodes.length > 0) {
+      setShowProblematicDeps(true);
+    } else if (nodes.length === 0) {
+      setShowError(true);
+      setErrorMessage("No dependencies to check");
     }
   };
 
@@ -118,7 +134,7 @@ export default function Graph() {
 
     setShowAddNode(false);
     setShowEditNode(true);
-    setShowMissingDeps(false);
+    setShowProblematicDeps(false);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -129,7 +145,7 @@ export default function Graph() {
   const closeAllNodePanels = () => {
     setShowAddNode(false);
     setShowEditNode(false);
-    setShowMissingDeps(false);
+    setShowProblematicDeps(false);
   };
 
   const onCancel = () => {
@@ -413,9 +429,9 @@ export default function Graph() {
           <DialogTitle>Edit Node</DialogTitle>
           <EditNode node={currNode!} onSubmit={onNodeSubmit} onError={onError} />
         </Dialog>
-        <Dialog open={showMissingDeps} onClose={onCancel} maxWidth="md" fullWidth={true}>
-          <DialogTitle>Missing Dependencies</DialogTitle>
-          <MissingDepsInfo missingDeps={missingDeps} />
+        <Dialog open={showProblematicDeps} onClose={onCancel} maxWidth="md" fullWidth={true}>
+          <DialogTitle>Problematic Dependencies</DialogTitle>
+          <ProblematicDepsInfo missingDeps={missingDeps} wrongDeps={wrongDeps} />
         </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}

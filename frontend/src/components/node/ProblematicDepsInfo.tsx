@@ -10,13 +10,14 @@ import {
   Dialog,
   DialogContent,
 } from "@mui/material";
-import { IMissingDependency } from "utils/models";
+import { IMissingDependency, IWrongDepedency } from "utils/models";
 
-export type MissingDepsInfoProp = {
+export type ProblematicDepsInfoProp = {
   missingDeps: IMissingDependency[];
+  wrongDeps: IWrongDepedency[];
 };
 
-export default function MissingDepsInfo({ missingDeps }: MissingDepsInfoProp) {
+export default function ProblematicDepsInfo({ missingDeps, wrongDeps }: ProblematicDepsInfoProp) {
   return (
     <div className="w-full flex flex-col items-center bg-white">
       <DialogContent dividers>
@@ -24,6 +25,11 @@ export default function MissingDepsInfo({ missingDeps }: MissingDepsInfoProp) {
           {missingDeps.map((dep, index) => (
             <Alert key={index} severity="error" variant="outlined">
               {`${dep.nodeName} is missing prerequisite course: ${dep.missingDep}`}
+            </Alert>
+          ))}
+          {wrongDeps.map((dep, index) => (
+            <Alert key={index} severity="error" variant="outlined">
+              {`The dependency between ${dep.sourceName} and ${dep.targetName} is reversed`}
             </Alert>
           ))}
         </Stack>
