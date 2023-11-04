@@ -316,7 +316,7 @@ export default function Graph() {
         }
       }
     },
-    [nodes, edges, setEdges, setNodes]
+    [nodes, setNodes]
   );
 
   const onNodesDelete = useCallback(
