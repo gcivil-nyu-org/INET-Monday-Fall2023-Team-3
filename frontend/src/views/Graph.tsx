@@ -10,6 +10,7 @@ import ReactFlow, {
   getConnectedEdges,
   getIncomers,
   getOutgoers,
+  Edge,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
@@ -276,6 +277,48 @@ export default function Graph() {
     [nodes, edges, setEdges, setNodes]
   );
 
+  const onEdgesDelete = useCallback(
+    async (deleted: Edge[]) => {
+      // check dependencies =>
+      for (const edge of deleted) {
+        // Find the corresponding target node based on edge.target
+        const targetNode = nodes.find((node) => node.id === edge.target);
+        // Check if the target node is NOT predefined
+        if (targetNode && targetNode.data.predefined == false) {
+          // Remove the source node id from target node's dependencies
+          const updatedDependencies = targetNode.data.dependencies.filter(
+            (dep) => dep !== edge.source
+          );
+          // Now you need to update the target node with the new dependencies
+          nodeUpdate(
+            {
+              ...targetNode.data,
+              // remove dependency of current node
+              dependencies: updatedDependencies,
+            },
+            sessionStorage.getItem("token")!
+          );
+          setNodes((currentNodes) => {
+            return currentNodes.map((node) => {
+              if (node.id === edge.target && node.data.predefined === false) {
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    dependencies: updatedDependencies,
+                  },
+                };
+              }
+              return node;
+            });
+          });
+          edgeDelete(edge.id, sessionStorage.getItem("token")!);
+        }
+      }
+    },
+    [nodes, edges, setEdges, setNodes]
+  );
+
   const onNodesDelete = useCallback(
     async (deleted: Node[]) => {
       // no need to update edges because we use foreign keys
@@ -359,7 +402,6 @@ export default function Graph() {
           <Alert severity="success">{successMessage}</Alert>
         </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
-          <DialogTitle>Add Node</DialogTitle>
           <AddNode
             predefinedNodes={predefinedNodes}
             onCanvasNodeIds={onCanvasNodeIds}
@@ -384,6 +426,7 @@ export default function Graph() {
           edges={edges}
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
+          onEdgesDelete={onEdgesDelete}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
