@@ -2,7 +2,7 @@ import { useState, ChangeEvent } from "react";
 import { Button, TextField, Alert } from "@mui/material";
 
 import { INode } from "utils/models";
-import { nodeCreate } from "utils/backendRequests";
+import { graphUpdateAdd, nodeCreate } from "utils/backendRequests";
 
 export type AddNodeProp = {
   predefinedNodes: INode[];
@@ -49,13 +49,23 @@ export default function AddNode({
       setErrorMessage("name cannot be empty");
       return;
     }
-
+    var nodeId = ""
     nodeCreate(
       { name: cleanName, description: cleanDescription },
       sessionStorage.getItem("token")!
     ).then((result) => {
       if (result.status) {
         onSubmit(result.value);
+        graphUpdateAdd(
+          { id: sessionStorage.getItem("graphId")!, nodes: [result.value] },
+          sessionStorage.getItem("token")!
+        ).then((result) => {
+          if (result.status) {
+            console.log("Node added to graph");
+          } else {
+            console.log("Cannot add node to graph");
+          }
+        });
       } else {
         onError(result.error);
       }

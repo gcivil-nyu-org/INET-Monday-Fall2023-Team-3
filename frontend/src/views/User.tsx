@@ -16,32 +16,32 @@ export default function User() {
   };
 
   const onCreateGraphButtonClicked = async () => {
-    // console.log("Create graph button clicked");
-    // try {
-    //   const result = await userGet(sessionStorage.getItem("token")!);
-    //   if (result.status) {
-    //     const user = result.value;
-    //     setUserEmail(user.email);
-    //     console.log("Current user email: " + user.email);
+    console.log("Create graph button clicked");
+    try {
+      const result = await userGet(sessionStorage.getItem("token")!);
+      if (result.status) {
+        const user = result.value;
+        setUserEmail(user.email);
+        console.log("Current user email: " + user.email);
 
-    //     // Wait until the user email is set before creating the graph
-    //     const graphResult = await graphCreate(
-    //       {user: user.email, editingEnabled: true},
-    //       sessionStorage.getItem("token")!
-    //     );
+        // Wait until the user email is set before creating the graph
+        const graphResult = await graphCreate(
+          {user: user.email, editingEnabled: true},
+          sessionStorage.getItem("token")!
+        );
 
-    //     if (graphResult.status) {
-    //       sessionStorage.setItem("graphId", graphResult.value.id);
-    //       console.log("Graph created");
-    //     } else {
-    //       console.log("Cannot create graph");
-    //     }
-    //   } else {
-    //     console.log("Cannot get current user");
-    //   }
-    // } catch (error) {
-    //   console.error("An error occurred:", error);
-    // }
+        if (graphResult.status) {
+          sessionStorage.setItem("graphId", graphResult.value.id);
+          console.log("Graph created");
+        } else {
+          console.log("Cannot create graph");
+        }
+      } else {
+        console.log("Cannot get current user");
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
     navigate("/graph");
   };
 

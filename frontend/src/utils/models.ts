@@ -58,7 +58,7 @@ export type IEdge = {
 export type IGraph = {
   id: string;
   editingEnabled: boolean;
-  nodes: string[]
-  edges: string[]
+  nodes: INode[]
+  edges: IEdge[]
   user: string;
 };

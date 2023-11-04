@@ -26,6 +26,8 @@ import {
   nodeDelete,
   nodeUpdate,
   nodeGetPredefined,
+  graphUpdateAdd,
+  graphUpdateDelete,
 } from "utils/backendRequests";
 
 export default function Graph() {
@@ -194,6 +196,18 @@ export default function Graph() {
       if (result.status) {
         console.log(`created edge with id ${result.value.id}`);
 
+        // add edge to graph
+        graphUpdateAdd(
+          { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+          sessionStorage.getItem("token")!
+        ).then((graphResult) => {
+          if (graphResult.status) {
+            console.log("edge added to graph");
+          } else {
+            console.log("Cannot add edge to graph");
+          }
+        });
+
         setEdges((edges) =>
           addEdge(
             {
@@ -290,6 +304,18 @@ export default function Graph() {
           if (node.data.predefined === false) {
             // do not delete predefined data
             nodeDelete(node.id, sessionStorage.getItem("token")!);
+            const INodeSendToBackend = {  // Define a new INode to send to backend, only id matters
+              id: node.id, name: "whatever", predefined: false, description: "whatever", dependencies: []};
+            graphUpdateDelete(
+              { id: sessionStorage.getItem("graphId")!, nodes: [INodeSendToBackend] },
+              sessionStorage.getItem("token")!
+            ).then((result) => {
+              if (result.status) {
+                console.log("Node deleted from graph");
+              } else {
+                console.log("Cannot delete node from graph");
+              }
+            });
           }
         });
       });
