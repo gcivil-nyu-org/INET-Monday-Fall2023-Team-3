@@ -67,6 +67,7 @@ def graph_get(request, graph_id):
 # @permission_classes([AllowAny])
 def graph_create(request):
     serializer = GraphSerializer(data=request.data)
+    # print(serializer.initial_data)
     print("entered graph_create")
     if serializer.is_valid():
         print("serializer is valid!! not my fault")
@@ -75,6 +76,7 @@ def graph_create(request):
     else:
         print(serializer.errors)
     return GRAPH_400_RESPONSE
+
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
@@ -92,8 +94,23 @@ def graph_update(request):
         if "edges" in serializer.validated_data:
             new_edges = serializer.validated_data.get("edges")
             instance.edges += new_edges
-        update_serializer = GraphSerializer(instance = instance)
+        update_serializer = GraphSerializer(instance=instance)
         update_serializer.instance.save()
     except Graph.DoesNotExist:
         return GRAPH_404_RESPONSE
 
+
+@api_view(["PUT"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_update_add(request):
+    serializer = GraphSerializer(data=request.data)
+    print(serializer.initial_data)
+
+
+@api_view(["PUT"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_update_delete(request):
+    serializer = GraphSerializer(data=request.data)
+    print(serializer.initial_data)
