@@ -312,8 +312,8 @@ export default function Graph() {
               return node;
             });
           });
-          edgeDelete(edge.id, sessionStorage.getItem("token")!);
         }
+        edgeDelete(edge.id, sessionStorage.getItem("token")!);
       }
     },
     [nodes, setNodes]
