@@ -10,16 +10,18 @@ import ReactFlow, {
   getConnectedEdges,
   getIncomers,
   getOutgoers,
+  Edge,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 
-import { IEdge, INode } from "utils/models";
+import { IEdge, INode, IMissingDependency, IWrongDepedency } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
+import ProblematicDepsInfo from "components/node/ProblematicDepsInfo";
 import {
   edgeCreate,
   edgeDelete,
@@ -32,11 +34,16 @@ export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
+  const [showProblematicDeps, setShowProblematicDeps] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
+  const [missingDeps, setMissingDeps] = useState<IMissingDependency[]>([]);
+  const [wrongDeps, setwrongDeps] = useState<IWrongDepedency[]>([]);
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
@@ -65,6 +72,7 @@ export default function Graph() {
 
     setShowAddNode(true);
     setShowEditNode(false);
+    setShowProblematicDeps(false);
   };
 
   const onShareButtonClicked = () => {
@@ -73,6 +81,52 @@ export default function Graph() {
 
   const onDoneButtonClicked = () => {
     console.log("done button clicked");
+    // validate missing dependencies
+    const tmpMissingDeps: IMissingDependency[] = [];
+    const tmpWrongDeps: IWrongDepedency[] = [];
+
+    // Create a map for quick ID to name resolution
+    const predefinedNodeMap = new Map<string, string>();
+    predefinedNodes.forEach((node) => {
+      predefinedNodeMap.set(node.id, node.name);
+    });
+
+    // Filter nodes that are marked as predefined
+    const onCanvasPredefinedNodes = nodes.filter((node) => node.data.predefined);
+    // Check each node for missing dependencies
+    onCanvasPredefinedNodes.forEach((node) => {
+      node.data.dependencies.forEach((depId) => {
+        const depName = predefinedNodeMap.get(depId) || `Unknown Dependency (ID: ${depId})`;
+        if (
+          !nodes.some((n) => n.id === depId) ||
+          !edges.some((edge) => edge.source === depId && edge.target === node.id)
+        ) {
+          // If the dependency ID is not in the map, then it's missing
+          tmpMissingDeps.push({
+            nodeName: node.data.name,
+            missingDep: depName,
+          });
+        }
+        if (edges.some((edge) => edge.source === node.id && edge.target === depId)) {
+          // dependencies wrong
+          tmpWrongDeps.push({
+            sourceName: depName,
+            targetName: node.data.name,
+          });
+        }
+      });
+    });
+    setMissingDeps(tmpMissingDeps);
+    setwrongDeps(tmpWrongDeps);
+    if (tmpMissingDeps.length === 0 && tmpWrongDeps.length === 0 && nodes.length > 0) {
+      setShowSuccess(true);
+      setSuccessMessage("No missing dependencies! All dependencies are correctly connected!");
+    } else if ((tmpMissingDeps.length > 0 || tmpWrongDeps.length > 0) && nodes.length > 0) {
+      setShowProblematicDeps(true);
+    } else if (nodes.length === 0) {
+      setShowError(true);
+      setErrorMessage("No dependencies to check");
+    }
   };
 
   const onEditNodeClicked = () => {
@@ -80,6 +134,7 @@ export default function Graph() {
 
     setShowAddNode(false);
     setShowEditNode(true);
+    setShowProblematicDeps(false);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -90,6 +145,7 @@ export default function Graph() {
   const closeAllNodePanels = () => {
     setShowAddNode(false);
     setShowEditNode(false);
+    setShowProblematicDeps(false);
   };
 
   const onCancel = () => {
@@ -237,6 +293,48 @@ export default function Graph() {
     [nodes, edges, setEdges, setNodes]
   );
 
+  const onEdgesDelete = useCallback(
+    async (deleted: Edge[]) => {
+      // check dependencies =>
+      for (const edge of deleted) {
+        // Find the corresponding target node based on edge.target
+        const targetNode = nodes.find((node) => node.id === edge.target);
+        // Check if the target node is NOT predefined
+        if (targetNode && targetNode.data.predefined === false) {
+          // Remove the source node id from target node's dependencies
+          const updatedDependencies = targetNode.data.dependencies.filter(
+            (dep) => dep !== edge.source
+          );
+          // Now you need to update the target node with the new dependencies
+          nodeUpdate(
+            {
+              ...targetNode.data,
+              // remove dependency of current node
+              dependencies: updatedDependencies,
+            },
+            sessionStorage.getItem("token")!
+          );
+          setNodes((currentNodes) => {
+            return currentNodes.map((node) => {
+              if (node.id === edge.target && node.data.predefined === false) {
+                return {
+                  ...node,
+                  data: {
+                    ...node.data,
+                    dependencies: updatedDependencies,
+                  },
+                };
+              }
+              return node;
+            });
+          });
+        }
+        edgeDelete(edge.id, sessionStorage.getItem("token")!);
+      }
+    },
+    [nodes, setNodes]
+  );
+
   const onNodesDelete = useCallback(
     async (deleted: Node[]) => {
       // no need to update edges because we use foreign keys
@@ -306,6 +404,7 @@ export default function Graph() {
   const onSnackBarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason !== "clickaway") {
       setShowError(false);
+      setShowSuccess(false);
     }
   };
 
@@ -315,8 +414,10 @@ export default function Graph() {
         <Snackbar open={showError} autoHideDuration={6000} onClose={onSnackBarClose}>
           <Alert severity="error">{errorMessage}</Alert>
         </Snackbar>
+        <Snackbar open={showSuccess} autoHideDuration={6000} onClose={onSnackBarClose}>
+          <Alert severity="success">{successMessage}</Alert>
+        </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
-          <DialogTitle>Add Node</DialogTitle>
           <AddNode
             predefinedNodes={predefinedNodes}
             onCanvasNodeIds={onCanvasNodeIds}
@@ -328,6 +429,10 @@ export default function Graph() {
           <DialogTitle>Edit Node</DialogTitle>
           <EditNode node={currNode!} onSubmit={onNodeSubmit} onError={onError} />
         </Dialog>
+        <Dialog open={showProblematicDeps} onClose={onCancel} maxWidth="md" fullWidth={true}>
+          <DialogTitle>Problematic Dependencies</DialogTitle>
+          <ProblematicDepsInfo missingDeps={missingDeps} wrongDeps={wrongDeps} />
+        </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}
           nodes={nodes}
@@ -337,6 +442,7 @@ export default function Graph() {
           edges={edges}
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
+          onEdgesDelete={onEdgesDelete}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
