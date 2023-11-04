@@ -284,7 +284,7 @@ export default function Graph() {
         // Find the corresponding target node based on edge.target
         const targetNode = nodes.find((node) => node.id === edge.target);
         // Check if the target node is NOT predefined
-        if (targetNode && targetNode.data.predefined == false) {
+        if (targetNode && targetNode.data.predefined === false) {
           // Remove the source node id from target node's dependencies
           const updatedDependencies = targetNode.data.dependencies.filter(
             (dep) => dep !== edge.source
