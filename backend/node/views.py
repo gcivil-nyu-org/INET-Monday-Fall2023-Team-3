@@ -48,6 +48,7 @@ def node_create(request):
     serializer = NodeSerializer(data=request.data, partial=True)
 
     if not serializer.is_valid():
+        print(1)
         return NODE_INVALID_FORMAT_RESPONSE
 
     node_id = serializer.validated_data.get("id")

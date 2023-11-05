@@ -1,6 +1,5 @@
 from django.db import models
 import uuid
-from graph.models import Graph
 from node.models import Node
 
 
@@ -14,9 +13,6 @@ class Edge(models.Model):
     )
     target = models.ForeignKey(
         Node, on_delete=models.CASCADE, related_name="incomming_edges"
-    )
-    graph = models.ForeignKey(
-        Graph, on_delete=models.CASCADE, related_name="edges", null=True
     )
 
     def __str__(self) -> str:
