@@ -59,7 +59,8 @@ export default function AddNode({
       if (result.status) {
         onSubmit(result.value);
         graphUpdateAdd(
-          { id: sessionStorage.getItem("graphId")!, nodes: [result.value] },
+          { id: sessionStorage.getItem("graphId")!,
+          nodes: [result.value] },
           sessionStorage.getItem("token")!
         ).then((result) => {
           if (result.status) {

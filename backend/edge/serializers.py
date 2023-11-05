@@ -8,7 +8,6 @@ class EdgeSerializer(serializers.Serializer):
     id = serializers.UUIDField(required=False)
     source = serializers.PrimaryKeyRelatedField(queryset=Node.objects.all())
     target = serializers.PrimaryKeyRelatedField(queryset=Node.objects.all())
-    # graph_id = serializers.UUIDField(write_only=True)
 
     def create(self, validated_data):
         return Edge.objects.create(**validated_data)

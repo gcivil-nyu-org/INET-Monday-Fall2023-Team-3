@@ -130,26 +130,30 @@ def graph_update_add(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_update_delete(request):
-    serializer = GraphSerializer(data=request.data, partial=True)
-    # the request contains graph id and the node or edge to be added
-    if not serializer.is_valid():
-        return GRAPH_400_RESPONSE
-    graph_id = serializer.validated_data.get("id")
+
+    data = request.data
+    if "nodes" in request.data:
+        # strip out the ids from the nodes
+        data['nodes'] = [node['id'] for node in request.data['nodes']]
+    if "edges" in request.data:
+        # strip out the ids from the edges
+        data['edges'] = [edge['id'] for edge in request.data['edges']]
+    graph_id = data.get("id")
+
     try:
         instance = Graph.objects.get(id=graph_id)
-        if "nodes" in serializer.validated_data:
+        if "nodes" in data:
             # if the request is for adding a new node
-            nodes_to_be_deleted = serializer.validated_data.get("nodes")
+            nodes_to_be_deleted = data.get("nodes")
             for node in nodes_to_be_deleted:
                 instance.nodes.remove(node)
-                # node deletion has already been handled
-                # only need to remove node id from graph
-        if "edges" in serializer.validated_data:
+        if "edges" in data:
             # if the request is for adding a new edge
-            edges_to_be_deleted = serializer.validated_data.get("edges")
+            edges_to_be_deleted = data.get("edges")
             for edge in edges_to_be_deleted:
                 instance.edges.remove(edge)
-        update_serializer = GraphSerializer(instance=instance)
-        update_serializer.instance.save()
+        instance.save()
+        return Response(status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
         return GRAPH_404_RESPONSE
+
