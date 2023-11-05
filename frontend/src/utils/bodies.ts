@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { IUser, INode, IEdge, IGraph } from "./models";
-=======
 import { IUser, INode, IEdge, IGraph} from "./models";
->>>>>>> graph-interface-yl
 
 // bodies
 // user
@@ -51,8 +47,3 @@ export type IGraphGetBody = undefined;
 export type IGraphUpdateBody = Partial<IGraph> & Pick<IGraph, "id">;
 
 export type IGraphDeleteBody = undefined;
-<<<<<<< HEAD
-
-
-=======
->>>>>>> graph-interface-yl

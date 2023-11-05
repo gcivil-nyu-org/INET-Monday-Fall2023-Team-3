@@ -1,10 +1,5 @@
 # Create your views here.
-<<<<<<< HEAD
 import requests
-=======
-# Create your views here.
-
->>>>>>> graph-interface-yl
 from rest_framework import status
 from rest_framework.decorators import (
     api_view,
@@ -17,10 +12,7 @@ from rest_framework.authentication import TokenAuthentication
 
 from .serializers import GraphSerializer
 from .models import Graph
-<<<<<<< HEAD
 from node.views import node_create, node_delete
-=======
->>>>>>> graph-interface-yl
 
 
 def detail(msg: str):
@@ -61,11 +53,7 @@ def graph_list(request):
 @permission_classes([IsAuthenticated])
 def graph_get(request, graph_id):
     try:
-<<<<<<< HEAD
         graph = Graph.objects.get(pk=graph_id)
-=======
-        graph = Graph.objects.get(id=graph_id)
->>>>>>> graph-interface-yl
         serializer = GraphSerializer(instance=graph)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
@@ -79,14 +67,7 @@ def graph_get(request, graph_id):
 # @permission_classes([AllowAny])
 def graph_create(request):
     serializer = GraphSerializer(data=request.data)
-<<<<<<< HEAD
     if serializer.is_valid():
-=======
-    # print(serializer.initial_data)
-    print("entered graph_create")
-    if serializer.is_valid():
-        print("serializer is valid!! not my fault")
->>>>>>> graph-interface-yl
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
@@ -94,7 +75,6 @@ def graph_create(request):
     return GRAPH_400_RESPONSE
 
 
-<<<<<<< HEAD
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
@@ -120,12 +100,6 @@ def graph_delete(request, graph_id):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_update(request, graph_id):
-=======
-@api_view(["POST"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_update(request):
->>>>>>> graph-interface-yl
     serializer = GraphSerializer(data=request.data, partial=True)
     if not serializer.is_valid():
         return GRAPH_400_RESPONSE
@@ -144,7 +118,6 @@ def graph_update(request):
         return GRAPH_404_RESPONSE
 
 
-<<<<<<< HEAD
 # @api_view(["PUT"])
 # @authentication_classes([TokenAuthentication])
 # @permission_classes([IsAuthenticated])
@@ -179,19 +152,3 @@ def graph_update(request):
 
 #     except Graph.DoesNotExist:
 #         return GRAPH_404_RESPONSE
-=======
-@api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_update_add(request):
-    serializer = GraphSerializer(data=request.data)
-    print(serializer.initial_data)
-
-
-@api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_update_delete(request):
-    serializer = GraphSerializer(data=request.data)
-    print(serializer.initial_data)
->>>>>>> graph-interface-yl

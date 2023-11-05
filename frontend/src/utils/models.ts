@@ -58,12 +58,7 @@ export type IEdge = {
 export type IGraph = {
   id: string;
   editingEnabled: boolean;
-<<<<<<< HEAD
-  nodes: string[]
-  edges: string[]
-=======
   nodes: INode[]
   edges: IEdge[]
->>>>>>> graph-interface-yl
   user: string;
 };

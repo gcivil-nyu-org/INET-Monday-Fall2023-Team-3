@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { IMessage, IToken, IUser, INode, IEdge, IGraph } from "./models";
-=======
 import { IMessage, IToken, IUser, INode, IEdge, IGraph} from "./models";
->>>>>>> graph-interface-yl
 
 // Responses
 // user

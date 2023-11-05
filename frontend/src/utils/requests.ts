@@ -183,9 +183,6 @@ export type Endpoints = {
     bodyType: IGraphGetBody;
     resultType: IGraphGetResponse;
   };
-<<<<<<< HEAD
-  "/graph/update/": {
-=======
   "/graph/update-delete/": {
     param: false;
     authenticate: true;
@@ -194,7 +191,6 @@ export type Endpoints = {
     resultType: IGraphUpdateResponse;
   };
   "/graph/update-add/": {
->>>>>>> graph-interface-yl
     param: false;
     authenticate: true;
     method: "PUT";
