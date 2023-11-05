@@ -7,6 +7,7 @@ from user.models import CustomUser
 from .models import Graph
 from node.models import Node
 from edge.models import Edge
+from graph.serializers import GraphSerializer
 
 # from node.models import Node
 # from edge.models import Edge
@@ -32,16 +33,13 @@ class GraphTests(APITestCase):
 
     def test_create(self):
         request_data = {"user": self.user.email}
-        print("printing user email from test user side", self.user.email)
         response = self.client.post("/backend/graph/create/", request_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        print(response.data)
 
     def test_graph_list(self):
         # Test the graph_list view
         response = self.client.get("/backend/graph/graphs/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        print(response.data)
 
         Graph.objects.create(user=self.user)
         Graph.objects.create(user=self.user)
@@ -56,11 +54,40 @@ class GraphTests(APITestCase):
         self.assertEqual(response.data["id"], str(graph1.id))
 
     def test_graph_delete(self):
+        # testing if an empty graph can be deleted
         graph1 = Graph.objects.create(user=self.user)
         self.assertEqual(len(Graph.objects.all()), 1)
         response = self.client.delete(f"/backend/graph/delete/{graph1.id}/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(Graph.objects.all()), 0)
+
+        # testing if a graph with nodes can be deleted, without impacting predefined nodes
+        graph2 = Graph.objects.create(user=self.user)
+        node1 = Node.objects.create(name="node1", predefined=True)
+        node2 = Node.objects.create(name="node2", predefined=False)
+        node1_id, node2_id = node1.id, node2.id
+        graph2.nodes.add(node1)
+        graph2.nodes.add(node2)
+        self.assertEqual(len(Node.objects.all()), 2)
+        response1 = self.client.delete(f"/backend/graph/delete/{graph2.id}/")
+        response2 = self.client.get(f"/backend/node/get/{node1_id}/")
+        response3 = self.client.get(f"/backend/node/get/{node2_id}/")
+        self.assertEqual(response1.status_code, status.HTTP_200_OK)
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)
+        self.assertNotEqual(response3.status_code, status.HTTP_200_OK)
+
+    def test_graph_update_add(self):
+        graph1 = Graph.objects.create(user=self.user)
+        serializer = GraphSerializer(instance=graph1)
+        self.assertEqual(len(graph1.nodes.all()), 0)
+        node1 = {"name": "CSE 101", "description": "CSE 101 class"}
+        node2 = {"name": "CSE 102", "description": "CSE 102 class"}
+        serializer.data["nodes"] = [node1, node2]
+        response = self.client.put("/backend/graph/update-add/", serializer.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(graph1.nodes.all()), 2)
+
+
 
     # def test_graph_add_node(self):
     #     graph1 = Graph.objects.create(user=self.user)

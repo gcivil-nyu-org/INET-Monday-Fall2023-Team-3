@@ -81,8 +81,39 @@ def graph_create(request):
 def graph_delete(request, graph_id):
     try:
         graph_to_be_deleted = Graph.objects.get(pk=graph_id)
+        nodes = graph_to_be_deleted.nodes.all()
+        edges = graph_to_be_deleted.edges.all()
+        for node in nodes:
+            # not passing a request through the node_delete endpoint because it is not necessary
+            if node.predefined: # if the node is predefined, do not delete it
+                continue
+            node.delete()
+        for edge in edges:
+            edge.delete()
         graph_to_be_deleted.delete()
         return Response(status=status.HTTP_200_OK)
+    except Graph.DoesNotExist:
+        return GRAPH_404_RESPONSE
+
+
+@api_view(["PUT"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_update(request):
+    serializer = GraphSerializer(data=request.data, partial=True)
+    if not serializer.is_valid():
+        return GRAPH_400_RESPONSE
+    graph_id = serializer.validated_data.get("id")
+    try:
+        instance = Graph.objects.get(id=graph_id)
+        if "nodes" in serializer.validated_data:
+            new_nodes = serializer.validated_data.get("nodes")
+            instance.nodes += new_nodes
+        if "edges" in serializer.validated_data:
+            new_edges = serializer.validated_data.get("edges")
+            instance.edges += new_edges
+        update_serializer = GraphSerializer(instance=instance)
+        update_serializer.instance.save()
     except Graph.DoesNotExist:
         return GRAPH_404_RESPONSE
 
