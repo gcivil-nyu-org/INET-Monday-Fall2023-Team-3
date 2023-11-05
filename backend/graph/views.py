@@ -99,7 +99,7 @@ def graph_delete(request, graph_id):
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def graph_update(request):
+def graph_update(request, graph_id):
     serializer = GraphSerializer(data=request.data, partial=True)
     if not serializer.is_valid():
         return GRAPH_400_RESPONSE

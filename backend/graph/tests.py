@@ -76,16 +76,41 @@ class GraphTests(APITestCase):
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response3.status_code, status.HTTP_200_OK)
 
-    def test_graph_update_add(self):
+    def test_graph_update(self):
+        # graph1 = Graph.objects.create(user=self.user)
+        # serializer = GraphSerializer(instance=graph1)
+        # self.assertEqual(len(graph1.nodes.all()), 0)
+        # node1 = {"name": "CSE 101", "description": "CSE 101 class"}
+        # node2 = {"name": "CSE 102", "description": "CSE 102 class"}
+        # serializer.data["nodes"] = [node1, node2]
+        # response = self.client.put("/backend/graph/update-add/", serializer.data)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self.assertEqual(len(graph1.nodes.all()), 2)
         graph1 = Graph.objects.create(user=self.user)
-        serializer = GraphSerializer(instance=graph1)
-        self.assertEqual(len(graph1.nodes.all()), 0)
+
         node1 = {"name": "CSE 101", "description": "CSE 101 class"}
         node2 = {"name": "CSE 102", "description": "CSE 102 class"}
-        serializer.data["nodes"] = [node1, node2]
-        response = self.client.put("/backend/graph/update-add/", serializer.data)
+
+        # Create a dictionary with the desired data
+        data = {
+            "nodes": [node1, node2],
+            "id": str(graph1.id),  # Include the graph's ID
+            # Include any other fields you need to update
+        }
+        print("graph id is:", str(graph1.id))
+
+        serializer = GraphSerializer(data=data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+        print("serializer data:", serializer.data)
+        response = self.client.put(f"/backend/graph/update-add/{str(graph1.id)}/", serializer.data)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(graph1.nodes.all()), 2)
+
 
 
 
