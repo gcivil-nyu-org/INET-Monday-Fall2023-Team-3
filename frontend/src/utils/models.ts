@@ -62,3 +62,17 @@ export type IGraph = {
   edges: IEdge[]
   user: string;
 };
+ /* a type define missing dependencies
+ */
+export type IMissingDependency = {
+  nodeName: string;
+  missingDep: string;
+}
+
+/**
+ * a type define wrong dependencies
+ */
+export type IWrongDepedency = {
+  sourceName: string;
+  targetName: string;
+}
