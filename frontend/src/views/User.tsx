@@ -33,7 +33,6 @@ export default function User() {
         if (graphResult.status) {
           sessionStorage.setItem("graphId", graphResult.value.id);
           console.log("Graph created");
-          navigate("/graph");
         } else {
           console.log("Cannot create graph");
         }
@@ -43,7 +42,7 @@ export default function User() {
     } catch (error) {
       console.error("An error occurred:", error);
     }
-
+    navigate("/graph");
   };
 
   return (

@@ -158,6 +158,10 @@ export const nodeGet: RestfulRequestHelper<"/node/get/"> = (param, token) => {
   return restfulRequest("/node/get/", "GET", { param, token });
 };
 
+export const nodeGetPredefined: RestfulRequestHelper<"/node/predefined-nodes/"> = (token) => {
+  return restfulRequest("/node/predefined-nodes/", "GET", {token});
+}
+
 export const nodeUpdate: RestfulRequestHelper<"/node/update/"> = (body, token) => {
   return restfulRequest("/node/update/", "PUT", { body, token });
 };
@@ -198,11 +202,14 @@ export const graphGet: RestfulRequestHelper<"/graph/get/"> = (param, token) => {
   return restfulRequest("/graph/get/", "GET", { param, token });
 };
 
-export const graphUpdate: RestfulRequestHelper<"/graph/update/"> = (body, token) => {
-  return restfulRequest("/graph/update/", "PUT", { body, token });
+export const graphUpdateDelete: RestfulRequestHelper<"/graph/update-delete/"> = (body, token) => {
+  return restfulRequest("/graph/update-delete/", "PUT", { body, token });
+};
+
+export const graphUpdateAdd: RestfulRequestHelper<"/graph/update-add/"> = (body, token) => {
+  return restfulRequest("/graph/update-add/", "PUT", { body, token });
 };
 
 export const graphDelete: RestfulRequestHelper<"/graph/delete/"> = (param, token) => {
   return restfulRequest("/graph/delete/", "DELETE", { param, token });
 };
-

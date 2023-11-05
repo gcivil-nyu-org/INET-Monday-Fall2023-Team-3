@@ -12,6 +12,7 @@ import {
   INodeCreateBody,
   INodeDeleteBody,
   INodeGetBody,
+  INodesGetBody,
   INodePingBody,
   INodeUpdateBody,
   IUserCreateBody,
@@ -34,6 +35,7 @@ import {
   INodeCreateResponse,
   INodeDeleteResponse,
   INodeGetResponse,
+  INodesGetResponse,
   INodePingResponse,
   INodeUpdateResponse,
   IUserCreateResponse,
@@ -118,7 +120,13 @@ export type Endpoints = {
     bodyType: INodeDeleteBody;
     resultType: INodeDeleteResponse;
   };
-
+  "/node/predefined-nodes/": {
+    param: false;
+    authenticate: true;
+    method: "GET";
+    bodyType: INodesGetBody;
+    resultType: INodesGetResponse;
+  };
   "/edge/ping/": {
     param: false;
     authenticate: false;
@@ -175,7 +183,18 @@ export type Endpoints = {
     bodyType: IGraphGetBody;
     resultType: IGraphGetResponse;
   };
+<<<<<<< HEAD
   "/graph/update/": {
+=======
+  "/graph/update-delete/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: IGraphUpdateBody;
+    resultType: IGraphUpdateResponse;
+  };
+  "/graph/update-add/": {
+>>>>>>> graph-interface-yl
     param: false;
     authenticate: true;
     method: "PUT";

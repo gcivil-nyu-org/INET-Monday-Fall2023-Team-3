@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { IMessage, IToken, IUser, INode, IEdge, IGraph } from "./models";
+=======
+import { IMessage, IToken, IUser, INode, IEdge, IGraph} from "./models";
+>>>>>>> graph-interface-yl
 
 // Responses
 // user
@@ -18,6 +22,8 @@ export type INodePingResponse = IMessage;
 export type INodeCreateResponse = INode;
 
 export type INodeGetResponse = INode;
+
+export type INodesGetResponse = INode[];
 
 export type INodeUpdateResponse = INode;
 
