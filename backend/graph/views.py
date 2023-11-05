@@ -61,9 +61,9 @@ def graph_get(request, graph_id):
 
 
 @api_view(["POST"])
-# @authentication_classes([TokenAuthentication])
+@authentication_classes([TokenAuthentication])
 # @authentication_classes([AllowAny])
-# @permission_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 # @permission_classes([AllowAny])
 def graph_create(request):
     serializer = GraphSerializer(data=request.data)
@@ -99,8 +99,6 @@ def graph_add_node(request, graph_id):
             "description": "Description of the new node",
         }
 
-        print("step 1 success")
-
         token = request.auth
         print("token is views is:", token.key)
         headers = {"Authorization": f"Token {token.key}"}
@@ -111,17 +109,13 @@ def graph_add_node(request, graph_id):
             json=node_data,
         )
 
-        print("step 2 success")
-
         if response.status_code == 200:
-            print("step 3 success")
             # Update the graph's node_ids with the new node's ID
             node_id = response.json().get("id")
             graph.node_ids.append(node_id)
             graph.save()
             return Response(status=status.HTTP_200_OK)
         else:
-            print("step 4 success")
             print(response.json())
             print(response.status_code)
             return Response(response.json(), status=response.status_code)
