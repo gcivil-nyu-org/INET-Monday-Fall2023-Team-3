@@ -21,8 +21,8 @@ test_user = {
 class GraphTests(APITestCase):
     def setUp(self) -> None:
         self.user = CustomUser.objects.create(**test_user)
-        self.token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + self.token.key)
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
 
     def test_ping(self):
         # Test the ping view
@@ -30,36 +30,37 @@ class GraphTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data, {"message": "pong"})
 
-    # def test_create(self):
-    #     request_data = {"user_id": self.user.id}
-    #     print("printing user id from test user side", self.user.id)
-    #     response = self.client.post("/backend/graph/create/", request_data)
-    #     self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-    #     print(response.data)
+    def test_create(self):
+        request_data = {"user": self.user.email}
+        print("printing user email from test user side", self.user.email)
+        response = self.client.post("/backend/graph/create/", request_data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        print(response.data)
 
-    # def test_graph_list(self):
-    #     # Test the graph_list view
-    #     response = self.client.get("/backend/graph/graphs/")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     print(response.data)
+    def test_graph_list(self):
+        # Test the graph_list view
+        response = self.client.get("/backend/graph/graphs/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        print(response.data)
 
-    #     Graph.objects.create(user=self.user)
-    #     Graph.objects.create(user=self.user)
-    #     response = self.client.get("/backend/graph/graphs/")
-    #     self.assertEqual(len(response.data), 2)
+        Graph.objects.create(user=self.user)
+        Graph.objects.create(user=self.user)
+        response = self.client.get("/backend/graph/graphs/")
+        self.assertEqual(len(response.data), 2)
 
-    # def test_graph_get(self):
-    #     graph1 = Graph.objects.create(user=self.user)
-    #     response = self.client.get(f"/backend/graph/get/{graph1.graph_id}/")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(response.data["graph_id"], str(graph1.graph_id))
+    def test_graph_get(self):
+        Graph.objects.create(user=self.user)
+        graph1 = Graph.objects.create(user=self.user)
+        response = self.client.get(f"/backend/graph/get/{graph1.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["id"], str(graph1.id))
 
-    # def test_graph_delete(self):
-    #     graph1 = Graph.objects.create(user=self.user)
-    #     self.assertEqual(len(Graph.objects.all()), 1)
-    #     response = self.client.delete(f"/backend/graph/delete/{graph1.graph_id}/")
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK)
-    #     self.assertEqual(len(Graph.objects.all()), 0)
+    def test_graph_delete(self):
+        graph1 = Graph.objects.create(user=self.user)
+        self.assertEqual(len(Graph.objects.all()), 1)
+        response = self.client.delete(f"/backend/graph/delete/{graph1.id}/")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(Graph.objects.all()), 0)
 
     # def test_graph_add_node(self):
     #     graph1 = Graph.objects.create(user=self.user)

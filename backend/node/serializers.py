@@ -10,10 +10,6 @@ class NodeSerializer(serializers.Serializer):
     dependencies = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Node.objects.all()
     )
-<<<<<<< HEAD
-=======
-    # graph_id = serializers.UUIDField(write_only=True)
->>>>>>> 3c4db39054d93d3a88370b80a4f08c4abb1ee31d
 
     def validate(self, attrs):
         if attrs.get("name") is None:

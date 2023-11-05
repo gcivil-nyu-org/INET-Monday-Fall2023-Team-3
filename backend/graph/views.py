@@ -67,7 +67,6 @@ def graph_get(request, graph_id):
 # @permission_classes([AllowAny])
 def graph_create(request):
     serializer = GraphSerializer(data=request.data)
-    print("entered graph_create")
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -88,37 +87,37 @@ def graph_delete(request, graph_id):
         return GRAPH_404_RESPONSE
 
 
-@api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_add_node(request, graph_id):
-    try:
-        graph = Graph.objects.get(pk=graph_id)
-        node_data = { # let's just use the dummy data for now
-            "name": "New Node",
-            "description": "Description of the new node",
-        }
+# @api_view(["PUT"])
+# @authentication_classes([TokenAuthentication])
+# @permission_classes([IsAuthenticated])
+# def graph_add_node(request, graph_id):
+#     try:
+#         graph = Graph.objects.get(pk=graph_id)
+#         node_data = { # let's just use the dummy data for now
+#             "name": "New Node",
+#             "description": "Description of the new node",
+#         }
 
-        token = request.auth
-        print("token is views is:", token.key)
-        headers = {"Authorization": f"Token {token.key}"}
+#         token = request.auth
+#         print("token is views is:", token.key)
+#         headers = {"Authorization": f"Token {token.key}"}
 
-        response = requests.post(
-            "http://localhost:8000/backend/node/create/",
-            headers=headers,
-            json=node_data,
-        )
+#         response = requests.post(
+#             "http://localhost:8000/backend/node/create/",
+#             headers=headers,
+#             json=node_data,
+#         )
 
-        if response.status_code == 200:
-            # Update the graph's node_ids with the new node's ID
-            node_id = response.json().get("id")
-            graph.node_ids.append(node_id)
-            graph.save()
-            return Response(status=status.HTTP_200_OK)
-        else:
-            print(response.json())
-            print(response.status_code)
-            return Response(response.json(), status=response.status_code)
+#         if response.status_code == 200:
+#             # Update the graph's node_ids with the new node's ID
+#             node_id = response.json().get("id")
+#             graph.node_ids.append(node_id)
+#             graph.save()
+#             return Response(status=status.HTTP_200_OK)
+#         else:
+#             print(response.json())
+#             print(response.status_code)
+#             return Response(response.json(), status=response.status_code)
 
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
+#     except Graph.DoesNotExist:
+#         return GRAPH_404_RESPONSE

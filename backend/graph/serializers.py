@@ -6,26 +6,35 @@ from edge.models import Edge
 
 
 class GraphSerializer(serializers.ModelSerializer):
-    user_id = serializers.CharField(write_only=True)  # Define the user_id field
+    editing_enabled = serializers.BooleanField(required=False)
     nodes = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Node.objects.all()
-    )  # should get str[]
+        many=True, queryset=Node.objects.all(), required=False
+    )  # nodes should be str[];
+    # Only check if the primary keys of nodes match records in table Node
     edges = serializers.PrimaryKeyRelatedField(
-        many=True, queryset=Edge.objects.all()
+        many=True, queryset=Edge.objects.all(), required=False
     )
+    user = serializers.CharField()  # Define the user_email field
+
 
     class Meta:
         model = Graph
         fields = "__all__"
 
     def create(self, validated_data):
-        user_id = validated_data.pop("user_id")
+        useremail = validated_data.pop("user")
+        nodes = validated_data.pop("nodes", [])
+        edges = validated_data.pop("edges", [])
         try:
-            user = CustomUser.objects.get(pk=user_id)
+            user = CustomUser.objects.get(email=useremail)
         except CustomUser.DoesNotExist:
             raise serializers.ValidationError("User does not exist")
         graph = Graph.objects.create(**validated_data, user=user)
+        graph.nodes.set(nodes)
+        graph.edges.set(edges)
         return graph
 
     def update(self, instance, validated_data):
         pass
+
+
