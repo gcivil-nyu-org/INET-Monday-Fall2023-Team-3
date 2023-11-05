@@ -3,8 +3,6 @@ from django.db import models
 import uuid
 from user.models import CustomUser
 
-# Create your models here.
-
 class Graph(models.Model):
     graph_id = models.UUIDField(
         primary_key=True, unique=True, editable=False, default=uuid.uuid4
