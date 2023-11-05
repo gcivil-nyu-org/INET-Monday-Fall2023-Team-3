@@ -40,7 +40,6 @@ class GraphTests(APITestCase):
         # Test the graph_list view
         response = self.client.get("/backend/graph/graphs/")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         Graph.objects.create(user=self.user)
         Graph.objects.create(user=self.user)
         response = self.client.get("/backend/graph/graphs/")
@@ -84,8 +83,6 @@ class GraphTests(APITestCase):
         # Create a dictionary with the desired data
         data = {
             "nodes": [node1, node2],
-            "id": str(graph1.id),  # Include the graph's ID
-            # Include any other fields you need to update
         }
 
         serializer = GraphSerializer(data=data)
