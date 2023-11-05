@@ -14,7 +14,7 @@ class GraphSerializer(serializers.ModelSerializer):
     edges = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Edge.objects.all(), required=False
     )
-    user = serializers.CharField()  # Define the user_email field
+    user = serializers.CharField(required=False)  # Define the user_email field
 
 
     class Meta:
@@ -34,7 +34,16 @@ class GraphSerializer(serializers.ModelSerializer):
         graph.edges.set(edges)
         return graph
 
+
     def update(self, instance, validated_data):
         pass
+        # # Since 'id' is read-only, you need to explicitly set it if it's included in the request
+        # if 'id' in validated_data:
+        #     instance.id = validated_data['id']
+
+        # # Handle other fields update here as needed
+
+        # instance.save()
+        # return instance
 
 

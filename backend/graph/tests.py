@@ -8,6 +8,7 @@ from .models import Graph
 from node.models import Node
 from edge.models import Edge
 from graph.serializers import GraphSerializer
+import uuid
 
 # from node.models import Node
 # from edge.models import Edge
@@ -75,29 +76,36 @@ class GraphTests(APITestCase):
         self.assertEqual(response2.status_code, status.HTTP_200_OK)
         self.assertNotEqual(response3.status_code, status.HTTP_200_OK)
 
-    def test_graph_update(self):
+    def test_graph_update_add(self):
         graph1 = Graph.objects.create(user=self.user)
-        node1 = {"name": "CSE 101", "description": "CSE 101 class"}
-        node2 = {"name": "CSE 102", "description": "CSE 102 class"}
-
-        # Create a dictionary with the desired data
-        data = {
-            "nodes": [node1, node2],
+        valid_data1 = {
+            "name": "ECE244",
+            "description": "Programming Fundamentals",
         }
+        valid_data2 = {
+            "name": "ECE311",
+            "description": "Control System I",
+        }
+        node1 = Node.objects.create(**valid_data1)
+        node2 = Node.objects.create(**valid_data2)
+        valid_data1["id"] = str(node1.id)
+        valid_data2["id"] = str(node2.id)
 
-        serializer = GraphSerializer(data=data)
-
-        if serializer.is_valid():
-            serializer.save()
-
-        print("serializer data:", serializer.data)
-        response = self.client.put(f"/backend/graph/update-add/{str(graph1.id)}/", serializer.data)
+        graph_id = str(graph1.id)
+        request_data = {"id": graph_id, "nodes": [valid_data1, valid_data2]}
+        response = self.client.put("/backend/graph/update-add/", request_data, format="json")
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        nodes_from_graph = sorted(graph1.nodes.all().values_list('id', flat=True))
+        expected_node_ids = sorted([node1.id, node2.id])
+        self.assertEqual(nodes_from_graph, expected_node_ids)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+    def test_graph_update_delete(self):
+        graph1 = Graph.objects.create(user=self.user)
+        node1 = Node.objects.create(name="node1", predefined=True)
+        node2 = Node.objects.create(name="node2", predefined=False)
+        graph1.nodes.add(node1)
+        graph1.nodes.add(node2)
         self.assertEqual(len(graph1.nodes.all()), 2)
-
-
 
 
     # def test_graph_add_node(self):
