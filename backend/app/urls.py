@@ -28,6 +28,7 @@ urlpatterns = [
     path("backend/node/", include("node.urls")),
     path("backend/edge/", include("edge.urls")),
     path("backend/graph/", include("graph.urls")),
+    path("backend/comment/", include("comment.urls")),
     path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("user/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("graph/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),

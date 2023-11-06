@@ -1,10 +1,16 @@
 from django.urls import path
 
-from .views import ping, comment_create, comment_get, comments_by_node, comment_update, comment_delete
+from .views import (
+    ping,
+    comment_create,
+    comment_get,
+    comments_by_node,
+    comment_update,
+    comment_delete,
+)
 
 
 app_name = "comment"
-
 urlpatterns = [
     path("ping/", ping, name="ping"),
     path("create/", comment_create, name="comment-create"),

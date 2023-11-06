@@ -65,6 +65,7 @@ def comment_create(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def comment_get(request, comment_id):
+    print(comment_id)
     try:
         comment = Comment.objects.get(id=comment_id)
         serializer = CommentSerializer(comment)
@@ -78,10 +79,8 @@ def comment_get(request, comment_id):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def comments_by_node(request, node_id):
-    print(node_id)
     try:
         node = Node.objects.get(id=node_id)
-        print(node)
     except Node.DoesNotExist:
         return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
 
