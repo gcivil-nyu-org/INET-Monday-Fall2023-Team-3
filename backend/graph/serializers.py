@@ -7,7 +7,8 @@ from edge.models import Edge
 
 
 class GraphSerializer(serializers.ModelSerializer):
-    user = serializers.CharField()  # Define the user_email field
+    id = serializers.UUIDField(required=False)
+    user = serializers.CharField(required=False)  # Define the user_email field
     nodes = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Node.objects.all(), required=False
     )  # nodes should be str[];
