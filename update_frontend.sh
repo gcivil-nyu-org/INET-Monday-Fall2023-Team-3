@@ -19,3 +19,4 @@ cd ..
 cd ./backend
 black .
 flake8 .
+cd ..

@@ -176,12 +176,6 @@ export default function Graph() {
             } else {
               console.log("Cannot add node to graph");
             }
-            return nodes.concat({
-              id: submittedNode.id,
-              type: "smoothNode",
-              position: { x: 0, y: 0 },
-              data: submittedNode,
-            });
           });
           return nodes.concat({
             id: submittedNode.id,
@@ -420,16 +414,16 @@ export default function Graph() {
             nodeDelete(node.id, sessionStorage.getItem("token")!);
             const INodeSendToBackend = {  // Define a new INode to send to backend, only id matters
               id: node.id, name: "whatever", predefined: false, description: "whatever", dependencies: []};
-            graphUpdateDelete(
-              { id: sessionStorage.getItem("graphId")!, nodes: [INodeSendToBackend] },
-              sessionStorage.getItem("token")!
-            ).then((result) => {
-              if (result.status) {
-                console.log("Node deleted from graph");
-              } else {
-                console.log("Cannot delete node from graph");
-              }
-            });
+            // graphUpdateDelete(
+            //   { id: sessionStorage.getItem("graphId")!, nodes: [INodeSendToBackend] },
+            //   sessionStorage.getItem("token")!
+            // ).then((result) => {
+            //   if (result.status) {
+            //     console.log("Node deleted from graph");
+            //   } else {
+            //     console.log("Cannot delete node from graph");
+            //   }
+            // });
           }
         });
       });
