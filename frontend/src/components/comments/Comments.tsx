@@ -12,33 +12,66 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Theme from "./Theme"; // Import your theme configuration
-import { userGet, userUpdate } from "utils/backendRequests";
+import { userGet, userUpdate, commentGetByNode } from "utils/backendRequests";
+import { IComment, INode } from 'utils/models';
 
 interface CommentsProps {
-    commentsUrl: string;
-    currentUserId: string;
+    node: INode,
 }
 
-const Comments: React.FC<CommentsProps> = ({ commentsUrl, currentUserId }) => {
+const Comments: React.FC<CommentsProps> = ({node}) => {
     const [severity, setSeverity] = useState<"error" | "success">("error");
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [message, setMessage] = useState("");
     const [backendComments, setBackendComments] = useState<CommentFromApi[]>([]); // Specify the type for backendComments
     const [activeComment, setActiveComment] = useState<CommentState | null>(null); // Specify the type for activeComment
+    const [comments, setComments] = useState<IComment[]>([]);
 
     useEffect(() => {
-        userGet(sessionStorage.getItem("token")!).then((result) => {
-          if (result.status) {
-            const user = result.value;
-            setEmail(user.email);
-            setUsername(user.username);
-          } else {
+        // Function to fetch comments by node and user details
+        const fetchData = async () => {
+          const token = sessionStorage.getItem("token");
+          if (!token) {
             setSeverity("error");
-            setMessage("Cannot get current user");
+            setMessage("No token found in session storage");
+            return;
           }
-        });
-      }, []);
+      
+          try {
+            // Get comments associated with the node
+      
+            // Check for a valid user session and set user details
+            const result = await userGet(token);
+            if (result.status) {
+              const { email, username } = result.value;
+              setEmail(email);
+              setUsername(username);
+              const response = await commentGetByNode(node.id, token);
+              if (response.status) {
+                console.log(response.value);
+                const commentsArray = Object.values(response.value);
+                setComments(commentsArray);
+              } else {
+                console.error("Error fetching comments:", response.error);
+              }
+            } else {
+              // Handle case where user details cannot be fetched
+              setSeverity("error");
+              setMessage("Cannot get current user");
+            }
+          } catch (error) {
+            // Handle any errors that occur during the fetch operations
+            console.error("Error fetching data:", error);
+            setSeverity("error");
+            setMessage("An error occurred while fetching data");
+          }
+        };
+      
+        // Call the fetchData function
+        fetchData();
+      }, []); // Empty dependency array means this effect will only run once on mount
+      
 
     const rootComments = backendComments.filter(
         (backendComment) => backendComment.parentId === null
@@ -109,7 +142,7 @@ const Comments: React.FC<CommentsProps> = ({ commentsUrl, currentUserId }) => {
                         addComment={addComment}
                         deleteComment={deleteComment}
                         updateComment={updateComment}
-                        currentUserId={currentUserId}
+                        currentUserId={email}
                     />
                 ))}
             </div>

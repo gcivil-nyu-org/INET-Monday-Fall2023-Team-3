@@ -15,7 +15,7 @@ import ReactFlow, {
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 
-import { IEdge, INode, IMissingDependency, IWrongDepedency } from "utils/models";
+import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
@@ -37,6 +37,7 @@ export default function Graph() {
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
   const [showProblematicDeps, setShowProblematicDeps] = useState(false);
+  const [showNodeDiscussion, setShowNodeDiscussion] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
@@ -49,6 +50,7 @@ export default function Graph() {
   const [missingDeps, setMissingDeps] = useState<IMissingDependency[]>([]);
   const [wrongDeps, setwrongDeps] = useState<IWrongDepedency[]>([]);
   const [currNode, setCurrNode] = useState<INode>();
+  const [clickNode, setClickNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
 
@@ -148,9 +150,9 @@ export default function Graph() {
       setInfoMessage("Comments are only available for NYU courses.");
       return;
     }
+    setShowNodeDiscussion(true);
     console.log(node.data.id);
-    const response = await commentGetByNode(node.data.id, sessionStorage.getItem("token")!);
-    console.log(response);
+    setClickNode(node.data);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -426,8 +428,8 @@ export default function Graph() {
   };
 
   return (
-    <div className="w-full h-full flex flex-row min-h-screen">
-      <div className="flex self-stretch basis-3/4">
+    <div className="w-full h-full flex flex-row min-h-screen overflow-hidden">
+      <div className="flex self-stretch basis-3/4 overflow-hidden">
         <Snackbar open={showError} autoHideDuration={6000} onClose={onSnackBarClose}>
           <Alert severity="error">{errorMessage}</Alert>
         </Snackbar>
@@ -493,8 +495,8 @@ export default function Graph() {
           <Controls />
         </ReactFlow>
       </div>
-      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500">
-        <Comments commentsUrl="http://localhost:3000/comments" currentUserId="1" />
+      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500 overflow-hidden">
+        {showNodeDiscussion && <Comments node={clickNode!} />}
       </div>
     </div>
   );
