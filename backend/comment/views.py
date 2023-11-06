@@ -1,8 +1,10 @@
-from django.shortcuts import render
-
 # Create your views here.
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
 from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
@@ -10,9 +12,11 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CommentSerializer
 from .models import Comment, Node
 
+
 # Helper function to create a detail message
 def detail(msg: str):
     return {"detail": msg}
+
 
 # Constant messages and responses
 COMMENT_PONG_MSG = detail("pong")
@@ -21,14 +25,22 @@ COMMENT_ID_ALREADY_EXISTS_MSG = detail("comment with the same id already exists"
 COMMENT_NOT_FOUND_MSG = detail("comment not found")
 
 COMMENT_PONG_RESPONSE = Response(COMMENT_PONG_MSG, status=status.HTTP_200_OK)
-COMMENT_INVALID_FORMAT_RESPONSE = Response(COMMENT_INVALID_FORMAT_MSG, status=status.HTTP_400_BAD_REQUEST)
-COMMENT_ID_ALREADY_EXISTS_RESPONSE = Response(COMMENT_ID_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT)
-COMMENT_NOT_FOUND_RESPONSE = Response(COMMENT_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND)
+COMMENT_INVALID_FORMAT_RESPONSE = Response(
+    COMMENT_INVALID_FORMAT_MSG, status=status.HTTP_400_BAD_REQUEST
+)
+COMMENT_ID_ALREADY_EXISTS_RESPONSE = Response(
+    COMMENT_ID_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT
+)
+COMMENT_NOT_FOUND_RESPONSE = Response(
+    COMMENT_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND
+)
+
 
 # Ping
 @api_view(["GET"])
 def ping(request):
     return COMMENT_PONG_RESPONSE
+
 
 # Create comment
 @api_view(["POST"])
@@ -36,16 +48,17 @@ def ping(request):
 @permission_classes([IsAuthenticated])
 def comment_create(request):
     serializer = CommentSerializer(data=request.data)
-    
+
     if not serializer.is_valid():
         return COMMENT_INVALID_FORMAT_RESPONSE
-    
+
     comment_id = serializer.validated_data.get("id")
     if comment_id and Comment.objects.filter(id=comment_id).exists():
         return COMMENT_ID_ALREADY_EXISTS_RESPONSE
-    
+
     serializer.save()  # Assuming the user is assigned from the request
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
 
 # Get comment
 @api_view(["GET"])
@@ -58,20 +71,24 @@ def comment_get(request, comment_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Comment.DoesNotExist:
         return COMMENT_NOT_FOUND_RESPONSE
-    
+
+
 # Get comments by Node ID
-@api_view(['GET'])
+@api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def comments_by_node(request, node_id):
+    print(node_id)
     try:
         node = Node.objects.get(id=node_id)
+        print(node)
     except Node.DoesNotExist:
-        return Response({'detail': 'Node not found'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
 
     comments = Comment.objects.filter(related_to=node)
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # Update comment
 @api_view(["PUT"])
@@ -86,9 +103,10 @@ def comment_update(request, comment_id):
     serializer = CommentSerializer(comment, data=request.data)
     if not serializer.is_valid():
         return COMMENT_INVALID_FORMAT_RESPONSE
-    
+
     serializer.save()
     return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 # Delete comment
 @api_view(["DELETE"])

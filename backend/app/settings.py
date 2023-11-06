@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "node",
     "edge",
     "graph",
+    "comment",
 ]
 
 MIDDLEWARE = [
