@@ -167,6 +167,22 @@ export default function Graph() {
           if (submittedNode.predefined) {
             setOnCanvasNodeIds((prevIds) => [...prevIds, submittedNode.id]);
           }
+          graphUpdateAdd(
+            { id: sessionStorage.getItem("graphId")!, nodes: [submittedNode] },
+            sessionStorage.getItem("token")!
+          ).then((result) => {
+            if (result.status) {
+              console.log("Node added to graph");
+            } else {
+              console.log("Cannot add node to graph");
+            }
+            return nodes.concat({
+              id: submittedNode.id,
+              type: "smoothNode",
+              position: { x: 0, y: 0 },
+              data: submittedNode,
+            });
+          });
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",

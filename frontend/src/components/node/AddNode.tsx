@@ -51,23 +51,12 @@ export default function AddNode({
       setErrorMessage("name cannot be empty");
       return;
     }
-    var nodeId = ""
     nodeCreate(
       { name: cleanName, description: cleanDescription },
       sessionStorage.getItem("token")!
     ).then((result) => {
       if (result.status) {
         onSubmit(result.value);
-        graphUpdateAdd(
-          { id: sessionStorage.getItem("graphId")!, nodes: [result.value] },
-          sessionStorage.getItem("token")!
-        ).then((result) => {
-          if (result.status) {
-            console.log("Node added to graph");
-          } else {
-            console.log("Cannot add node to graph");
-          }
-        });
       } else {
         onError(result.error);
       }
