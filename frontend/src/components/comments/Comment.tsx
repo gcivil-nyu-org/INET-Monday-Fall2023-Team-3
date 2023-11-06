@@ -1,6 +1,6 @@
 import React from 'react';
 import CommentForm from './CommentForm';
-
+import { Button, Avatar, Dialog, DialogTitle } from "@mui/material";
 export interface CommentProps {
     comment: {
         id: string;
@@ -52,7 +52,7 @@ const Comment: React.FC<CommentProps> = ({
     return (
         <div key={comment.id} className="flex mb-7">
             <div className="mr-4">
-                <img className="rounded-full" src="backend/static/user-icon.png" alt="User Icon" />
+                <Avatar className="w-12 h-12" src="https://mui.com/static/images/avatar/1.jpg" />
             </div>
             <div className="w-full">
                 <div className="flex">

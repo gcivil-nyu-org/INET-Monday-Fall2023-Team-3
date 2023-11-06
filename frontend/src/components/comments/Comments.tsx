@@ -9,6 +9,10 @@ import {
     updateComment as updateCommentApi,
     deleteComment as deleteCommentApi,
 } from '../../api';
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import Theme from "./Theme"; // Import your theme configuration
+import { userGet, userUpdate } from "utils/backendRequests";
 
 interface CommentsProps {
     commentsUrl: string;
@@ -16,8 +20,25 @@ interface CommentsProps {
 }
 
 const Comments: React.FC<CommentsProps> = ({ commentsUrl, currentUserId }) => {
+    const [severity, setSeverity] = useState<"error" | "success">("error");
+    const [email, setEmail] = useState("");
+    const [username, setUsername] = useState("");
+    const [message, setMessage] = useState("");
     const [backendComments, setBackendComments] = useState<CommentFromApi[]>([]); // Specify the type for backendComments
     const [activeComment, setActiveComment] = useState<CommentState | null>(null); // Specify the type for activeComment
+
+    useEffect(() => {
+        userGet(sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const user = result.value;
+            setEmail(user.email);
+            setUsername(user.username);
+          } else {
+            setSeverity("error");
+            setMessage("Cannot get current user");
+          }
+        });
+      }, []);
 
     const rootComments = backendComments.filter(
         (backendComment) => backendComment.parentId === null
@@ -72,7 +93,9 @@ const Comments: React.FC<CommentsProps> = ({ commentsUrl, currentUserId }) => {
     }, []);
 
     return (
-        <div className="mt-2">
+        <ThemeProvider theme={Theme}>
+        <CssBaseline />
+        <div className="mt-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
             <div className="text-2xl">Discussion Section</div>
             <CommentForm submitLabel="Write" handleSubmit={addComment} />
             <div className="mt-4">
@@ -91,6 +114,7 @@ const Comments: React.FC<CommentsProps> = ({ commentsUrl, currentUserId }) => {
                 ))}
             </div>
         </div>
+        </ThemeProvider>
     );
 };
 
