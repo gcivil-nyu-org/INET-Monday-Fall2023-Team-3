@@ -197,3 +197,7 @@ export const commentGetByNode: RestfulRequestHelper<"/comment/get-by-node/"> = (
 export const commentCreate: RestfulRequestHelper<"/comment/create/"> = (body, token) => {
   return restfulRequest("/comment/create/", "POST", { body, token });
 }
+
+export const commentUpdate: RestfulRequestHelper<"/comment/update/"> = (body, token) => {
+  return restfulRequest("/comment/update/", "PUT", { body, token });
+}

@@ -17,6 +17,7 @@ import {
   IUserUpdateBody,
   ICommentsGetBody,
   ICommentCreateBody,
+  ICommentUpdateBody,
 } from "./bodies";
 import {
   IEdgeCreateResponse,
@@ -37,6 +38,7 @@ import {
   IUserUpdateResponse,
   ICommentsGetResponse,
   ICommentCreateResponse,
+  ICommentUpdateResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -169,5 +171,12 @@ export type Endpoints = {
     method: "POST";
     bodyType: ICommentCreateBody;
     resultType: ICommentCreateResponse;
+  };
+  "/comment/update/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: ICommentUpdateBody;
+    resultType: ICommentUpdateResponse;
   };
 };

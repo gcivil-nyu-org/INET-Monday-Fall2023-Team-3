@@ -92,18 +92,20 @@ def comments_by_node(request, node_id):
 @api_view(["PUT"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def comment_update(request, comment_id):
-    try:
-        comment = Comment.objects.get(id=comment_id)
-    except Comment.DoesNotExist:
-        return COMMENT_NOT_FOUND_RESPONSE
-
-    serializer = CommentSerializer(comment, data=request.data)
+def comment_update(request):
+    print(request)
+    serializer = CommentSerializer(data=request.data, partial=True)
     if not serializer.is_valid():
         return COMMENT_INVALID_FORMAT_RESPONSE
-
-    serializer.save()
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    comment_id = request.data.get("id")
+    try:
+        instance = Comment.objects.get(id=comment_id)
+        serializer.instance = instance
+        serializer.save()
+        serializer = CommentSerializer(instance=serializer.instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Comment.DoesNotExist:
+        return COMMENT_NOT_FOUND_RESPONSE
 
 
 # Delete comment

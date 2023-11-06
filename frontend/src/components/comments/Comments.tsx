@@ -12,7 +12,7 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Theme from "./Theme"; // Import your theme configuration
-import { userGet, userUpdate, commentGetByNode, commentCreate } from "utils/backendRequests";
+import { userGet, userUpdate, commentGetByNode, commentCreate, commentUpdate } from "utils/backendRequests";
 import { IComment, INode } from 'utils/models';
 
 interface CommentsProps {
@@ -109,7 +109,11 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
     };
 
     const updateComment = (text: string, commentId: string) => {
-        updateCommentApi(text).then(() => {
+        const payload = {
+            id: commentId,
+            body: text,
+        };
+        commentUpdate(payload, sessionStorage.getItem("token")!).then(() => {
             const updatedBackendComments = comments.map((backendComment) => {
                 if (backendComment.id === commentId) {
                     return { ...backendComment, body: text };

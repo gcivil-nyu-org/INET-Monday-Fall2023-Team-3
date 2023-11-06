@@ -46,3 +46,5 @@ export type ICommentGetBody = undefined;
 export type ICommentsGetBody = undefined;
 
 export type ICommentDeleteBody = undefined;
+
+export type ICommentUpdateBody = Partial<IComment>;
