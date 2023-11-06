@@ -201,3 +201,7 @@ export const commentCreate: RestfulRequestHelper<"/comment/create/"> = (body, to
 export const commentUpdate: RestfulRequestHelper<"/comment/update/"> = (body, token) => {
   return restfulRequest("/comment/update/", "PUT", { body, token });
 }
+
+export const commentDelete: RestfulRequestHelper<"/comment/delete/"> = (param, token) => {
+  return restfulRequest("/comment/delete/", "DELETE", { param, token });
+}

@@ -18,6 +18,7 @@ import {
   ICommentsGetBody,
   ICommentCreateBody,
   ICommentUpdateBody,
+  ICommentDeleteBody,
 } from "./bodies";
 import {
   IEdgeCreateResponse,
@@ -39,6 +40,7 @@ import {
   ICommentsGetResponse,
   ICommentCreateResponse,
   ICommentUpdateResponse,
+  ICommentDeleteResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -178,5 +180,12 @@ export type Endpoints = {
     method: "PUT";
     bodyType: ICommentUpdateBody;
     resultType: ICommentUpdateResponse;
+  };
+  "/comment/delete/": {
+    param: true;
+    authenticate: true;
+    method: "DELETE";
+    bodyType: ICommentDeleteBody;
+    resultType: ICommentDeleteResponse;
   };
 };

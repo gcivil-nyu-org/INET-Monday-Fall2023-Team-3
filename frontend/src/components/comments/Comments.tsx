@@ -12,7 +12,7 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Theme from "./Theme"; // Import your theme configuration
-import { userGet, userUpdate, commentGetByNode, commentCreate, commentUpdate } from "utils/backendRequests";
+import { userGet, userUpdate, commentGetByNode, commentCreate, commentUpdate, commentDelete } from "utils/backendRequests";
 import { IComment, INode } from 'utils/models';
 
 interface CommentsProps {
@@ -127,7 +127,7 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
 
     const deleteComment = (commentId: string) => {
         if (window.confirm('Are you sure you want to remove comment?')) {
-            deleteCommentApi().then(() => {
+            commentDelete(commentId, sessionStorage.getItem("token")!).then(() => {
                 const updatedBackendComments = comments.filter(
                     (backendComment) => backendComment.id !== commentId
                 );
