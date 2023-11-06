@@ -67,3 +67,15 @@ export type IWrongDepedency = {
   sourceName: string;
   targetName: string;
 }
+
+/**
+ * Represents a comment in backend
+ */
+export type IComment = {
+  id: string; 
+  body: string;
+  user: string;
+  parent: string;
+  related_to: string;
+  created_at: string;
+}

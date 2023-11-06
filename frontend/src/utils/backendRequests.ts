@@ -189,3 +189,7 @@ export const edgeUpdate: RestfulRequestHelper<"/edge/update/"> = (body, token) =
 export const edgeDelete: RestfulRequestHelper<"/edge/delete/"> = (param, token) => {
   return restfulRequest("/edge/delete/", "DELETE", { param, token });
 };
+
+export const commentGetByNode: RestfulRequestHelper<"/comment/get-by-node/"> = (param, token) => {
+  return restfulRequest("/comment/get-by-node/", "GET", { param, token });
+}

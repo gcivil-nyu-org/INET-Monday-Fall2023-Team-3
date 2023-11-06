@@ -1,4 +1,4 @@
-import { IMessage, IToken, IUser, INode, IEdge } from "./models";
+import { IMessage, IToken, IUser, INode, IEdge, IComment } from "./models";
 
 // Responses
 // user
@@ -35,3 +35,16 @@ export type IEdgeGetResponse = IEdge;
 export type IEdgeUpdateResponse = IEdge;
 
 export type IEdgeDeleteResponse = undefined;
+
+// comment
+export type ICommentPingResponse = IMessage;
+
+export type ICommentCreateResponse = IComment;
+
+export type ICommentGetResponse = IComment;
+
+export type ICommentsGetResponse = IComment[];
+
+export type ICommentUpdateResponse = IComment;
+
+export type ICommentDeleteResponse = IComment;

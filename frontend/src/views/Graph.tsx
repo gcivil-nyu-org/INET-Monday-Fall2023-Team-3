@@ -28,6 +28,7 @@ import {
   nodeDelete,
   nodeUpdate,
   nodeGetPredefined,
+  commentGetByNode,
 } from "utils/backendRequests";
 
 export default function Graph() {
@@ -39,6 +40,8 @@ export default function Graph() {
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoMessage, setInfoMessage] = useState("");
 
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
@@ -135,6 +138,18 @@ export default function Graph() {
     setShowAddNode(false);
     setShowEditNode(true);
     setShowProblematicDeps(false);
+  };
+
+  const onNodeClick = async (event: React.MouseEvent, node: Node<INode>) => {
+    console.log('single click');
+    if (node.data.predefined === false) {
+      setShowInfo(true);
+      setInfoMessage("Comments are only available for NYU courses.");
+      return;
+    }
+    console.log(node.data.id);
+    const response = await commentGetByNode(node.data.id, sessionStorage.getItem("token")!);
+    console.log(response);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -405,6 +420,7 @@ export default function Graph() {
     if (reason !== "clickaway") {
       setShowError(false);
       setShowSuccess(false);
+      setShowInfo(false);
     }
   };
 
@@ -416,6 +432,9 @@ export default function Graph() {
         </Snackbar>
         <Snackbar open={showSuccess} autoHideDuration={6000} onClose={onSnackBarClose}>
           <Alert severity="success">{successMessage}</Alert>
+        </Snackbar>
+        <Snackbar open={showInfo} autoHideDuration={6000} onClose={onSnackBarClose}>
+          <Alert severity="info">{infoMessage}</Alert>
         </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <AddNode
@@ -438,6 +457,7 @@ export default function Graph() {
           nodes={nodes}
           onNodesChange={onNodesChange}
           onNodesDelete={onNodesDelete}
+          onNodeClick={onNodeClick}
           onNodeDoubleClick={onNodeDoubleClick}
           edges={edges}
           onEdgesChange={onEdgesChange}

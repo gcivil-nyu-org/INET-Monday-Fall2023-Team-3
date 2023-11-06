@@ -1,4 +1,4 @@
-import { IUser, INode, IEdge } from "./models";
+import { IUser, INode, IEdge, IComment } from "./models";
 
 // bodies
 // user
@@ -35,3 +35,14 @@ export type IEdgeGetBody = undefined;
 export type IEdgeUpdateBody = IEdge;
 
 export type IEdgeDeleteBody = undefined;
+
+// comment
+export type ICommentPingBody = undefined;
+
+export type ICommentCreateBody = Partial<IComment>;
+
+export type ICommentGetBody = undefined;
+
+export type ICommentsGetBody = undefined;
+
+export type ICommentDeleteBody = undefined;

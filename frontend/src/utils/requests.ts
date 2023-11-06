@@ -15,6 +15,7 @@ import {
   IUserLoginBody,
   IUserPingBody,
   IUserUpdateBody,
+  ICommentsGetBody,
 } from "./bodies";
 import {
   IEdgeCreateResponse,
@@ -33,6 +34,7 @@ import {
   IUserLoginResponse,
   IUserPingResponse,
   IUserUpdateResponse,
+  ICommentsGetResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -152,4 +154,11 @@ export type Endpoints = {
     bodyType: IEdgeDeleteBody;
     resultType: IEdgeDeleteResponse;
   };
+  "/comment/get-by-node/": {
+    param: true;
+    authenticate: true;
+    method: "GET";
+    bodyType: ICommentsGetBody;
+    resultType: ICommentsGetResponse;
+  }
 };
