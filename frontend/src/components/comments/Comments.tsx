@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import CommentForm from './CommentForm';
 import Comment from './Comment';
 import { CommentState } from './Comment';
-import { Comment as CommentFromApi } from '../api'
+import { Comment as CommentFromApi } from '../../api';
 import {
     getComments as getCommentsApi,
     createComment as createCommentApi,
     updateComment as updateCommentApi,
     deleteComment as deleteCommentApi,
-} from '../api';
+} from '../../api';
 
 interface CommentsProps {
     commentsUrl: string;
