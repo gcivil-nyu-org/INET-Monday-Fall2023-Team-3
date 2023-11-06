@@ -22,6 +22,7 @@ import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
 import ProblematicDepsInfo from "components/node/ProblematicDepsInfo";
+import Comments from "components/comments/Comments"
 import {
   edgeCreate,
   edgeDelete,
@@ -373,12 +374,12 @@ export default function Graph() {
             currentNodes.map((node) => {
               return node.id === targetNode.id
                 ? {
-                    ...node,
-                    data: {
-                      ...node.data,
-                      dependencies: newDependencies,
-                    },
-                  }
+                  ...node,
+                  data: {
+                    ...node.data,
+                    dependencies: newDependencies,
+                  },
+                }
                 : node;
             })
           );
@@ -473,7 +474,7 @@ export default function Graph() {
         </ReactFlow>
       </div>
       <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500">
-        {/* add comment page */}
+        <Comments commentsUrl="http://localhost:3000/comments" currentUserId="1" />
       </div>
     </div>
   );

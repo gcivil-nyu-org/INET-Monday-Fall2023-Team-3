@@ -72,10 +72,10 @@ const Comments: React.FC<CommentsProps> = ({ commentsUrl, currentUserId }) => {
     }, []);
 
     return (
-        <div className="comments">
-            <div className="comment-form-title">Write a comment</div>
+        <div className="mt-2">
+            <div className="text-2xl">Discussion Section</div>
             <CommentForm submitLabel="Write" handleSubmit={addComment} />
-            <div className="comments-container">
+            <div className="mt-4">
                 {rootComments.map((rootComment) => (
                     <Comment
                         key={rootComment.id}
