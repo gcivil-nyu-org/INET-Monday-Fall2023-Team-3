@@ -78,11 +78,11 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
     );
 
     const getReplies = (commentId: string) => {
-        return backendComments
-            .filter((backendComment) => backendComment.parentId === commentId)
+        return comments
+            .filter((backendComment) => backendComment.parent === commentId)
             .sort(
                 (a, b) =>
-                    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+                    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
             );
     }
 
@@ -135,12 +135,6 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
             });
         }
     };
-
-    useEffect(() => {
-        getCommentsApi().then((data) => {
-            setBackendComments(data);
-        });
-    }, []);
 
     return (
         <ThemeProvider theme={Theme}>

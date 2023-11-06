@@ -75,9 +75,9 @@ const Comment: React.FC<CommentProps> = ({
                     {canReply && (
                         <div
                             className="mr-4 hover:underline"
-                            onClick={() =>
-                                setActiveComment({ id: comment.id, type: 'replying' })
-                            }
+                            onClick={() =>{
+                                setActiveComment({ id: comment.id, type: 'replying' });
+                            }}
                         >
                             Reply
                         </div>
