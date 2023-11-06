@@ -193,3 +193,7 @@ export const edgeDelete: RestfulRequestHelper<"/edge/delete/"> = (param, token) 
 export const commentGetByNode: RestfulRequestHelper<"/comment/get-by-node/"> = (param, token) => {
   return restfulRequest("/comment/get-by-node/", "GET", { param, token });
 }
+
+export const commentCreate: RestfulRequestHelper<"/comment/create/"> = (body, token) => {
+  return restfulRequest("/comment/create/", "POST", { body, token });
+}

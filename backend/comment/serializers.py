@@ -3,9 +3,11 @@ from .models import Comment, CustomUser, Node  # Import User and Node models as 
 
 
 class CommentSerializer(serializers.Serializer):
-    id = serializers.UUIDField(required=False)
+    id = serializers.UUIDField()
     body = serializers.CharField()
-    user = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all())
+    user = serializers.SlugRelatedField(
+        slug_field="email", queryset=CustomUser.objects.all()
+    )
     parent = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(), required=False, allow_null=True
     )

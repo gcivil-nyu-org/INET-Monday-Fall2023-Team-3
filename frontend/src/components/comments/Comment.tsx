@@ -4,10 +4,10 @@ import { Button, Avatar, Dialog, DialogTitle } from "@mui/material";
 export interface CommentProps {
     comment: {
         id: string;
-        username: string;
         body: string;
-        userId: string;
-        createdAt: string;
+        user: string;
+        parent: string;
+        created_at: string;
     };
     replies: any[]; // Update the type as needed
     setActiveComment: React.Dispatch<React.SetStateAction<CommentState | null>>;
@@ -43,12 +43,12 @@ const Comment: React.FC<CommentProps> = ({
         activeComment &&
         activeComment.id === comment.id &&
         activeComment.type === 'replying';
-    const canDelete = currentUserId === comment.userId && replies.length === 0;
+    const canDelete = currentUserId === comment.user && replies.length === 0;
     const canReply = Boolean(currentUserId);
-    const canEdit = currentUserId === comment.userId;
+    const canEdit = currentUserId === comment.user;
     const replyId = parentId ? parentId : comment.id;
-    const createdAt = new Date(comment.createdAt).toLocaleDateString();
-
+    const createdAt = new Date(comment.created_at).toLocaleDateString();
+    console.log(createdAt);
     return (
         <div key={comment.id} className="flex mb-7">
             <div className="mr-4">
@@ -56,8 +56,8 @@ const Comment: React.FC<CommentProps> = ({
             </div>
             <div className="w-full">
                 <div className="flex">
-                    <div className="mr-4 text-lg text-white">{comment.username}</div>
-                    <div>{createdAt}</div>
+                    <div className="mr-4 text-lg text-white">{comment.user}</div>
+                    <div>{new Date(comment.created_at).toLocaleDateString()}</div>
                 </div>
                 {!isEditing && <div className="text-xl">{comment.body}</div>}
                 {isEditing && (

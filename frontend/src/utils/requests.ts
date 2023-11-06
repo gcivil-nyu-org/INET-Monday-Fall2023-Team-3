@@ -16,6 +16,7 @@ import {
   IUserPingBody,
   IUserUpdateBody,
   ICommentsGetBody,
+  ICommentCreateBody,
 } from "./bodies";
 import {
   IEdgeCreateResponse,
@@ -35,6 +36,7 @@ import {
   IUserPingResponse,
   IUserUpdateResponse,
   ICommentsGetResponse,
+  ICommentCreateResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -160,5 +162,12 @@ export type Endpoints = {
     method: "GET";
     bodyType: ICommentsGetBody;
     resultType: ICommentsGetResponse;
-  }
+  };
+  "/comment/create/": {
+    param: false;
+    authenticate: true;
+    method: "POST";
+    bodyType: ICommentCreateBody;
+    resultType: ICommentCreateResponse;
+  };
 };

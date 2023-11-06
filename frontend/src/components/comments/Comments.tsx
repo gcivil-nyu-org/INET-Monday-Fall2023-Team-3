@@ -12,7 +12,7 @@ import {
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import Theme from "./Theme"; // Import your theme configuration
-import { userGet, userUpdate, commentGetByNode } from "utils/backendRequests";
+import { userGet, userUpdate, commentGetByNode, commentCreate } from "utils/backendRequests";
 import { IComment, INode } from 'utils/models';
 
 interface CommentsProps {
@@ -70,11 +70,11 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
       
         // Call the fetchData function
         fetchData();
-      }, []); // Empty dependency array means this effect will only run once on mount
+      }, [node]); // Empty dependency array means this effect will only run once on mount
       
 
-    const rootComments = backendComments.filter(
-        (backendComment) => backendComment.parentId === null
+    const rootComments = comments.filter(
+        (backendComment) => backendComment.parent === null
     );
 
     const getReplies = (commentId: string) => {
@@ -88,22 +88,35 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
 
 
     const addComment = (text: string, parentId: string | null) => {
-        createCommentApi(text, parentId).then(comment => {
-            const newComment = [comment, ...backendComments]
-            setBackendComments(newComment);
-            setActiveComment(null);
+        const payload = {
+            body: text,
+            user: email, // This should be the user's ID, not their email.
+            parent: parentId!,
+            related_to: node.id,
+        };
+        commentCreate(payload, sessionStorage.getItem("token")!).then((result) => {
+            if (result.status) {
+                const newComment = [result.value, ...comments];
+                console.log(newComment);
+                setComments(newComment);
+                setActiveComment(null);
+            } else {
+              console.log(result.error);
+            }
+            
         });
+        
     };
 
     const updateComment = (text: string, commentId: string) => {
         updateCommentApi(text).then(() => {
-            const updatedBackendComments = backendComments.map((backendComment) => {
+            const updatedBackendComments = comments.map((backendComment) => {
                 if (backendComment.id === commentId) {
                     return { ...backendComment, body: text };
                 }
                 return backendComment;
             });
-            setBackendComments(updatedBackendComments);
+            setComments(updatedBackendComments);
             setActiveComment(null);
         });
     };
@@ -111,10 +124,10 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
     const deleteComment = (commentId: string) => {
         if (window.confirm('Are you sure you want to remove comment?')) {
             deleteCommentApi().then(() => {
-                const updatedBackendComments = backendComments.filter(
+                const updatedBackendComments = comments.filter(
                     (backendComment) => backendComment.id !== commentId
                 );
-                setBackendComments(updatedBackendComments);
+                setComments(updatedBackendComments);
             });
         }
     };

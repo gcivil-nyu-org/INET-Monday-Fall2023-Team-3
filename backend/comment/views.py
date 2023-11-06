@@ -47,8 +47,7 @@ def ping(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def comment_create(request):
-    serializer = CommentSerializer(data=request.data)
-
+    serializer = CommentSerializer(data=request.data, partial=True)
     if not serializer.is_valid():
         return COMMENT_INVALID_FORMAT_RESPONSE
 
