@@ -105,23 +105,24 @@ def graph_update(request):
 @permission_classes([IsAuthenticated])
 def graph_update_add(request):
     if "nodes" in request.data:
-        request.data['nodes'] = [node['id'] for node in request.data['nodes']]
+        request.data["nodes"] = [node["id"] for node in request.data["nodes"]]
     if "edges" in request.data:
-        request.data['edges'] = [edge['id'] for edge in request.data['edges']]
+        request.data["edges"] = [edge["id"] for edge in request.data["edges"]]
 
     serializer = GraphSerializer(data=request.data)
     if serializer.is_valid():
-        graph_instance = Graph.objects.get(id=serializer.data['id'])
+        graph_instance = Graph.objects.get(id=serializer.data["id"])
         print("before update", graph_instance.nodes.all())
 
         serializer.instance = graph_instance
         node_instance = Node.objects.get(id=serializer.data["nodes"][0])
-        # add node to graph.nodes, which will sync with database immediately. So no need for call save()
+        # add node to graph.nodes, which will sync with database immediately.
+        # So no need for call save()
         serializer.instance.nodes.add(node_instance)
 
-        new_graph_ins = Graph.objects.get(id=serializer.data['id'])
+        new_graph_ins = Graph.objects.get(id=serializer.data["id"])
         print("after update:", new_graph_ins.nodes.all())
-
+    return GRAPH_404_RESPONSE
 
 
 @api_view(["PUT"])
@@ -129,15 +130,15 @@ def graph_update_add(request):
 @permission_classes([IsAuthenticated])
 def graph_update_delete(request):
     if "nodes" in request.data:
-        request.data['nodes'] = [node['id'] for node in request.data['nodes']]
+        request.data["nodes"] = [node["id"] for node in request.data["nodes"]]
     if "edges" in request.data:
-        request.data['edges'] = [edge['id'] for edge in request.data['edges']]
+        request.data["edges"] = [edge["id"] for edge in request.data["edges"]]
     print(request.data)
     serializer = GraphSerializer(data=request.data)
-    instance = Graph.objects.get(id=serializer.data['id'])
+    instance = Graph.objects.get(id=serializer.data["id"])
     print("before update", instance)
     serializer.instance = instance
-    node_instance = G.objects.get(id=serializer.data["nodes"][0])
+    node_instance = Graph.objects.get(id=serializer.data["nodes"][0])
     serializer.instance.nodes.add(node_instance)
     # serializer.instance.save()
     new_graph_ins = Graph.objects.get(id=serializer.data["nodes"][0])

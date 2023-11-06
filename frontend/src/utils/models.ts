@@ -53,12 +53,15 @@ export type IEdge = {
 };
 
 /**
- * a type define missing dependencies
+ * Represents a graph in backend
  */
-export type IMissingDependency = {
-  nodeName: string;
-  missingDep: string;
-}
+export type IGraph = {
+  id: string;
+  editingEnabled: boolean;
+  nodes: INode[]
+  edges: IEdge[]
+  user: string;
+};
 
 /**
  * a type define wrong dependencies
@@ -66,7 +69,7 @@ export type IMissingDependency = {
 export type IWrongDepedency = {
   sourceName: string;
   targetName: string;
-}
+};
 
 /**
  * a type define missing dependencies
@@ -74,12 +77,4 @@ export type IWrongDepedency = {
 export type IMissingDependency = {
   nodeName: string;
   missingDep: string;
-}
-
-/**
- * a type define wrong dependencies
- */
-export type IWrongDepedency = {
-  sourceName: string;
-  targetName: string;
-}
+};
