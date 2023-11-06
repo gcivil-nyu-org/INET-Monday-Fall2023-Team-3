@@ -50,16 +50,16 @@ const Comment: React.FC<CommentProps> = ({
     const createdAt = new Date(comment.createdAt).toLocaleDateString();
 
     return (
-        <div key={comment.id} className="comment">
-            <div className="comment-image-container">
-                <img src="/user-icon.png" alt="User Icon" />
+        <div key={comment.id} className="flex mb-7">
+            <div className="mr-4">
+                <img className="rounded-full" src="backend/static/user-icon.png" alt="User Icon" />
             </div>
-            <div className="comment-right-part">
-                <div className="comment-content">
-                    <div className="comment-author">{comment.username}</div>
+            <div className="w-full">
+                <div className="flex">
+                    <div className="mr-4 text-lg text-white">{comment.username}</div>
                     <div>{createdAt}</div>
                 </div>
-                {!isEditing && <div className="comment-text">{comment.body}</div>}
+                {!isEditing && <div className="text-xl">{comment.body}</div>}
                 {isEditing && (
                     <CommentForm
                         submitLabel="Update"
@@ -71,10 +71,10 @@ const Comment: React.FC<CommentProps> = ({
                         }}
                     />
                 )}
-                <div className="comment-actions">
+                <div className="flex text-sm text-white	 cursor-pointer mt-4">
                     {canReply && (
                         <div
-                            className="comment-action"
+                            className="mr-4 hover:underline"
                             onClick={() =>
                                 setActiveComment({ id: comment.id, type: 'replying' })
                             }
@@ -84,7 +84,7 @@ const Comment: React.FC<CommentProps> = ({
                     )}
                     {canEdit && (
                         <div
-                            className="comment-action"
+                            className="mr-4 hover:underline"
                             onClick={() =>
                                 setActiveComment({ id: comment.id, type: 'editing' })
                             }
@@ -94,7 +94,7 @@ const Comment: React.FC<CommentProps> = ({
                     )}
                     {canDelete && (
                         <div
-                            className="comment-action"
+                            className="mr-4 hover:underline"
                             onClick={() => deleteComment(comment.id)}
                         >
                             Delete
@@ -108,7 +108,7 @@ const Comment: React.FC<CommentProps> = ({
                     />
                 )}
                 {replies.length > 0 && (
-                    <div className="replies">
+                    <div className="mt-6">
                         {replies.map((reply) => (
                             <Comment
                                 comment={reply}
