@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from "react";
 import { Button, Alert, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { userCreate } from "utils/backendRequests";
+import validator from "validator";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -10,6 +11,57 @@ export default function SignUp() {
   const [password, setPassword] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const validateEmailHost = () => {
+    return validator.isEmail(email, {
+      host_whitelist: ["nyu.edu"],
+    });
+  };
+  const validatePasswordLength = () => {
+    return validator.isStrongPassword(password, {
+      minLength: 8,
+    });
+  };
+  const validatePasswordUppercase = () => {
+    return validator.isStrongPassword(password, {
+      minUppercase: 1,
+    });
+  };
+  const validatePasswordSymbols = () => {
+    return validator.isStrongPassword(password, {
+      minSymbols: 1,
+    });
+  };
+  const validateEmail = () => {
+    const isValid = validateEmailHost();
+    if (!isValid) {
+      setErrorMessage("email must end with @nyu.edu");
+    }
+    return isValid;
+  };
+  const validatePassword = () => {
+    let isValid = validatePasswordLength();
+    if (!isValid) {
+      setErrorMessage("password must be at least 8 characters long");
+      return false;
+    }
+    isValid = validatePasswordUppercase();
+    if (!isValid) {
+      setErrorMessage("password must contain at least 1 uppercase character");
+      return false;
+    }
+    isValid = validatePasswordSymbols();
+    if (!isValid) {
+      setErrorMessage("password must contain at least 1 symbol");
+      return false;
+    }
+    return true;
+  };
+  const validateUser = () => {
+    const isEmailValid = validateEmail();
+    if (!isEmailValid) return false;
+    return validatePassword();
+  };
 
   const onSingupButtonClicked = () => {
     console.log(`email: ${email}`);
@@ -20,6 +72,10 @@ export default function SignUp() {
       setErrorMessage("Password mismatch, please try again");
       return;
     }
+
+    // if user credential does not meet requirement do nothing
+    // error messages are set correspondingly in the function
+    if (!validateUser()) return;
 
     userCreate({
       email: email,
