@@ -12,7 +12,6 @@ from rest_framework.authentication import TokenAuthentication
 
 from .serializers import GraphSerializer
 from .models import Graph
-from node.views import node_create, node_delete
 
 
 def detail(msg: str):
@@ -84,8 +83,9 @@ def graph_delete(request, graph_id):
         nodes = graph_to_be_deleted.nodes.all()
         edges = graph_to_be_deleted.edges.all()
         for node in nodes:
-            # not passing a request through the node_delete endpoint because it is not necessary
-            if node.predefined: # if the node is predefined, do not delete it
+            # not passing a request through the node_delete endpoint
+            # because it is not necessary
+            if node.predefined:  # if the node is predefined, do not delete it
                 continue
             node.delete()
         for edge in edges:
@@ -105,10 +105,10 @@ def graph_update_add(request):
     data = request.data
     if "nodes" in request.data:
         # strip out the ids from the nodes
-        data['nodes'] = [node['id'] for node in request.data['nodes']]
+        data["nodes"] = [node["id"] for node in request.data["nodes"]]
     if "edges" in request.data:
         # strip out the ids from the edges
-        data['edges'] = [edge['id'] for edge in request.data['edges']]
+        data["edges"] = [edge["id"] for edge in request.data["edges"]]
     graph_id = data.get("id")
     try:
         instance = Graph.objects.get(id=graph_id)
@@ -130,14 +130,13 @@ def graph_update_add(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_update_delete(request):
-
     data = request.data
     if "nodes" in request.data:
         # strip out the ids from the nodes
-        data['nodes'] = [node['id'] for node in request.data['nodes']]
+        data["nodes"] = [node["id"] for node in request.data["nodes"]]
     if "edges" in request.data:
         # strip out the ids from the edges
-        data['edges'] = [edge['id'] for edge in request.data['edges']]
+        data["edges"] = [edge["id"] for edge in request.data["edges"]]
     graph_id = data.get("id")
 
     try:
@@ -156,4 +155,3 @@ def graph_update_delete(request):
         return Response(status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
         return GRAPH_404_RESPONSE
-

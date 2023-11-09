@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import NodeSerializer
 from .models import Node
 
+
 # Create your views here.
 def detail(msg: str):
     return {"detail": msg}

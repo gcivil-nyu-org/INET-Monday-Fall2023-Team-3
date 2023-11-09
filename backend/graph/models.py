@@ -5,6 +5,7 @@ from user.models import CustomUser
 from node.models import Node
 from edge.models import Edge
 
+
 class Graph(models.Model):
     id = models.UUIDField(
         "id", primary_key=True, unique=True, editable=False, default=uuid.uuid4

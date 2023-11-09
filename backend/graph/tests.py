@@ -7,8 +7,6 @@ from user.models import CustomUser
 from .models import Graph
 from node.models import Node
 from edge.models import Edge
-from graph.serializers import GraphSerializer
-from django.core import serializers
 
 # from node.models import Node
 # from edge.models import Edge
@@ -61,7 +59,8 @@ class GraphTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(Graph.objects.all()), 0)
 
-        # testing if a graph with nodes can be deleted, without impacting predefined nodes
+        # testing if a graph with nodes can be deleted,
+        # without impacting predefined nodes
         graph2 = Graph.objects.create(user=self.user)
         node1 = Node.objects.create(name="node1", predefined=True)
         node2 = Node.objects.create(name="node2", predefined=False)
@@ -94,9 +93,11 @@ class GraphTests(APITestCase):
 
         graph_id = str(graph1.id)
         request_data = {"id": graph_id, "nodes": [valid_data1, valid_data2]}
-        response = self.client.put("/backend/graph/update-add/", request_data, format="json")
+        response = self.client.put(
+            "/backend/graph/update-add/", request_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        nodes_from_graph = sorted(graph1.nodes.all().values_list('id', flat=True))
+        nodes_from_graph = sorted(graph1.nodes.all().values_list("id", flat=True))
         expected_node_ids = sorted([node1.id, node2.id])
         self.assertEqual(nodes_from_graph, expected_node_ids)
 
@@ -109,19 +110,25 @@ class GraphTests(APITestCase):
         valid_data3["id"] = str(edge1.id)
 
         request_data = {"id": graph_id, "edges": [valid_data3]}
-        response = self.client.put("/backend/graph/update-add/", request_data, format="json")
+        response = self.client.put(
+            "/backend/graph/update-add/", request_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(graph1.edges.all()), 1)
 
         # edge1 will be deleted
-        response = self.client.put("/backend/graph/update-delete/", request_data, format="json")
+        response = self.client.put(
+            "/backend/graph/update-delete/", request_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(graph1.edges.all()), 0)
 
         # node1 will be deleted
         request_data = {"id": graph_id, "nodes": [valid_data1]}
-        response = self.client.put("/backend/graph/update-delete/", request_data, format="json")
+        response = self.client.put(
+            "/backend/graph/update-delete/", request_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        nodes_from_graph = sorted(graph1.nodes.all().values_list('id', flat=True))
+        nodes_from_graph = sorted(graph1.nodes.all().values_list("id", flat=True))
         expected_node_ids = sorted([node2.id])
         self.assertEqual(nodes_from_graph, expected_node_ids)
