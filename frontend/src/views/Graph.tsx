@@ -412,18 +412,6 @@ export default function Graph() {
           if (node.data.predefined === false) {
             // do not delete predefined data
             nodeDelete(node.id, sessionStorage.getItem("token")!);
-            const INodeSendToBackend = {  // Define a new INode to send to backend, only id matters
-              id: node.id, name: "whatever", predefined: false, description: "whatever", dependencies: []};
-            // graphUpdateDelete(
-            //   { id: sessionStorage.getItem("graphId")!, nodes: [INodeSendToBackend] },
-            //   sessionStorage.getItem("token")!
-            // ).then((result) => {
-            //   if (result.status) {
-            //     console.log("Node deleted from graph");
-            //   } else {
-            //     console.log("Cannot delete node from graph");
-            //   }
-            // });
           }
         });
       });
