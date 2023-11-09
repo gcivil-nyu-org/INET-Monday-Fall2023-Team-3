@@ -4,7 +4,7 @@ from .models import CustomUser
 
 
 class UserSerializer(serializers.Serializer):
-    email = serializers.CharField(required=True)
+    email = serializers.EmailField(required=True)
     username = serializers.CharField()
     password = serializers.CharField()
 
