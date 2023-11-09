@@ -5,3 +5,4 @@ from .models import Node
 # Register your models here.
 
 admin.site.register(Node)
+
