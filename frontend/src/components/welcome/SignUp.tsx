@@ -66,7 +66,7 @@ export default function SignUp() {
     return validatePassword();
   };
 
-  const onSingupButtonClicked = () => {
+  const onSignupButtonClicked = () => {
     console.log(`email: ${email}`);
     console.log(`username: ${username}`);
     console.log(`password: ${password}`);
@@ -162,7 +162,7 @@ export default function SignUp() {
           className="w-64 h-16 m-auto bg-blue-400"
           size="large"
           variant="contained"
-          onClick={onSingupButtonClicked}
+          onClick={onSignupButtonClicked}
         >
           Sign Up
         </Button>
