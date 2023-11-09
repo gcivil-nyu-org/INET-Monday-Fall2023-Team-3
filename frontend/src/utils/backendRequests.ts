@@ -202,10 +202,6 @@ export const graphGet: RestfulRequestHelper<"/graph/get/"> = (param, token) => {
   return restfulRequest("/graph/get/", "GET", { param, token });
 };
 
-export const graphUpdateDelete: RestfulRequestHelper<"/graph/update-delete/"> = (body, token) => {
-  return restfulRequest("/graph/update-delete/", "PUT", { body, token });
-};
-
 export const graphUpdateAdd: RestfulRequestHelper<"/graph/update-add/"> = (body, token) => {
   return restfulRequest("/graph/update-add/", "PUT", { body, token });
 };

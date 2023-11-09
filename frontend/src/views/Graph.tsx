@@ -29,7 +29,6 @@ import {
   nodeUpdate,
   nodeGetPredefined,
   graphUpdateAdd,
-  graphUpdateDelete,
 } from "utils/backendRequests";
 
 export default function Graph() {
