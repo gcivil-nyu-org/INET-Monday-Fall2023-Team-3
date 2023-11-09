@@ -17,20 +17,23 @@ export default function SignUp() {
       host_whitelist: ["nyu.edu"],
     });
   };
+  const validateOption = {
+    minLength: 8,
+    minUppercase: 0,
+    minSymbols: 0,
+    minLowercase: 0,
+    minNumbers: 0,
+  };
   const validatePasswordLength = () => {
-    return validator.isStrongPassword(password, {
-      minLength: 8,
-    });
+    return validator.isStrongPassword(password, validateOption);
   };
   const validatePasswordUppercase = () => {
-    return validator.isStrongPassword(password, {
-      minUppercase: 1,
-    });
+    validateOption.minUppercase = 1;
+    return validator.isStrongPassword(password, validateOption);
   };
   const validatePasswordSymbols = () => {
-    return validator.isStrongPassword(password, {
-      minSymbols: 1,
-    });
+    validateOption.minSymbols = 1;
+    return validator.isStrongPassword(password, validateOption);
   };
   const validateEmail = () => {
     const isValid = validateEmailHost();
