@@ -28,6 +28,7 @@ import {
   nodeDelete,
   nodeUpdate,
   nodeGetPredefined,
+  graphUpdateAdd,
 } from "utils/backendRequests";
 
 export default function Graph() {
@@ -165,6 +166,16 @@ export default function Graph() {
           if (submittedNode.predefined) {
             setOnCanvasNodeIds((prevIds) => [...prevIds, submittedNode.id]);
           }
+          graphUpdateAdd(
+            { id: sessionStorage.getItem("graphId")!, nodes: [submittedNode] },
+            sessionStorage.getItem("token")!
+          ).then((result) => {
+            if (result.status) {
+              console.log("Node added to graph");
+            } else {
+              console.log("Cannot add node to graph");
+            }
+          });
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
@@ -249,6 +260,18 @@ export default function Graph() {
       const result = await edgeCreate({ source, target }, sessionStorage.getItem("token")!);
       if (result.status) {
         console.log(`created edge with id ${result.value.id}`);
+
+        // add edge to graph
+        graphUpdateAdd(
+          { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+          sessionStorage.getItem("token")!
+        ).then((graphResult) => {
+          if (graphResult.status) {
+            console.log("edge added to graph");
+          } else {
+            console.log("Cannot add edge to graph");
+          }
+        });
 
         setEdges((edges) =>
           addEdge(

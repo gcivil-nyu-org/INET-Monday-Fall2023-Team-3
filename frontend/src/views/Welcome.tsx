@@ -59,19 +59,19 @@ export default function Welcome() {
       </div>
       <div className="w-full flex flex-row self-stretch items-stretch justify-between flex-1">
         <div className="flex flex-1 bg-gray-500"></div>
-        <Dialog
+        <Dialog  // Dialog is a component from Material UI
           open={login || signup}
           onClose={onLoginOrSignupCancelled}
           maxWidth="sm"
           fullWidth={true}
         >
-          {login && (
+          {login && (  // if login is true, then render the Login component
             <>
               <DialogTitle>Log In</DialogTitle>
               <Login />
             </>
           )}
-          {signup && (
+          {signup && (  // if signup is true, then render the Signup component
             <>
               <DialogTitle>Sign Up</DialogTitle>
               <Signup />
