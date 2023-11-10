@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
   Controls,
@@ -13,8 +14,8 @@ import ReactFlow, {
   Edge,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
-import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
-
+import { Add, Share, DoneAll } from "@mui/icons-material";
+import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
 import { IEdge, INode, IMissingDependency, IWrongDepedency } from "utils/models";
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
@@ -31,6 +32,7 @@ import {
 } from "utils/backendRequests";
 
 export default function Graph() {
+  const navigate = useNavigate();
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
@@ -127,6 +129,10 @@ export default function Graph() {
       setShowError(true);
       setErrorMessage("No dependencies to check");
     }
+  };
+
+  const onReturnButtonClicked = () => {
+    navigate("/user");
   };
 
   const onEditNodeClicked = () => {
@@ -466,6 +472,13 @@ export default function Graph() {
                 onClick={onDoneButtonClicked}
               >
                 <DoneAll />
+              </Button>
+              <Button
+                variant="outlined"
+                sx={{ padding: "8px", minWidth: "32px" }}
+                onClick={onReturnButtonClicked}
+              >
+                <KeyboardReturnIcon />
               </Button>
             </div>
           </Panel>
