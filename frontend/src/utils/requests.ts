@@ -20,6 +20,7 @@ import {
   IUserLoginBody,
   IUserPingBody,
   IUserUpdateBody,
+  INodePositionBody,
 } from "./bodies";
 import {
   IEdgeCreateResponse,
@@ -43,6 +44,7 @@ import {
   IUserLoginResponse,
   IUserPingResponse,
   IUserUpdateResponse,
+  INodePositionResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -196,5 +198,12 @@ export type Endpoints = {
     method: "DELETE";
     bodyType: IGraphDeleteBody;
     resultType: IGraphDeleteResponse;
+  };
+  "/graph/update-node-position/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: INodePositionBody;
+    resultType: INodePositionResponse;
   };
 };
