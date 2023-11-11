@@ -1,4 +1,4 @@
-import { IMessage, IToken, IUser, INode, IEdge, IGraph, INodePosition} from "./models";
+import { IMessage, IToken, IUser, INode, IEdge, IGraph, INodePosition, IGraphList} from "./models";
 
 // Responses
 // user
@@ -49,3 +49,5 @@ export type IGraphUpdateResponse = IGraph;
 export type IGraphDeleteResponse = undefined;
 
 export type INodePositionResponse = INodePosition;
+
+export type IGraphListResponse = IGraphList;

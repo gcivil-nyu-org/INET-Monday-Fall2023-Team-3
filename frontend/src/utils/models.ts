@@ -87,3 +87,7 @@ export type INodePosition = {
   x: number;
   y: number;
 }
+
+export type IGraphList = {
+  graphList: string[];
+};

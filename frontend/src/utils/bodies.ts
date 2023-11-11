@@ -49,3 +49,5 @@ export type IGraphUpdateBody = Partial<IGraph> & Pick<IGraph, "id">;
 export type IGraphDeleteBody = undefined;
 
 export type INodePositionBody = INodePosition;
+
+export type IGraphListBody = undefined;

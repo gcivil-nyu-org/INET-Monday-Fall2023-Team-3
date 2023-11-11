@@ -11,5 +11,7 @@ urlpatterns = [
     path("delete/<str:graph_id>/", views.graph_delete, name="graph-delete"),
     path("update-add/", views.graph_update_add, name="graph-update-add"),
     path("update-delete/", views.graph_update_delete, name="graph-update-delete"),
+    # get a list of ids of graphs owned by the user
+    path("list-get/<str:user_email>/", views.graph_list_get, name="graph-get-list")
     # path("add_node/<str:graph_id>/", views.graph_add_node, name="graph-add-node"),
 ]

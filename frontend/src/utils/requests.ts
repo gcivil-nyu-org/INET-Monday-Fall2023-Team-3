@@ -21,7 +21,9 @@ import {
   IUserPingBody,
   IUserUpdateBody,
   INodePositionBody,
+  IGraphListBody,
 } from "./bodies";
+import { IGraphList } from "./models";
 import {
   IEdgeCreateResponse,
   IEdgeDeleteResponse,
@@ -45,6 +47,7 @@ import {
   IUserPingResponse,
   IUserUpdateResponse,
   INodePositionResponse,
+  IGraphListResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -206,4 +209,11 @@ export type Endpoints = {
     bodyType: INodePositionBody;
     resultType: INodePositionResponse;
   };
-};
+  "/graph/list-get/": {
+    param: true;
+    authenticate: true;
+    method: "GET";
+    bodyType: IGraphListBody;
+    resultType: IGraphListResponse;
+  };
+}

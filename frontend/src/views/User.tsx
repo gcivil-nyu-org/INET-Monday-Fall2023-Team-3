@@ -1,14 +1,42 @@
 import { Button, Avatar, Dialog, DialogTitle } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GraphList from "components/user/GraphList";
 import Update from "components/user/Update";
-import { graphCreate, userGet } from "utils/backendRequests";
+import { graphCreate, userGet, graphListGet} from "utils/backendRequests";
 
 export default function User() {
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
   const [userEmail, setUserEmail] = useState("");
+  const [graphList, setGraphList] = useState<string[]>([]);
+
+  useEffect(() => {
+    userGet(sessionStorage.getItem("token")!).then((result) => {
+      if (result.status) {
+        setUserEmail(result.value.email);
+      } else {
+        console.log("Cannot get current user");
+      }
+    });
+  }, []);
+
+  useEffect(() => {
+    if(userEmail !== ""){
+      graphListGet(userEmail, sessionStorage.getItem("token")!).then((result) => {
+        if (result.status) {
+          console.log("result");
+          console.log(result);
+          setGraphList(result.value.graphList);
+          console.log("returned Graph list: ");
+          console.log(result.value.graphList);
+        } else {
+          console.log("could not get graph");
+        }
+      });
+    }
+  }, [userEmail]); // when userEmail changes, update the graphList
+
 
   const onUpdateCancelled = () => {
     console.log("update cancelled");
@@ -45,6 +73,14 @@ export default function User() {
     navigate("/graph");
   };
 
+  // const graphDataArray = graphList.map(graphId => ({
+  //   id: graphId,
+  //   title: "Dummy Graph Title", // 根据需要设置标题
+  //   imgUrl: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg" // 替换为相应的图像URL
+  // }));
+  console.log("graphList: ")
+  console.log(graphList)
+
   return (
     <div className="w-full h-full flex flex-col min-h-screen">
       <div className="flex h-24 flex-row ml-auto">
@@ -71,17 +107,12 @@ export default function User() {
         <DialogTitle>Update</DialogTitle>
         <Update />
       </Dialog>
-      <GraphList
-        name="Recent Graph"
-        graphs={[
-          {
-            id: "id-1",
-            title: "dummy",
-            imgUrl:
-              "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
-          },
-        ]}
-      />
+
+      {/* <GraphList
+        name="My Graph"
+        graphs={graphDataArray}
+      /> */}
+
       <GraphList
         name="Shared Graph"
         graphs={[

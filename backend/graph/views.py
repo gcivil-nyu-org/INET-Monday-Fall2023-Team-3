@@ -154,3 +154,18 @@ def graph_update_delete(request):
         return Response(status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
         return GRAPH_404_RESPONSE
+
+
+@api_view(["Get"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_list_get(request, user_email):
+    graph_id_list = Graph.objects.filter(user__email=user_email).values_list(
+        "id", flat=True
+    )
+    print(type(graph_id_list))
+    graph_id_list = list(graph_id_list)
+    for i in range(len(graph_id_list)):
+        graph_id_list[i] = str(graph_id_list[i])
+    print(graph_id_list)
+    return Response({"graph_list": graph_id_list}, status=status.HTTP_200_OK)
