@@ -12,6 +12,8 @@ export type IUserGetResponse = Omit<IUser, "password">;
 
 export type IUserUpdateResponse = Omit<IUser, "password">;
 
+export type IUserListResponse = Omit<IUser, "password">[];
+
 // node
 export type INodePingResponse = IMessage;
 

@@ -22,6 +22,7 @@ import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
+import GraphSharing from "components/node/GraphSharing";
 import ProblematicDepsInfo from "components/node/ProblematicDepsInfo";
 import {
   edgeCreate,
@@ -42,6 +43,7 @@ export default function Graph() {
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showGraphSharing, setShowGraphSharing] = useState(false);
 
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
@@ -76,10 +78,15 @@ export default function Graph() {
     setShowAddNode(true);
     setShowEditNode(false);
     setShowProblematicDeps(false);
+    setShowGraphSharing(false);
   };
 
   const onShareButtonClicked = () => {
     console.log("share button clicked");
+    setShowGraphSharing(true);
+    setShowAddNode(false);
+    setShowEditNode(false);
+    setShowProblematicDeps(false);
   };
 
   const onDoneButtonClicked = () => {
@@ -142,6 +149,7 @@ export default function Graph() {
     setShowAddNode(false);
     setShowEditNode(true);
     setShowProblematicDeps(false);
+    setShowGraphSharing(false);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -153,6 +161,7 @@ export default function Graph() {
     setShowAddNode(false);
     setShowEditNode(false);
     setShowProblematicDeps(false);
+    setShowGraphSharing(false);
   };
 
   const onCancel = () => {
@@ -461,6 +470,10 @@ export default function Graph() {
         <Dialog open={showProblematicDeps} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <DialogTitle>Problematic Dependencies</DialogTitle>
           <ProblematicDepsInfo missingDeps={missingDeps} wrongDeps={wrongDeps} />
+        </Dialog>
+        <Dialog open={showGraphSharing} onClose={onCancel} maxWidth="md" fullWidth={true}>
+          <DialogTitle>Share Graph</DialogTitle>
+          <GraphSharing onClose={onCancel} />
         </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}

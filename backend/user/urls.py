@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import ping, user_create, user_get, user_login, user_update
+from .views import ping, user_create, user_get, user_login, user_update, user_list
 
 app_user = "user"
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path("login/", user_login, name="login"),
     path("get/", user_get, name="get"),
     path("update/", user_update, name="update"),
+    path("list/", user_list, name="list"),
 ]

@@ -12,6 +12,8 @@ export type IUserGetBody = undefined;
 
 export type IUserUpdateBody = Partial<IUser> & Pick<IUser, "email">;
 
+export type IUserListBody = undefined;
+
 // node
 export type INodePingBody = undefined;
 

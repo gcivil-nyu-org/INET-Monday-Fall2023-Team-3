@@ -20,6 +20,7 @@ import {
   IUserLoginBody,
   IUserPingBody,
   IUserUpdateBody,
+  IUserListBody,
 } from "./bodies";
 import {
   IEdgeCreateResponse,
@@ -43,6 +44,7 @@ import {
   IUserLoginResponse,
   IUserPingResponse,
   IUserUpdateResponse,
+  IUserListResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -84,7 +86,13 @@ export type Endpoints = {
     bodyType: IUserUpdateBody;
     resultType: IUserUpdateResponse;
   };
-
+  "/user/list/": {
+    param: false;
+    authenticate: true;
+    method: "GET";
+    bodyType: IUserListBody;
+    resultType: IUserListResponse;
+  };
   "/node/ping/": {
     param: false;
     authenticate: false;

@@ -146,6 +146,10 @@ export const userUpdate: RestfulRequestHelper<"/user/update/"> = (body, token) =
   return restfulRequest("/user/update/", "POST", { body, token });
 };
 
+export const userList: RestfulRequestHelper<"/user/list/"> = (token) => {
+  return restfulRequest("/user/list/", "GET", {token});
+}
+
 export const nodePing: RestfulRequestHelper<"/node/ping/"> = () => {
   return restfulRequest("/node/ping/", "GET", {});
 };
