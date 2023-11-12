@@ -1,5 +1,9 @@
 from rest_framework import serializers
-from .models import Comment, CustomUser, Node  # Import User and Node models as well
+from .models import (
+    Comment,
+    CustomUser,
+    Node,
+)  # Import User and Node models as well
 
 
 class CommentSerializer(serializers.Serializer):
@@ -11,7 +15,9 @@ class CommentSerializer(serializers.Serializer):
     parent = serializers.PrimaryKeyRelatedField(
         queryset=Comment.objects.all(), required=False, allow_null=True
     )
-    related_to = serializers.PrimaryKeyRelatedField(queryset=Node.objects.all())
+    related_to_node = serializers.PrimaryKeyRelatedField(
+        queryset=Node.objects.all(), required=False, allow_null=True
+    )
     created_at = serializers.DateTimeField(read_only=True)
 
     def create(self, validated_data):
@@ -23,6 +29,8 @@ class CommentSerializer(serializers.Serializer):
         instance.body = validated_data.get("body", instance.body)
         instance.user = validated_data.get("user", instance.user)
         instance.parent = validated_data.get("parent", instance.parent)
-        instance.related_to = validated_data.get("related_to", instance.related_to)
+        instance.related_to_node = validated_data.get(
+            "related_to_node", instance.related_to_node
+        )
         instance.save()
         return instance

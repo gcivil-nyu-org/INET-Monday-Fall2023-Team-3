@@ -85,6 +85,13 @@ export type Endpoints = {
     bodyType: IUserGetBody;
     resultType: IUserGetResponse;
   };
+  "/user/get-name/": {
+    param: true;
+    authenticate: true;
+    method: "GET";
+    bodyType: IUserGetBody;
+    resultType: IUserGetResponse;
+  };
   "/user/update/": {
     param: false;
     authenticate: true;

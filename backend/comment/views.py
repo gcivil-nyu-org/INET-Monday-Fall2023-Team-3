@@ -83,7 +83,7 @@ def comments_by_node(request, node_id):
     except Node.DoesNotExist:
         return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    comments = Comment.objects.filter(related_to=node)
+    comments = Comment.objects.filter(related_to_node=node)
     serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 

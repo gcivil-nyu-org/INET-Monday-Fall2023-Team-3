@@ -13,9 +13,12 @@ class Comment(models.Model):
     parent = models.ForeignKey(
         "self", on_delete=models.CASCADE, null=True, blank=True, related_name="children"
     )  # Can be null for top-level comments
-    related_to = models.ForeignKey(
+    related_to_node = models.ForeignKey(
         Node, on_delete=models.CASCADE
     )  # Links to a Node model instance
+    # related_to_graph = models.ForeignKey(
+    #    Graph, on_delete=models.CASCADE
+    # )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
