@@ -9,14 +9,9 @@ import {
   commentUpdate,
   commentDelete,
 } from "utils/backendRequests";
+import { IComment } from "utils/models";
 export interface CommentProps {
-  comment: {
-    id: string;
-    body: string;
-    user: string;
-    parent: string;
-    created_at: string;
-  };
+  comment: IComment;
   replies: any[]; // Update the type as needed
   setActiveComment: React.Dispatch<React.SetStateAction<CommentState | null>>;
   activeComment: CommentState | null;
@@ -44,6 +39,7 @@ const Comment: React.FC<CommentProps> = ({
   currentUserId,
 }) => {
   const [username, setUsername] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
   const isEditing =
     activeComment && activeComment.id === comment.id && activeComment.type === "editing";
   const isReplying =
@@ -52,7 +48,6 @@ const Comment: React.FC<CommentProps> = ({
   const canReply = Boolean(currentUserId);
   const canEdit = currentUserId === comment.user;
   const replyId = parentId ? parentId : comment.id;
-  const createdAt = new Date(comment.created_at).toLocaleDateString();
 
   useEffect(() => {
     // Function to fetch user by comments and user details
@@ -63,10 +58,9 @@ const Comment: React.FC<CommentProps> = ({
         // Check for a valid user session and set user details
         const result = await userGetName(comment.user, token!);
         if (result.status) {
-          console.log(result.value);
           const username = result.value.username;
           setUsername(username);
-          console.log(username);
+          setCreatedAt(new Date(comment.createdAt).toLocaleString());
         } else {
           // Handle case where user details cannot be fetched
           console.error("error fetching user:", result.status);
@@ -87,7 +81,7 @@ const Comment: React.FC<CommentProps> = ({
       <div className="w-full">
         <div className="flex">
           <div className="mr-4 text-lg text-white">{username}</div>
-          <div>{new Date(comment.created_at).toLocaleDateString()}</div>
+          <div>{createdAt}</div>
         </div>
         {!isEditing && <div className="text-xl">{comment.body}</div>}
         {isEditing && (

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import CommentForm from './CommentForm';
 import Comment from './Comment';
 import { CommentState } from './Comment';
-import { Comment as CommentFromApi } from '../../api';
 import {
     getComments as getCommentsApi,
     createComment as createCommentApi,
@@ -23,7 +22,6 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
     const [severity, setSeverity] = useState<"error" | "success">("error");
     const [email, setEmail] = useState("");
     const [message, setMessage] = useState("");
-    const [backendComments, setBackendComments] = useState<CommentFromApi[]>([]); // Specify the type for backendComments
     const [activeComment, setActiveComment] = useState<CommentState | null>(null); // Specify the type for activeComment
     const [comments, setComments] = useState<IComment[]>([]);
 
@@ -39,16 +37,12 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
       
           try {
             // Get comments associated with the node
-      
             // Check for a valid user session and set user details
             const result = await userGet(token);
             if (result.status) {
-              console.log(result.value)
               setEmail(result.value.email);
-              console.log(email);
               const response = await commentGetByNode(node.id, token);
               if (response.status) {
-                console.log(response.value);
                 const commentsArray = Object.values(response.value);
                 setComments(commentsArray);
               } else {
@@ -73,15 +67,15 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
       
 
     const rootComments = comments.filter(
-        (backendComment) => backendComment.parent === null
+        (comment) => comment.parent === null
     );
 
     const getReplies = (commentId: string) => {
         return comments
-            .filter((backendComment) => backendComment.parent === commentId)
+            .filter((comment) => comment.parent === commentId)
             .sort(
                 (a, b) =>
-                    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             );
     }
 
@@ -91,18 +85,16 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
             body: text,
             user: email, // This should be the user's ID, not their email.
             parent: parentId!,
-            related_to_node: node.id,
+            relatedToNode: node.id,
         };
         commentCreate(payload, sessionStorage.getItem("token")!).then((result) => {
             if (result.status) {
                 const newComment = [result.value, ...comments];
-                console.log(newComment);
                 setComments(newComment);
                 setActiveComment(null);
             } else {
               console.log(result.error);
             }
-            
         });
         
     };
@@ -113,13 +105,13 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
             body: text,
         };
         commentUpdate(payload, sessionStorage.getItem("token")!).then(() => {
-            const updatedBackendComments = comments.map((backendComment) => {
-                if (backendComment.id === commentId) {
-                    return { ...backendComment, body: text };
+            const updatedComments = comments.map((comment) => {
+                if (comment.id === commentId) {
+                    return { ...comment, body: text };
                 }
-                return backendComment;
+                return comment;
             });
-            setComments(updatedBackendComments);
+            setComments(updatedComments);
             setActiveComment(null);
         });
     };
@@ -127,10 +119,10 @@ const Comments: React.FC<CommentsProps> = ({node}) => {
     const deleteComment = (commentId: string) => {
         if (window.confirm('Are you sure you want to remove comment?')) {
             commentDelete(commentId, sessionStorage.getItem("token")!).then(() => {
-                const updatedBackendComments = comments.filter(
-                    (backendComment) => backendComment.id !== commentId
+                const updatedComments = comments.filter(
+                    (comment) => comment.id !== commentId
                 );
-                setComments(updatedBackendComments);
+                setComments(updatedComments);
             });
         }
     };

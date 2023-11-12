@@ -86,7 +86,7 @@ export type IComment = {
   body: string;
   user: string;
   parent: string;
-  related_to_node: string;
-  created_at: string;
+  relatedToNode: string;
+  createdAt: string;
 }
 

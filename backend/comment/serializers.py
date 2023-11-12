@@ -26,11 +26,12 @@ class CommentSerializer(serializers.Serializer):
 
     def update(self, instance: Comment, validated_data):
         # Update the Comment instance with the validated data
+        print(validated_data)
         instance.body = validated_data.get("body", instance.body)
         instance.user = validated_data.get("user", instance.user)
         instance.parent = validated_data.get("parent", instance.parent)
         instance.related_to_node = validated_data.get(
-            "related_to_node", instance.related_to_node
+            "relatedToNode", instance.related_to_node
         )
         instance.save()
         return instance
