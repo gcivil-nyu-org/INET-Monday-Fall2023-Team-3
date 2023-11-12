@@ -76,6 +76,7 @@ export type IComment = {
   body: string;
   user: string;
   parent: string;
-  related_to: string;
+  related_to_node: string;
+  related_to_graph: string;
   created_at: string;
 }
