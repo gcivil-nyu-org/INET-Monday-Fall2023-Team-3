@@ -11,6 +11,7 @@ import ReactFlow, {
   getIncomers,
   getOutgoers,
   Edge,
+  MarkerType,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
@@ -58,14 +59,14 @@ export default function Graph() {
   useEffect(() => {
     console.log("graph: ", graph);
     if (graph !== undefined) {
-      // setNodes(graph.nodes);
-      // setEdges(graph.edges);
       sessionStorage.setItem("graphId", graph.id);
       for(let i=0; i<graph.nodes.length; i++){
-        setOnCanvasNodeIds((prevIds) => [...prevIds, graph.nodes[i]]);
         nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
           if (result.status) {
             const node = result.value;
+            if (node.predefined) {
+              setOnCanvasNodeIds((prevIds) => [...prevIds, node.id]);
+            }
             setNodes((nodes) => {
               return nodes.concat({
                 id: node.id,
@@ -89,6 +90,12 @@ export default function Graph() {
                   id: edge.id,
                   source: edge.source,
                   target: edge.target,
+                  style: {
+                    strokeWidth: 3,
+                  },
+                  markerEnd: {
+                    type: MarkerType.Arrow,
+                  }
                 },
                 edges
               )
@@ -100,7 +107,7 @@ export default function Graph() {
       }
     }
 
-  }, [graph]);
+  }, [graph, setEdges, setNodes]);
 
   useEffect(() => {
     async function fetchPredefinedNodes() {
