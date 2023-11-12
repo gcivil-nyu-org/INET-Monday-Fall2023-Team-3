@@ -51,7 +51,6 @@ export default function AddNode({
       setErrorMessage("name cannot be empty");
       return;
     }
-
     nodeCreate(
       { name: cleanName, description: cleanDescription },
       sessionStorage.getItem("token")!

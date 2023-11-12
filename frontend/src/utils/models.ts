@@ -53,12 +53,22 @@ export type IEdge = {
 };
 
 /**
+ * Represents a graph in backend
+ */
+export type IGraph = {
+  id: string;
+  editingEnabled: boolean;
+  nodes: INode[]
+  edges: IEdge[]
+  user: string;
+};
+/**
  * a type define missing dependencies
  */
 export type IMissingDependency = {
   nodeName: string;
   missingDep: string;
-} 
+}
 
 /**
  * a type define wrong dependencies
@@ -80,3 +90,4 @@ export type IComment = {
   related_to_graph: string;
   created_at: string;
 }
+

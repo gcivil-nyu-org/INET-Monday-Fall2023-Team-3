@@ -1,4 +1,4 @@
-import { IUser, INode, IEdge, IComment } from "./models";
+import { IUser, INode, IEdge, IComment, IGraph } from "./models";
 
 // bodies
 // user
@@ -36,6 +36,7 @@ export type IEdgeUpdateBody = IEdge;
 
 export type IEdgeDeleteBody = undefined;
 
+
 // comment
 export type ICommentPingBody = undefined;
 
@@ -48,3 +49,16 @@ export type ICommentsGetBody = undefined;
 export type ICommentDeleteBody = undefined;
 
 export type ICommentUpdateBody = Partial<IComment>;
+
+// graph
+
+export type IGraphPingBody = undefined;
+
+export type IGraphCreateBody = Partial<IGraph> & Pick<IGraph, "user">;
+
+export type IGraphGetBody = undefined;
+
+export type IGraphUpdateBody = Partial<IGraph> & Pick<IGraph, "id">;
+
+export type IGraphDeleteBody = undefined;
+

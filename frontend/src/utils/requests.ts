@@ -4,6 +4,11 @@ import {
   IEdgeGetBody,
   IEdgePingBody,
   IEdgeUpdateBody,
+  IGraphCreateBody,
+  IGraphGetBody,
+  IGraphPingBody,
+  IGraphUpdateBody,
+  IGraphDeleteBody,
   INodeCreateBody,
   INodeDeleteBody,
   INodeGetBody,
@@ -26,6 +31,11 @@ import {
   IEdgeGetResponse,
   IEdgePingResponse,
   IEdgeUpdateResponse,
+  IGraphCreateResponse,
+  IGraphGetResponse,
+  IGraphPingResponse,
+  IGraphUpdateResponse,
+  IGraphDeleteResponse,
   INodeCreateResponse,
   INodeDeleteResponse,
   INodeGetResponse,
@@ -187,5 +197,40 @@ export type Endpoints = {
     method: "DELETE";
     bodyType: ICommentDeleteBody;
     resultType: ICommentDeleteResponse;
+  };
+  "/graph/ping/": {
+    param: false;
+    authenticate: false;
+    method: "GET";
+    bodyType: IGraphPingBody;
+    resultType: IGraphPingResponse;
+  };
+  "/graph/create/": {
+    param: false;
+    authenticate: true;
+    method: "POST";
+    bodyType: IGraphCreateBody;
+    resultType: IGraphCreateResponse;
+  };
+  "/graph/get/": {
+    param: true;
+    authenticate: true;
+    method: "GET";
+    bodyType: IGraphGetBody;
+    resultType: IGraphGetResponse;
+  };
+  "/graph/update-add/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: IGraphUpdateBody;
+    resultType: IGraphUpdateResponse;
+  };
+  "/graph/delete/": {
+    param: true;
+    authenticate: true;
+    method: "DELETE";
+    bodyType: IGraphDeleteBody;
+    resultType: IGraphDeleteResponse;
   };
 };

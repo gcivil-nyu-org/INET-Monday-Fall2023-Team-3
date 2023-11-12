@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
   Controls,
@@ -14,8 +15,9 @@ import ReactFlow, {
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
-
 import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment } from "utils/models";
+import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
+
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
@@ -30,9 +32,11 @@ import {
   nodeUpdate,
   nodeGetPredefined,
   commentGetByNode,
+  graphUpdateAdd,
 } from "utils/backendRequests";
 
 export default function Graph() {
+  const navigate = useNavigate();
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
@@ -135,6 +139,10 @@ export default function Graph() {
     }
   };
 
+  const onReturnButtonClicked = () => {
+    navigate("/user");
+  };
+
   const onEditNodeClicked = () => {
     console.log("edit node clicked");
 
@@ -183,6 +191,16 @@ export default function Graph() {
           if (submittedNode.predefined) {
             setOnCanvasNodeIds((prevIds) => [...prevIds, submittedNode.id]);
           }
+          graphUpdateAdd(
+            { id: sessionStorage.getItem("graphId")!, nodes: [submittedNode] },
+            sessionStorage.getItem("token")!
+          ).then((result) => {
+            if (result.status) {
+              console.log("Node added to graph");
+            } else {
+              console.log("Cannot add node to graph");
+            }
+          });
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
@@ -267,6 +285,18 @@ export default function Graph() {
       const result = await edgeCreate({ source, target }, sessionStorage.getItem("token")!);
       if (result.status) {
         console.log(`created edge with id ${result.value.id}`);
+
+        // add edge to graph
+        graphUpdateAdd(
+          { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+          sessionStorage.getItem("token")!
+        ).then((graphResult) => {
+          if (graphResult.status) {
+            console.log("edge added to graph");
+          } else {
+            console.log("Cannot add edge to graph");
+          }
+        });
 
         setEdges((edges) =>
           addEdge(
@@ -489,6 +519,13 @@ export default function Graph() {
                 onClick={onDoneButtonClicked}
               >
                 <DoneAll />
+              </Button>
+              <Button
+                variant="outlined"
+                sx={{ padding: "8px", minWidth: "32px" }}
+                onClick={onReturnButtonClicked}
+              >
+                <KeyboardReturnIcon />
               </Button>
             </div>
           </Panel>
