@@ -102,6 +102,7 @@ def graph_update_add(request):
     # the request data contains the graph id and entire nodes or edges
     # need the ids only
     data = request.data
+    print(data)
     if "nodes" in request.data:
         # strip out the ids from the nodes
         data["nodes"] = [node["id"] for node in request.data["nodes"]]

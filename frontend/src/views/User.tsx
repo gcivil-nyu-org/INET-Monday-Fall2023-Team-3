@@ -25,8 +25,6 @@ export default function User() {
     if(userEmail !== ""){
       graphListGet(userEmail, sessionStorage.getItem("token")!).then((result) => {
         if (result.status) {
-          console.log("result");
-          console.log(result);
           setGraphList(result.value.graphList);
           console.log("returned Graph list: ");
           console.log(result.value.graphList);
@@ -73,13 +71,12 @@ export default function User() {
     navigate("/graph");
   };
 
-  // const graphDataArray = graphList.map(graphId => ({
-  //   id: graphId,
-  //   title: "Dummy Graph Title", // 根据需要设置标题
-  //   imgUrl: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg" // 替换为相应的图像URL
-  // }));
-  console.log("graphList: ")
-  console.log(graphList)
+  const graphDataArray = graphList.map(graphId => ({
+    id: graphId,
+    title: "Dummy Title",
+    imgUrl: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
+  }));
+
 
   return (
     <div className="w-full h-full flex flex-col min-h-screen">
@@ -108,10 +105,10 @@ export default function User() {
         <Update />
       </Dialog>
 
-      {/* <GraphList
+      <GraphList
         name="My Graph"
         graphs={graphDataArray}
-      /> */}
+      />
 
       <GraphList
         name="Shared Graph"

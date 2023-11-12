@@ -44,7 +44,7 @@ export type IGraphCreateResponse = IGraph;
 
 export type IGraphGetResponse = IGraph;
 
-export type IGraphUpdateResponse = IGraph;
+export type IGraphUpdateResponse = undefined;
 
 export type IGraphDeleteResponse = undefined;
 

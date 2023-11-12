@@ -29,7 +29,10 @@ import {
   nodeUpdate,
   nodeGetPredefined,
   graphUpdateAdd,
+  nodeGet,
+  edgeGet,
 } from "utils/backendRequests";
+import { useLocation } from "react-router-dom";
 
 export default function Graph() {
   const nodeTypes = useMemo(() => ({ smoothNode: SmoothNode }), []);
@@ -48,6 +51,56 @@ export default function Graph() {
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
+  const location = useLocation();
+  const graph = location.state?.graph;
+
+  // if graph is passed in when user click a graph, load the graph
+  useEffect(() => {
+    console.log("graph: ", graph);
+    if (graph !== undefined) {
+      // setNodes(graph.nodes);
+      // setEdges(graph.edges);
+      sessionStorage.setItem("graphId", graph.id);
+      for(let i=0; i<graph.nodes.length; i++){
+        setOnCanvasNodeIds((prevIds) => [...prevIds, graph.nodes[i]]);
+        nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const node = result.value;
+            setNodes((nodes) => {
+              return nodes.concat({
+                id: node.id,
+                type: "smoothNode",
+                position: { x: 0, y: 0 },
+                data: node,
+              });
+            });
+          } else {
+            console.log("Cannot get node");
+          }
+        });
+      }
+      for(let i=0; i<graph.edges.length; i++){
+        edgeGet(graph.edges[i], sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const edge = result.value;
+            setEdges((edges) =>
+              addEdge(
+                {
+                  id: edge.id,
+                  source: edge.source,
+                  target: edge.target,
+                },
+                edges
+              )
+            );
+          } else {
+            console.log("Cannot get edge");
+          }
+        });
+      }
+    }
+
+  }, [graph]);
 
   useEffect(() => {
     async function fetchPredefinedNodes() {
@@ -260,7 +313,6 @@ export default function Graph() {
       const result = await edgeCreate({ source, target }, sessionStorage.getItem("token")!);
       if (result.status) {
         console.log(`created edge with id ${result.value.id}`);
-
         // add edge to graph
         graphUpdateAdd(
           { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
