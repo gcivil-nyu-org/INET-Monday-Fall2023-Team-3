@@ -31,13 +31,13 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
   const [activeComment, setActiveComment] = useState<CommentState | null>(null); // Specify the type for activeComment
   const [comments, setComments] = useState<IComment[]>([]);
   const ws = useRef<WebSocket | null>(null); // Use useRef to persist the WebSocket connection without causing re-renders
-  const wsUrl = "ws://127.0.0.1:8000/ws/comment/"; // Your WebSocket URL ws://localhost:8000/ws/somepath/
+  const wsUrl = "ws://smooth-dirty.us-west-2.elasticbeanstalk.com/ws/comment/"; // Your WebSocket URL ws://localhost:8000/ws/somepath/
   const token = sessionStorage.getItem("token");
   useEffect(() => {
     // Establish WebSocket connection
 
     if (ws.current === null) {
-      ws.current = new WebSocket("ws://127.0.0.1:8000/ws/comment/");
+      ws.current = new WebSocket("ws://smooth-dirty.us-west-2.elasticbeanstalk.com/ws/comment/");
 
       ws.current.onopen = () => {
         console.log("WebSocket connection established");
