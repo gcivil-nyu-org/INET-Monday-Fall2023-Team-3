@@ -25,7 +25,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
     };
 
     return (
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} className="flex flex-col items-center">
             <textarea
                 className="w-full h-32 mr-4 ml-4 mb-4 mt-4 border border-white"
                 value={text}

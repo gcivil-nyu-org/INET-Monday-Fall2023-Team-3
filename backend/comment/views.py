@@ -85,7 +85,12 @@ def comments_by_node(request, node_id):
 
     comments = Comment.objects.filter(related_to_node=node)
     serializer = CommentSerializer(comments, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+    data = serializer.data
+    for item in data:
+        item["createdAt"] = item.pop("created_at")
+        item["relatedToNode"] = item.pop("related_to_node")
+    print(data)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 # Update comment

@@ -8,8 +8,7 @@ import {
   updateComment as updateCommentApi,
   deleteComment as deleteCommentApi,
 } from "../../api";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider, CssBaseline, Grid, Paper, Box } from "@mui/material";
 import Theme from "./Theme"; // Import your theme configuration
 import {
   userGet,
@@ -70,6 +69,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
         if (message.type === "new_comment") {
           console.log(message.data);
           setComments((prevComments) => [...prevComments, message.data]);
+          console.log(comments);
         } else if (message.type === "update_comment") {
           console.log("update");
           console.log(message.data);
@@ -113,7 +113,6 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
           const response = await commentGetByNode(node.id, token);
           if (response.status) {
             const commentsArray = Object.values(response.value);
-            console.log(commentsArray)
             setComments(commentsArray);
           } else {
             console.error("Error fetching comments:", response.error);
@@ -230,25 +229,75 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      <div className="mt-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
-      <div className="text-2xl text-center text-white bg-black">Discussion Section</div>
-        <CommentForm submitLabel="Write" handleSubmit={addComment} />
-        <div className="mt-4">
-          {rootComments.map((rootComment) => (
-            <Comment
-              key={rootComment.id}
-              comment={rootComment}
-              replies={getReplies(rootComment.id)}
-              activeComment={activeComment}
-              setActiveComment={setActiveComment}
-              addComment={addComment}
-              deleteComment={deleteComment}
-              updateComment={updateComment}
-              currentUserId={email}
-            />
-          ))}
-        </div>
-      </div>
+      <Box sx={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden" }}>
+        {/* Semi-transparent overlay */}
+        <Box
+          sx={{
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(100, 116, 139, 0.5)", // Adjust transparency as needed
+            zIndex: 2,
+          }}
+        />
+        {/* Centered content block with overflow allowed on y-axis */}
+        <Box
+          sx={{
+            position: "relative",
+            zIndex: 3,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Paper
+            elevation={3}
+            sx={{
+              maxWidth: "600px",
+              width: "100%",
+              maxHeight: "calc(100vh - 64px)",
+              overflowY: "auto", // allows for vertical scrolling inside the paper
+              margin: "32px",
+              overflowX: "hidden",
+              backgroundColor: "rgba(255,255,255,0.3)",
+              display: "flex", // Use flex layout
+              flexDirection: "column", // Stack children vertically,
+              height: '100%',
+              position: 'relative',
+            }}
+          >
+            <Box sx={{ p: 2, textAlign: "center" }}>
+              <Box sx={{ fontWeight: "bold", fontSize: "24px", mb: 2, p: 2, textAlign: "center" }}>
+                Discussion Section
+              </Box>
+              <CommentForm submitLabel="Write" handleSubmit={addComment} />
+            </Box>
+            {/* Scrollable comments area */}
+            <Box
+              sx={{
+                p: 2,
+                flex: 1,
+                overflowY: "auto", // Enable vertical scrolling for comments
+              }}
+            >
+              {rootComments.map((rootComment) => (
+                <Comment
+                  key={rootComment.id}
+                  comment={rootComment}
+                  replies={getReplies(rootComment.id)}
+                  activeComment={activeComment}
+                  setActiveComment={setActiveComment}
+                  addComment={addComment}
+                  deleteComment={deleteComment}
+                  updateComment={updateComment}
+                  currentUserId={email}
+                />
+              ))}
+            </Box>
+          </Paper>
+        </Box>
+      </Box>
     </ThemeProvider>
   );
 };

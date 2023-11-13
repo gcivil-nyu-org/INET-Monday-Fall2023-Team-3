@@ -16,7 +16,7 @@ import ReactFlow, {
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment } from "utils/models";
-import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
@@ -24,7 +24,7 @@ import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
 import ProblematicDepsInfo from "components/node/ProblematicDepsInfo";
-import Comments from "components/comments/Comments"
+import Comments from "components/comments/Comments";
 import {
   edgeCreate,
   edgeDelete,
@@ -152,7 +152,7 @@ export default function Graph() {
   };
 
   const onNodeClick = async (event: React.MouseEvent, node: Node<INode>) => {
-    console.log('single click');
+    console.log("single click");
     if (node.data.predefined === false) {
       setShowInfo(true);
       setInfoMessage("Comments are only available for NYU courses.");
@@ -421,12 +421,12 @@ export default function Graph() {
             currentNodes.map((node) => {
               return node.id === targetNode.id
                 ? {
-                  ...node,
-                  data: {
-                    ...node.data,
-                    dependencies: newDependencies,
-                  },
-                }
+                    ...node,
+                    data: {
+                      ...node.data,
+                      dependencies: newDependencies,
+                    },
+                  }
                 : node;
             })
           );

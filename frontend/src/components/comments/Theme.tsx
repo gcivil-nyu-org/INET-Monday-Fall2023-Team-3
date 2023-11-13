@@ -9,7 +9,7 @@ const themeOptions: ThemeOptions = {
       styleOverrides: {
         body: darkScrollbar(
             {
-                track: 'rgb(100, 116, 139)',
+                track: 'rgb(148, 163, 184)',
                 thumb: 'rgb(148, 163, 184)',
                 active: 'rgb(51, 65, 85)',
             }

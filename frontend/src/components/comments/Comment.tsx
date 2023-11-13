@@ -80,10 +80,13 @@ const Comment: React.FC<CommentProps> = ({
       </div>
       <div className="w-full">
         <div className="flex">
-          <div className="mr-4 text-md text-black bg-white">{username}</div>
-          <div className='text-white'>{createdAt}</div>
+          <div className="mr-4 text-md text-white">{username}</div>
+          <div className='text-gray-600'>{createdAt}</div>
         </div>
-        {!isEditing && <div className="text-lg text-white bg-blue-700">{comment.body}</div>}
+        {!isEditing && 
+        <div className="text-lg text-black bg-white mt-2 rounded-lg p-4">
+            {comment.body}
+        </div>}
         {isEditing && (
           <CommentForm
             submitLabel="Update"
@@ -95,7 +98,7 @@ const Comment: React.FC<CommentProps> = ({
             }}
           />
         )}
-        <div className="flex text-sm text-white	 cursor-pointer mt-4">
+        <div className="flex text-sm text-white cursor-pointer mt-4">
           {canReply && (
             <div
               className="mr-4 hover:underline"
