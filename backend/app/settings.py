@@ -161,7 +161,7 @@ CHANNEL_LAYERS = {
         "CONFIG": {
             "hosts": [
                 ("127.0.0.1", 6379),
-                ("rediscluster.t2msds.clustercfg.usw2.cache.amazonaws.com", 6379),
+                ("rediscluster-0001-001.t2msds.0001.usw2.cache.amazonaws.com", 6379),
             ],  # Assuming Redis is running locally
         },
     },
