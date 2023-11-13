@@ -156,7 +156,5 @@ ASGI_APPLICATION = "app.asgi.application"
 
 # Configure channel layer (using Redis as backend)
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer"
-    },
+    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
 }
