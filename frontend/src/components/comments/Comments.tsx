@@ -231,7 +231,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <div className="mt-2 max-h-[calc(100vh-4rem)] overflow-y-auto">
-        <div className="text-2xl">Discussion Section</div>
+      <div className="text-2xl text-center text-white bg-black">Discussion Section</div>
         <CommentForm submitLabel="Write" handleSubmit={addComment} />
         <div className="mt-4">
           {rootComments.map((rootComment) => (
