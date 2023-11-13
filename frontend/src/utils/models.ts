@@ -77,3 +77,17 @@ export type IWrongDepedency = {
   sourceName: string;
   targetName: string;
 }
+
+/**
+ * a type define a node's position on graph
+ */
+export type INodePosition = {
+  graphId: string;
+  nodeId: string;
+  x: number;
+  y: number;
+}
+
+export type IGraphList = {
+  graphList: string[];
+};

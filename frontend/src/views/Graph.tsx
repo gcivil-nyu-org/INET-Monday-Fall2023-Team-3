@@ -12,6 +12,7 @@ import ReactFlow, {
   getIncomers,
   getOutgoers,
   Edge,
+  MarkerType,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll } from "@mui/icons-material";
@@ -30,7 +31,11 @@ import {
   nodeUpdate,
   nodeGetPredefined,
   graphUpdateAdd,
+  nodeGet,
+  edgeGet,
+  graphNodePosition,
 } from "utils/backendRequests";
+import { useLocation } from "react-router-dom";
 
 export default function Graph() {
   const navigate = useNavigate();
@@ -50,6 +55,66 @@ export default function Graph() {
   const [currNode, setCurrNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
+  const location = useLocation();
+  const graph = location.state?.graph;
+
+  // if graph is passed in when user click a graph, load the graph
+  useEffect(() => {
+    console.log("graph: ", graph);
+    if (graph !== undefined) {
+      sessionStorage.setItem("graphId", graph.id);
+      for(let i=0; i<graph.nodes.length; i++){
+        nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const node = result.value;
+            if (node.predefined) {
+              setOnCanvasNodeIds((prevIds) => [...prevIds, node.id]);
+            }
+            var curNodePosition = graph.nodePositions.find((nodePosition: { id: string, x:number, y:number }) => nodePosition.id === node.id);
+            if (curNodePosition === undefined) {
+              curNodePosition = { id: node.id, x: 0, y: 0 };
+            }
+            setNodes((nodes) => {
+              return nodes.concat({
+                id: node.id,
+                type: "smoothNode",
+                position: { x: curNodePosition.x, y: curNodePosition.y },
+                data: node,
+              });
+            });
+          } else {
+            console.log("Cannot get node");
+          }
+        });
+      }
+      for(let i=0; i<graph.edges.length; i++){
+        edgeGet(graph.edges[i], sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const edge = result.value;
+            setEdges((edges) =>
+              addEdge(
+                {
+                  id: edge.id,
+                  source: edge.source,
+                  target: edge.target,
+                  style: {
+                    strokeWidth: 3,
+                  },
+                  markerEnd: {
+                    type: MarkerType.Arrow,
+                  }
+                },
+                edges
+              )
+            );
+          } else {
+            console.log("Cannot get edge");
+          }
+        });
+      }
+    }
+
+  }, [graph, setEdges, setNodes]);
 
   useEffect(() => {
     async function fetchPredefinedNodes() {
@@ -266,7 +331,6 @@ export default function Graph() {
       const result = await edgeCreate({ source, target }, sessionStorage.getItem("token")!);
       if (result.status) {
         console.log(`created edge with id ${result.value.id}`);
-
         // add edge to graph
         graphUpdateAdd(
           { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
@@ -285,6 +349,12 @@ export default function Graph() {
               id: result.value.id,
               source: result.value.source,
               target: result.value.target,
+              style: {
+                strokeWidth: 3,
+              },
+              markerEnd: {
+                type: MarkerType.Arrow,
+              }
             },
             edges
           )
@@ -437,6 +507,27 @@ export default function Graph() {
     }
   };
 
+  const onNodeDragStop = (event: React.MouseEvent, node: Node<INode>) => {
+    // update node position
+    setNodes((nodes) => {
+      const nodeIndex = nodes.findIndex((n) => n.id === node.id);
+      if (nodeIndex === -1) {
+        return nodes;
+      }
+      const newNode = { ...nodes[nodeIndex], position: node.position };  // update node position
+      return [...nodes.slice(0, nodeIndex), newNode, ...nodes.slice(nodeIndex + 1)];
+    });
+    graphNodePosition(
+      { graphId: sessionStorage.getItem("graphId")!, nodeId: node.id, x: node.position.x, y: node.position.y },
+      sessionStorage.getItem("token")!).then((result) => {
+        if (result.status) {
+          console.log("Node position updated");
+        } else {
+          console.log("Cannot update node position");
+        }
+      });
+  };
+
   return (
     <div className="w-full h-full flex flex-row min-h-screen">
       <div className="flex self-stretch basis-3/4">
@@ -472,6 +563,7 @@ export default function Graph() {
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
           onEdgesDelete={onEdgesDelete}
+          onNodeDragStop={onNodeDragStop}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">

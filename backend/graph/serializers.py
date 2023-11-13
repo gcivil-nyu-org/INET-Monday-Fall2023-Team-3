@@ -15,6 +15,9 @@ class GraphSerializer(serializers.ModelSerializer):
         many=True, queryset=Edge.objects.all(), required=False
     )
     user = serializers.CharField(required=False)  # Define the user_email field
+    shared_user = serializers.JSONField(required=False)
+    node_positions = serializers.JSONField(required=False)
+    title = serializers.CharField(required=False)
 
     class Meta:
         model = Graph
