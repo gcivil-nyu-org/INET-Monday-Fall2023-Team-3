@@ -29,3 +29,5 @@ typing_extensions==4.8.0
 tzdata==2023.3
 urllib3==2.0.7
 channels==3.0.5
+channels-redis==4.1.0
+async-timeout==4.0.3
