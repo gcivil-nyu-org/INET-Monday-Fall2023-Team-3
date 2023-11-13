@@ -159,7 +159,10 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [
+                ("rediscluster.t2msds.clustercfg.usw2.cache.amazonaws.com", 6379),
+                ("127.0.0.1", 6379),
+            ],
         },
     },
 }
