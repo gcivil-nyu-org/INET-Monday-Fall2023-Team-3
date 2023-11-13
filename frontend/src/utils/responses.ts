@@ -47,7 +47,7 @@ export type ICommentsGetResponse = IComment[];
 
 export type ICommentUpdateResponse = IComment;
 
-export type ICommentDeleteResponse = IComment;
+export type ICommentDeleteResponse = Partial<IComment>;
 
 // graph
 

@@ -115,7 +115,9 @@ def comment_update(request):
 def comment_delete(request, comment_id):
     try:
         comment = Comment.objects.get(id=comment_id)
+        serializer = CommentSerializer(comment)  # Serialize the comment
         comment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        serializer.data.id = comment_id
+        return Response({"id": comment_id}, status=status.HTTP_200_OK)
     except Comment.DoesNotExist:
         return COMMENT_NOT_FOUND_RESPONSE

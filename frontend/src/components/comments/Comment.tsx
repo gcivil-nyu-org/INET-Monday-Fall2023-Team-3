@@ -72,7 +72,7 @@ const Comment: React.FC<CommentProps> = ({
     };
     // Call the fetchData function
     fetchData();
-  }, []); // Empty dependency array means this effect will only run once on mount
+  }, [comment.createdAt, comment.user]); // Empty dependency array means this effect will only run once on mount
   return (
     <div key={comment.id} className="flex mb-7">
       <div className="mr-4">
