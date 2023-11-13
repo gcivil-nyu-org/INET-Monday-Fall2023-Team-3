@@ -132,3 +132,23 @@ class GraphTests(APITestCase):
         nodes_from_graph = sorted(graph1.nodes.all().values_list("id", flat=True))
         expected_node_ids = sorted([node2.id])
         self.assertEqual(nodes_from_graph, expected_node_ids)
+
+    def test_node_position(self):
+        graph = Graph.objects.create(user=self.user)
+        valid_data1 = {
+            "name": "ECE244",
+            "description": "Programming Fundamentals",
+        }
+        node1 = Node.objects.create(**valid_data1)
+        graph_id = str(graph.id)
+        request_data = {"graph_id": graph_id, "node_id": str(node1.id), "x": 1, "y": 2}
+        response = self.client.put(
+            "/backend/graph/node-position/", request_data, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        request_data = {"graph_id": graph_id, "node_id": str(node1.id), "x": 3, "y": 4}
+        response = self.client.put(
+            "/backend/graph/node-position/", request_data, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)

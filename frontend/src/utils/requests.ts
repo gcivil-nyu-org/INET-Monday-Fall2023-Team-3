@@ -202,7 +202,7 @@ export type Endpoints = {
     bodyType: IGraphDeleteBody;
     resultType: IGraphDeleteResponse;
   };
-  "/graph/update-node-position/": {
+  "/graph/node-position/": {
     param: false;
     authenticate: true;
     method: "PUT";

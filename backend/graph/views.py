@@ -170,3 +170,33 @@ def graph_list_get(request, user_email):
         graph_id_list[i] = str(graph_id_list[i])
     print(graph_id_list)
     return Response({"graph_list": graph_id_list}, status=status.HTTP_200_OK)
+
+
+@api_view(["PUT"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_position_set(request):
+    new_node_position = request.data
+    try:
+        graph_instance = Graph.objects.get(id=new_node_position["graph_id"])
+        node_position_list = graph_instance.node_positions
+
+        flag = False
+        for d in node_position_list:
+            if d["id"] == new_node_position["node_id"]:
+                flag = True
+                d["x"] = new_node_position["x"]
+                d["y"] = new_node_position["y"]
+        if not flag:  # new node
+            node_position_list.append(
+                {
+                    "id": new_node_position["node_id"],
+                    "x": new_node_position["x"],
+                    "y": new_node_position["y"],
+                }
+            )
+        graph_instance.node_positions = node_position_list
+        graph_instance.save()
+        return Response(status=status.HTTP_200_OK)
+    except Graph.DoesNotExist:
+        return GRAPH_404_RESPONSE

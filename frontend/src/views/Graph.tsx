@@ -32,6 +32,7 @@ import {
   graphUpdateAdd,
   nodeGet,
   edgeGet,
+  graphNodePosition,
 } from "utils/backendRequests";
 import { useLocation } from "react-router-dom";
 
@@ -67,11 +68,15 @@ export default function Graph() {
             if (node.predefined) {
               setOnCanvasNodeIds((prevIds) => [...prevIds, node.id]);
             }
+            var curNodePosition = graph.nodePositions.find((nodePosition: { id: string, x:number, y:number }) => nodePosition.id === node.id);
+            if (curNodePosition === undefined) {
+              curNodePosition = { id: node.id, x: 0, y: 0 };
+            }
             setNodes((nodes) => {
               return nodes.concat({
                 id: node.id,
                 type: "smoothNode",
-                position: { x: 0, y: 0 },
+                position: { x: curNodePosition.x, y: curNodePosition.y },
                 data: node,
               });
             });
@@ -338,6 +343,12 @@ export default function Graph() {
               id: result.value.id,
               source: result.value.source,
               target: result.value.target,
+              style: {
+                strokeWidth: 3,
+              },
+              markerEnd: {
+                type: MarkerType.Arrow,
+              }
             },
             edges
           )
@@ -490,6 +501,27 @@ export default function Graph() {
     }
   };
 
+  const onNodeDragStop = (event: React.MouseEvent, node: Node<INode>) => {
+    // update node position
+    setNodes((nodes) => {
+      const nodeIndex = nodes.findIndex((n) => n.id === node.id);
+      if (nodeIndex === -1) {
+        return nodes;
+      }
+      const newNode = { ...nodes[nodeIndex], position: node.position };  // update node position
+      return [...nodes.slice(0, nodeIndex), newNode, ...nodes.slice(nodeIndex + 1)];
+    });
+    graphNodePosition(
+      { graphId: sessionStorage.getItem("graphId")!, nodeId: node.id, x: node.position.x, y: node.position.y },
+      sessionStorage.getItem("token")!).then((result) => {
+        if (result.status) {
+          console.log("Node position updated");
+        } else {
+          console.log("Cannot update node position");
+        }
+      });
+  };
+
   return (
     <div className="w-full h-full flex flex-row min-h-screen">
       <div className="flex self-stretch basis-3/4">
@@ -525,6 +557,7 @@ export default function Graph() {
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
           onEdgesDelete={onEdgesDelete}
+          onNodeDragStop={onNodeDragStop}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
