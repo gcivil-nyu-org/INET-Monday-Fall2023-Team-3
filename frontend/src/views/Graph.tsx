@@ -15,21 +15,24 @@ import ReactFlow, {
   MarkerType,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
-import { Add, Share, DoneAll } from "@mui/icons-material";
-import KeyboardReturnIcon from '@mui/icons-material/KeyboardReturn';
-import { IEdge, INode, IMissingDependency, IWrongDepedency } from "utils/models";
+import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
+import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment } from "utils/models";
+import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
+
 import "reactflow/dist/style.css";
 import AddNode from "components/node/AddNode";
 import AddPredefinedNode from "components/node/AddPredefinedNode";
 import EditNode from "components/node/EditNode";
 import SmoothNode from "components/node/SmoothNode";
 import ProblematicDepsInfo from "components/node/ProblematicDepsInfo";
+import Comments from "components/comments/Comments";
 import {
   edgeCreate,
   edgeDelete,
   nodeDelete,
   nodeUpdate,
   nodeGetPredefined,
+  commentGetByNode,
   graphUpdateAdd,
   nodeGet,
   edgeGet,
@@ -44,16 +47,20 @@ export default function Graph() {
   const [showAddNode, setShowAddNode] = useState(false);
   const [showEditNode, setShowEditNode] = useState(false);
   const [showProblematicDeps, setShowProblematicDeps] = useState(false);
+  const [showNodeDiscussion, setShowNodeDiscussion] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showInfo, setShowInfo] = useState(false);
+  const [infoMessage, setInfoMessage] = useState("");
 
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
   const [missingDeps, setMissingDeps] = useState<IMissingDependency[]>([]);
   const [wrongDeps, setwrongDeps] = useState<IWrongDepedency[]>([]);
   const [currNode, setCurrNode] = useState<INode>();
+  const [clickNode, setClickNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
   const location = useLocation();
@@ -211,6 +218,17 @@ export default function Graph() {
     setShowAddNode(false);
     setShowEditNode(true);
     setShowProblematicDeps(false);
+  };
+
+  const onNodeClick = async (event: React.MouseEvent, node: Node<INode>) => {
+    console.log("single click");
+    if (node.data.predefined === false) {
+      setShowInfo(true);
+      setInfoMessage("Comments are only available for NYU courses.");
+      return;
+    }
+    setShowNodeDiscussion(true);
+    setClickNode(node.data);
   };
 
   const onNodeDoubleClick = (event: React.MouseEvent, node: Node<INode>) => {
@@ -440,6 +458,11 @@ export default function Graph() {
 
   const onNodesDelete = useCallback(
     async (deleted: Node[]) => {
+      // Check if the clicked node is among the deleted nodes
+      const isClickNodeDeleted = deleted.some((node) => node.id === clickNode?.id);
+      if (isClickNodeDeleted) {
+        setShowNodeDiscussion(false);
+      }
       // no need to update edges because we use foreign keys
       // in backend, therefore deleting node will delete
       // corresponding edges as well
@@ -496,7 +519,7 @@ export default function Graph() {
       });
       await Promise.all(nodeUpdatePromises).catch(onError);
     },
-    [nodes, edges, setEdges, setNodes]
+    [clickNode, nodes, edges, setEdges, setNodes]
   );
 
   const onError = (err: string) => {
@@ -508,6 +531,7 @@ export default function Graph() {
     if (reason !== "clickaway") {
       setShowError(false);
       setShowSuccess(false);
+      setShowInfo(false);
     }
   };
 
@@ -592,13 +616,16 @@ export default function Graph() {
 
 
   return (
-    <div className="w-full h-full flex flex-row min-h-screen">
-      <div className="flex self-stretch basis-3/4">
+    <div className="w-full h-full flex flex-row min-h-screen overflow-hidden">
+      <div className="flex self-stretch basis-3/4 overflow-hidden">
         <Snackbar open={showError} autoHideDuration={6000} onClose={onSnackBarClose}>
           <Alert severity="error">{errorMessage}</Alert>
         </Snackbar>
         <Snackbar open={showSuccess} autoHideDuration={6000} onClose={onSnackBarClose}>
           <Alert severity="success">{successMessage}</Alert>
+        </Snackbar>
+        <Snackbar open={showInfo} autoHideDuration={6000} onClose={onSnackBarClose}>
+          <Alert severity="info">{infoMessage}</Alert>
         </Snackbar>
         <Dialog open={showAddNode} onClose={onCancel} maxWidth="md" fullWidth={true}>
           <AddNode
@@ -621,11 +648,13 @@ export default function Graph() {
           nodes={nodes}
           onNodesChange={onNodesChange}
           onNodesDelete={onNodesDelete}
+          onNodeClick={onNodeClick}
           onNodeDoubleClick={onNodeDoubleClick}
           edges={edges}
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
           onEdgesDelete={onEdgesDelete}
+          onPaneClick={() => setShowNodeDiscussion(false)}
           onNodeDragStop={onNodeDragStop}
         >
           <Panel className="bg-transparent" position="top-left">
@@ -667,8 +696,8 @@ export default function Graph() {
           {renderTitle()}
         </div>
       </div>
-      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500">
-        {/* add comment page */}
+      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500 overflow-hidden">
+        {showNodeDiscussion && <Comments node={clickNode!} />}
       </div>
     </div>
   );

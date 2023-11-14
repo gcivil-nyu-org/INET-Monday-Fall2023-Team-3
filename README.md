@@ -44,7 +44,12 @@ develop: [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/INET-Monday-F
     cd backend
     python manage.py migrate
     ```
-8. Run server
+8. Load predefined data
+   ```sh
+   cd backend
+   python manage.py loaddata predefined_courses
+   ```
+10. Run server
     ```sh
     cd backend
     python manage.py runserver

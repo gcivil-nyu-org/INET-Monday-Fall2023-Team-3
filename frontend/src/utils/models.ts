@@ -80,6 +80,18 @@ export type IWrongDepedency = {
 }
 
 /**
+ * Represents a comment in backend
+ */
+export type IComment = {
+  id: string; 
+  body: string;
+  user: string;
+  parent: string;
+  relatedToNode: string;
+  createdAt: string;
+}
+
+/**
  * a type define a node's position on graph
  */
 export type INodePosition = {

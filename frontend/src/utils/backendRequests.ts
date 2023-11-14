@@ -142,6 +142,10 @@ export const userGet: RestfulRequestHelper<"/user/get/"> = (token) => {
   return restfulRequest("/user/get/", "GET", { token });
 };
 
+export const userGetName: RestfulRequestHelper<"/user/get-name/"> = (param, token) => {
+  return restfulRequest("/user/get-name/", "GET", { param, token });
+};
+
 export const userUpdate: RestfulRequestHelper<"/user/update/"> = (body, token) => {
   return restfulRequest("/user/update/", "POST", { body, token });
 };
@@ -190,6 +194,22 @@ export const edgeDelete: RestfulRequestHelper<"/edge/delete/"> = (param, token) 
   return restfulRequest("/edge/delete/", "DELETE", { param, token });
 };
 
+export const commentGetByNode: RestfulRequestHelper<"/comment/get-by-node/"> = (param, token) => {
+  return restfulRequest("/comment/get-by-node/", "GET", { param, token });
+}
+
+export const commentCreate: RestfulRequestHelper<"/comment/create/"> = (body, token) => {
+  return restfulRequest("/comment/create/", "POST", { body, token });
+}
+
+export const commentUpdate: RestfulRequestHelper<"/comment/update/"> = (body, token) => {
+  return restfulRequest("/comment/update/", "PUT", { body, token });
+}
+
+export const commentDelete: RestfulRequestHelper<"/comment/delete/"> = (param, token) => {
+  return restfulRequest("/comment/delete/", "DELETE", { param, token });
+}
+
 export const graphPing: RestfulRequestHelper<"/graph/ping/"> = () => {
   return restfulRequest("/graph/ping/", "GET", {});
 };
@@ -221,3 +241,4 @@ export const graphListGet: RestfulRequestHelper<"/graph/list-get/"> = (param, to
 export const graphTitleSet: RestfulRequestHelper<"/graph/title-set/"> = (body, token) => {
   return restfulRequest("/graph/title-set/", "PUT", { body, token });
 }
+

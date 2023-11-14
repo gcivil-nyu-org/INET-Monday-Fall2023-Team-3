@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
-
+from django.shortcuts import get_object_or_404
 from .models import CustomUser
 from .serializers import UserSerializer
 
@@ -89,6 +89,19 @@ def user_get(request):
     serializer = UserSerializer(instance=request.user)
     data = serializer.data
     data.pop("password")
+    return Response(data, status=status.HTTP_200_OK)
+
+
+# Get user name by user id
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def user_get_name(request, email):
+    print(request)
+    user = get_object_or_404(CustomUser, email=email)
+    serializer = UserSerializer(instance=user)
+    data = serializer.data
+    data.pop("password")  # Remove the password field if it exists
     return Response(data, status=status.HTTP_200_OK)
 
 

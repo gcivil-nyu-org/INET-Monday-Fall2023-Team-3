@@ -20,6 +20,10 @@ import {
   IUserLoginBody,
   IUserPingBody,
   IUserUpdateBody,
+  ICommentsGetBody,
+  ICommentCreateBody,
+  ICommentUpdateBody,
+  ICommentDeleteBody,
   INodePositionBody,
   IGraphListBody,
   IGraphTitleBody,
@@ -47,6 +51,10 @@ import {
   IUserLoginResponse,
   IUserPingResponse,
   IUserUpdateResponse,
+  ICommentsGetResponse,
+  ICommentCreateResponse,
+  ICommentUpdateResponse,
+  ICommentDeleteResponse,
   INodePositionResponse,
   IGraphListResponse,
   IGraphTitleResponse,
@@ -79,6 +87,13 @@ export type Endpoints = {
   };
   "/user/get/": {
     param: false;
+    authenticate: true;
+    method: "GET";
+    bodyType: IUserGetBody;
+    resultType: IUserGetResponse;
+  };
+  "/user/get-name/": {
+    param: true;
     authenticate: true;
     method: "GET";
     bodyType: IUserGetBody;
@@ -168,6 +183,34 @@ export type Endpoints = {
     method: "DELETE";
     bodyType: IEdgeDeleteBody;
     resultType: IEdgeDeleteResponse;
+  };
+  "/comment/get-by-node/": {
+    param: true;
+    authenticate: true;
+    method: "GET";
+    bodyType: ICommentsGetBody;
+    resultType: ICommentsGetResponse;
+  };
+  "/comment/create/": {
+    param: false;
+    authenticate: true;
+    method: "POST";
+    bodyType: ICommentCreateBody;
+    resultType: ICommentCreateResponse;
+  };
+  "/comment/update/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: ICommentUpdateBody;
+    resultType: ICommentUpdateResponse;
+  };
+  "/comment/delete/": {
+    param: true;
+    authenticate: true;
+    method: "DELETE";
+    bodyType: ICommentDeleteBody;
+    resultType: ICommentDeleteResponse;
   };
   "/graph/ping/": {
     param: false;
