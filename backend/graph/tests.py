@@ -164,5 +164,5 @@ class GraphTests(APITestCase):
     def test_graph_list_get(self):
         graph = Graph.objects.create(user=self.user, title="test")
         response = self.client.get(f"/backend/graph/list-get/{self.user.email}/")
-        assert response.data == {'graph_list':[[str(graph.id), graph.title]]}
+        assert response.data == {"graph_list": [[str(graph.id), graph.title]]}
         assert response.status_code == status.HTTP_200_OK

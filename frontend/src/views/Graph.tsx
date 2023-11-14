@@ -65,6 +65,7 @@ export default function Graph() {
     if (graph !== undefined) {
       sessionStorage.setItem("graphId", graph.id);
       for(let i=0; i<graph.nodes.length; i++){
+        setTitle(graph.title);
         nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
           if (result.status) {
             const node = result.value;
