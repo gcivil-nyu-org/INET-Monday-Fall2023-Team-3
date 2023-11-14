@@ -445,7 +445,7 @@ export default function Graph() {
       });
       await Promise.all(nodeUpdatePromises).catch(onError);
     },
-    [nodes, edges, setEdges, setNodes]
+    [clickNode, nodes, edges, setEdges, setNodes]
   );
 
   const onError = (err: string) => {
