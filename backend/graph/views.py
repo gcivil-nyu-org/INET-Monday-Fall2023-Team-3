@@ -217,3 +217,4 @@ def graph_title_set(request):
         return Response(status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
         return GRAPH_404_RESPONSE
+    
