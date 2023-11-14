@@ -159,7 +159,6 @@ export default function Graph() {
       return;
     }
     setShowNodeDiscussion(true);
-    console.log(node.data.id);
     setClickNode(node.data);
   };
 
@@ -385,6 +384,11 @@ export default function Graph() {
 
   const onNodesDelete = useCallback(
     async (deleted: Node[]) => {
+      // Check if the clicked node is among the deleted nodes
+      const isClickNodeDeleted = deleted.some((node) => node.id === clickNode?.id);
+      if (isClickNodeDeleted) {
+        setShowNodeDiscussion(false);
+      }
       // no need to update edges because we use foreign keys
       // in backend, therefore deleting node will delete
       // corresponding edges as well
@@ -496,6 +500,7 @@ export default function Graph() {
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeConnect}
           onEdgesDelete={onEdgesDelete}
+          onPaneClick={() => setShowNodeDiscussion(false)}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">

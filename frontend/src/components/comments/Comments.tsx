@@ -152,7 +152,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
     commentCreate(payload, sessionStorage.getItem("token")!).then((result) => {
       if (result.status) {
         const newComment = [result.value, ...comments];
-        // setComments(newComment);
+        setComments(newComment);
         setActiveComment(null);
         // Check if the WebSocket is connected
         if (ws && ws.current?.readyState === WebSocket.OPEN) {
@@ -174,17 +174,14 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
     };
     commentUpdate(payload, sessionStorage.getItem("token")!).then((result) => {
       if (result.status) {
-        /*
-                const updatedComments = comments.map((comment) => {
-                    if (comment.id === commentId) {
-                        return { ...comment, body: text };
-                    }
-                    return comment;
-                });
-                setComments(updatedComments);
-                */
+        const updatedComments = comments.map((comment) => {
+          if (comment.id === commentId) {
+            return { ...comment, body: text };
+          }
+          return comment;
+        });
+        setComments(updatedComments);
         setActiveComment(null);
-        console.log(result.value);
         if (ws && ws.current?.readyState === WebSocket.OPEN) {
           // Send the comment data through the WebSocket
           ws.current.send(JSON.stringify({ action: "update", data: result.value }));
@@ -202,15 +199,10 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
       commentDelete(commentId, sessionStorage.getItem("token")!).then((result) => {
         console.log(result);
         if (result.status) {
-          /*
-                    const updatedComments = comments.map((comment) => {
-                        if (comment.id === commentId) {
-                            return { ...comment, body: text };
-                        }
-                        return comment;
-                    });
-                    setComments(updatedComments);
-                    */
+          const updatedComments = comments.filter((comment) => comment.id !== commentId);
+          console.log(updatedComments);
+          setComments(updatedComments);
+
           setActiveComment(null);
           console.log(result.value);
           if (ws && ws.current?.readyState === WebSocket.OPEN) {
@@ -263,8 +255,8 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
               backgroundColor: "rgba(255,255,255,0.3)",
               display: "flex", // Use flex layout
               flexDirection: "column", // Stack children vertically,
-              height: '100%',
-              position: 'relative',
+              height: "100%",
+              position: "relative",
             }}
           >
             <Box sx={{ p: 2, textAlign: "center" }}>

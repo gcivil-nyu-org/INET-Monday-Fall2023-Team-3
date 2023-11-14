@@ -31,6 +31,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                 value={text}
                 onChange={(e) => setText(e.target.value)}
             />
+            <div className="flex justify-center w-full"> {/* Flex container for buttons */}
             <button className="text-base ml-4 px-4 py-2 bg-blue-700 rounded-md text-white hover:cursor-pointer hover:bg-blue-500 disabled:opacity-70 disabled:cursor-not-allowed" disabled={isTextareaDisabled}>
                 {submitLabel}
             </button>
@@ -43,6 +44,7 @@ const CommentForm: React.FC<CommentFormProps> = ({
                     Cancel
                 </button>
             )}
+            </div>
         </form>
     );
 };
