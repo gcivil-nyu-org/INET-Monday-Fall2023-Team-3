@@ -24,7 +24,11 @@ import {
   ICommentCreateBody,
   ICommentUpdateBody,
   ICommentDeleteBody,
+  INodePositionBody,
+  IGraphListBody,
+  IGraphTitleBody,
 } from "./bodies";
+import { IGraphList } from "./models";
 import {
   IEdgeCreateResponse,
   IEdgeDeleteResponse,
@@ -51,6 +55,9 @@ import {
   ICommentCreateResponse,
   ICommentUpdateResponse,
   ICommentDeleteResponse,
+  INodePositionResponse,
+  IGraphListResponse,
+  IGraphTitleResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -240,4 +247,25 @@ export type Endpoints = {
     bodyType: IGraphDeleteBody;
     resultType: IGraphDeleteResponse;
   };
-};
+  "/graph/node-position/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: INodePositionBody;
+    resultType: INodePositionResponse;
+  };
+  "/graph/list-get/": {
+    param: true;
+    authenticate: true;
+    method: "GET";
+    bodyType: IGraphListBody;
+    resultType: IGraphListResponse;
+  };
+  "/graph/title-set/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: IGraphTitleBody;
+    resultType: IGraphTitleResponse;
+  };
+}

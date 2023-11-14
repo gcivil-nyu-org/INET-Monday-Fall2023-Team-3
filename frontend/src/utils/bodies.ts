@@ -1,4 +1,6 @@
-import { IUser, INode, IEdge, IComment, IGraph } from "./models";
+
+import { IUser, INode, IEdge, IComment, IGraph, INodePosition } from "./models";
+
 
 // bodies
 // user
@@ -61,4 +63,10 @@ export type IGraphGetBody = undefined;
 export type IGraphUpdateBody = Partial<IGraph> & Pick<IGraph, "id">;
 
 export type IGraphDeleteBody = undefined;
+
+export type INodePositionBody = INodePosition;
+
+export type IGraphListBody = undefined;
+
+export type IGraphTitleBody = Pick<IGraph, "title"> & Pick<IGraph, "id">;
 

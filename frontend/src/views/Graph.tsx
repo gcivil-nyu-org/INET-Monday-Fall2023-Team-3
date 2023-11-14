@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, ChangeEvent, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
@@ -12,6 +12,7 @@ import ReactFlow, {
   getIncomers,
   getOutgoers,
   Edge,
+  MarkerType,
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
@@ -33,7 +34,12 @@ import {
   nodeGetPredefined,
   commentGetByNode,
   graphUpdateAdd,
+  nodeGet,
+  edgeGet,
+  graphNodePosition,
+  graphTitleSet,
 } from "utils/backendRequests";
+import { useLocation } from "react-router-dom";
 
 export default function Graph() {
   const navigate = useNavigate();
@@ -57,6 +63,69 @@ export default function Graph() {
   const [clickNode, setClickNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
+  const location = useLocation();
+  const graph = location.state?.graph;
+  const [title, setTitle] = useState<string>("Untitled Graph");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  // if graph is passed in when user click a graph, load the graph
+  useEffect(() => {
+    console.log("graph: ", graph);
+    if (graph !== undefined) {
+      sessionStorage.setItem("graphId", graph.id);
+      for(let i=0; i<graph.nodes.length; i++){
+        setTitle(graph.title);
+        nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const node = result.value;
+            if (node.predefined) {
+              setOnCanvasNodeIds((prevIds) => [...prevIds, node.id]);
+            }
+            var curNodePosition = graph.nodePositions.find((nodePosition: { id: string, x:number, y:number }) => nodePosition.id === node.id);
+            if (curNodePosition === undefined) {
+              curNodePosition = { id: node.id, x: 0, y: 0 };
+            }
+            setNodes((nodes) => {
+              return nodes.concat({
+                id: node.id,
+                type: "smoothNode",
+                position: { x: curNodePosition.x, y: curNodePosition.y },
+                data: node,
+              });
+            });
+          } else {
+            console.log("Cannot get node");
+          }
+        });
+      }
+      for(let i=0; i<graph.edges.length; i++){
+        edgeGet(graph.edges[i], sessionStorage.getItem("token")!).then((result) => {
+          if (result.status) {
+            const edge = result.value;
+            setEdges((edges) =>
+              addEdge(
+                {
+                  id: edge.id,
+                  source: edge.source,
+                  target: edge.target,
+                  style: {
+                    strokeWidth: 3,
+                  },
+                  markerEnd: {
+                    type: MarkerType.Arrow,
+                  }
+                },
+                edges
+              )
+            );
+          } else {
+            console.log("Cannot get edge");
+          }
+        });
+      }
+    }
+
+  }, [graph, setEdges, setNodes]);
 
   useEffect(() => {
     async function fetchPredefinedNodes() {
@@ -284,7 +353,6 @@ export default function Graph() {
       const result = await edgeCreate({ source, target }, sessionStorage.getItem("token")!);
       if (result.status) {
         console.log(`created edge with id ${result.value.id}`);
-
         // add edge to graph
         graphUpdateAdd(
           { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
@@ -303,6 +371,12 @@ export default function Graph() {
               id: result.value.id,
               source: result.value.source,
               target: result.value.target,
+              style: {
+                strokeWidth: 3,
+              },
+              markerEnd: {
+                type: MarkerType.Arrow,
+              }
             },
             edges
           )
@@ -461,6 +535,86 @@ export default function Graph() {
     }
   };
 
+  const onNodeDragStop = (event: React.MouseEvent, node: Node<INode>) => {
+    // update node position
+    setNodes((nodes) => {
+      const nodeIndex = nodes.findIndex((n) => n.id === node.id);
+      if (nodeIndex === -1) {
+        return nodes;
+      }
+      const newNode = { ...nodes[nodeIndex], position: node.position };  // update node position
+      return [...nodes.slice(0, nodeIndex), newNode, ...nodes.slice(nodeIndex + 1)];
+    });
+    graphNodePosition(
+      { graphId: sessionStorage.getItem("graphId")!, nodeId: node.id, x: node.position.x, y: node.position.y },
+      sessionStorage.getItem("token")!).then((result) => {
+        if (result.status) {
+          console.log("Node position updated");
+        } else {
+          console.log("Cannot update node position");
+        }
+      });
+  };
+
+
+  const handleTitleClick = (): void => {
+    setIsEditing(true);
+  };
+
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setTitle(e.target.value);
+  };
+
+  const handleTitleSubmit = (e: KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>): void => {
+    if (e.type === 'blur' || (e as KeyboardEvent<HTMLInputElement>).key === 'Enter') {
+      setIsEditing(false);
+      graphTitleSet(
+        { id: sessionStorage.getItem("graphId")!, title: title },
+        sessionStorage.getItem("token")!
+      ).then((result) => {
+          if (result.status) {
+            console.log("Graph title updated");
+          } else {
+            console.log("Cannot update graph title");
+          }
+        }
+      );
+    }
+  };
+
+  const titleStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: '10px',    // Adjust top position as needed
+    left: '37.5%',     // Set left position to 50%
+    transform: 'translateX(-50%)', // Move the title left by 50% of its own width
+    fontSize: '28px', // Adjust font size as needed
+    fontWeight: 'bold',
+    fontFamily: '"Times New Roman", Times, serif',
+  };
+
+  const renderTitle = (): JSX.Element => {
+    if (isEditing) {
+      return (
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          onBlur={handleTitleSubmit}
+          onKeyDown={handleTitleSubmit}
+          autoFocus
+          style={titleStyle} // Slightly smaller font for input
+        />
+      );
+    } else {
+      return (
+        <h1 onClick={handleTitleClick} style={titleStyle}>
+          {title}
+        </h1>
+      );
+    }
+  };
+
+
   return (
     <div className="w-full h-full flex flex-row min-h-screen overflow-hidden">
       <div className="flex self-stretch basis-3/4 overflow-hidden">
@@ -501,6 +655,7 @@ export default function Graph() {
           onConnect={onEdgeConnect}
           onEdgesDelete={onEdgesDelete}
           onPaneClick={() => setShowNodeDiscussion(false)}
+          onNodeDragStop={onNodeDragStop}
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
@@ -536,6 +691,10 @@ export default function Graph() {
           </Panel>
           <Controls />
         </ReactFlow>
+
+        <div>
+          {renderTitle()}
+        </div>
       </div>
       <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500 overflow-hidden">
         {showNodeDiscussion && <Comments node={clickNode!} />}
