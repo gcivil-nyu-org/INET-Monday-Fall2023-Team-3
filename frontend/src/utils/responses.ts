@@ -51,3 +51,5 @@ export type IGraphDeleteResponse = undefined;
 export type INodePositionResponse = INodePosition;
 
 export type IGraphListResponse = IGraphList;
+
+export type IGraphTitleResponse = undefined;

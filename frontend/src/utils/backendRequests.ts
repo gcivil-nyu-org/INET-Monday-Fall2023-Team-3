@@ -217,3 +217,7 @@ export const graphNodePosition: RestfulRequestHelper<"/graph/node-position/"> = 
 export const graphListGet: RestfulRequestHelper<"/graph/list-get/"> = (param, token) => {
   return restfulRequest("/graph/list-get/", "GET", { param, token });
 };
+
+export const graphTitleSet: RestfulRequestHelper<"/graph/title-set/"> = (body, token) => {
+  return restfulRequest("/graph/title-set/", "PUT", { body, token });
+}

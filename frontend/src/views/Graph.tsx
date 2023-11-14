@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, ChangeEvent, KeyboardEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
@@ -34,6 +34,7 @@ import {
   nodeGet,
   edgeGet,
   graphNodePosition,
+  graphTitleSet,
 } from "utils/backendRequests";
 import { useLocation } from "react-router-dom";
 
@@ -57,6 +58,8 @@ export default function Graph() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
   const location = useLocation();
   const graph = location.state?.graph;
+  const [title, setTitle] = useState<string>("Untitled Graph");
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   // if graph is passed in when user click a graph, load the graph
   useEffect(() => {
@@ -64,6 +67,7 @@ export default function Graph() {
     if (graph !== undefined) {
       sessionStorage.setItem("graphId", graph.id);
       for(let i=0; i<graph.nodes.length; i++){
+        setTitle(graph.title);
         nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
           if (result.status) {
             const node = result.value;
@@ -528,6 +532,65 @@ export default function Graph() {
       });
   };
 
+
+  const handleTitleClick = (): void => {
+    setIsEditing(true);
+  };
+
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    setTitle(e.target.value);
+  };
+
+  const handleTitleSubmit = (e: KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>): void => {
+    if (e.type === 'blur' || (e as KeyboardEvent<HTMLInputElement>).key === 'Enter') {
+      setIsEditing(false);
+      graphTitleSet(
+        { id: sessionStorage.getItem("graphId")!, title: title },
+        sessionStorage.getItem("token")!
+      ).then((result) => {
+          if (result.status) {
+            console.log("Graph title updated");
+          } else {
+            console.log("Cannot update graph title");
+          }
+        }
+      );
+    }
+  };
+
+  const titleStyle: React.CSSProperties = {
+    position: 'fixed',
+    top: '10px',    // Adjust top position as needed
+    left: '37.5%',     // Set left position to 50%
+    transform: 'translateX(-50%)', // Move the title left by 50% of its own width
+    fontSize: '28px', // Adjust font size as needed
+    fontWeight: 'bold',
+    fontFamily: '"Times New Roman", Times, serif',
+  };
+
+  const renderTitle = (): JSX.Element => {
+    if (isEditing) {
+      return (
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          onBlur={handleTitleSubmit}
+          onKeyDown={handleTitleSubmit}
+          autoFocus
+          style={titleStyle} // Slightly smaller font for input
+        />
+      );
+    } else {
+      return (
+        <h1 onClick={handleTitleClick} style={titleStyle}>
+          {title}
+        </h1>
+      );
+    }
+  };
+
+
   return (
     <div className="w-full h-full flex flex-row min-h-screen">
       <div className="flex self-stretch basis-3/4">
@@ -599,6 +662,10 @@ export default function Graph() {
           </Panel>
           <Controls />
         </ReactFlow>
+
+        <div>
+          {renderTitle()}
+        </div>
       </div>
       <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500">
         {/* add comment page */}

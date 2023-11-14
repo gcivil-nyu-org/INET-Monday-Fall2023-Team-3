@@ -58,6 +58,7 @@ export type IEdge = {
 export type IGraph = {
   id: string;
   editingEnabled: boolean;
+  title: string;
   nodes: INode[]
   edges: IEdge[]
   user: string;
@@ -89,5 +90,5 @@ export type INodePosition = {
 }
 
 export type IGraphList = {
-  graphList: string[];
+  graphList: string[][];
 };

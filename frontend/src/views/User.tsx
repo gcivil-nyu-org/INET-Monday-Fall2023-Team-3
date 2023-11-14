@@ -9,7 +9,7 @@ export default function User() {
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-  const [graphList, setGraphList] = useState<string[]>([]);
+  const [graphList, setGraphList] = useState<string[][]>([]);
 
   useEffect(() => {
     userGet(sessionStorage.getItem("token")!).then((result) => {
@@ -71,9 +71,9 @@ export default function User() {
     navigate("/graph");
   };
 
-  const graphDataArray = graphList.map(graphId => ({
-    id: graphId,
-    title: "Dummy Title",
+  const graphDataArray = graphList.map(graphInfo => ({
+    id: graphInfo[0],
+    title: graphInfo[1],
     imgUrl: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
   }));
 

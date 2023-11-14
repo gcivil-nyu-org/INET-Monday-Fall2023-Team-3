@@ -161,15 +161,18 @@ def graph_update_delete(request):
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_list_get(request, user_email):
-    graph_id_list = Graph.objects.filter(user__email=user_email).values_list(
-        "id", flat=True
+    graph_id_title_list = Graph.objects.filter(user__email=user_email).values_list(
+        "id",
+        "title",
     )
-    print(type(graph_id_list))
-    graph_id_list = list(graph_id_list)
-    for i in range(len(graph_id_list)):
-        graph_id_list[i] = str(graph_id_list[i])
-    print(graph_id_list)
-    return Response({"graph_list": graph_id_list}, status=status.HTTP_200_OK)
+    graph_id_title_list = list(graph_id_title_list)
+    for i in range(len(graph_id_title_list)):
+        graph_id_title_list[i] = [
+            str(graph_id_title_list[i][0]),
+            graph_id_title_list[i][1],
+        ]
+    print(graph_id_title_list)
+    return Response({"graph_list": graph_id_title_list}, status=status.HTTP_200_OK)
 
 
 @api_view(["PUT"])
@@ -196,6 +199,20 @@ def node_position_set(request):
                 }
             )
         graph_instance.node_positions = node_position_list
+        graph_instance.save()
+        return Response(status=status.HTTP_200_OK)
+    except Graph.DoesNotExist:
+        return GRAPH_404_RESPONSE
+
+
+@api_view(["PUT"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_title_set(request):
+    new_title = request.data["title"]
+    try:
+        graph_instance = Graph.objects.get(id=request.data["id"])
+        graph_instance.title = new_title
         graph_instance.save()
         return Response(status=status.HTTP_200_OK)
     except Graph.DoesNotExist:
