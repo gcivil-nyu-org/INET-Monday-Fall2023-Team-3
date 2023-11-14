@@ -51,3 +51,5 @@ export type IGraphDeleteBody = undefined;
 export type INodePositionBody = INodePosition;
 
 export type IGraphListBody = undefined;
+
+export type IGraphTitleBody = Pick<IGraph, "title"> & Pick<IGraph, "id">;

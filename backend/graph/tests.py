@@ -152,3 +152,17 @@ class GraphTests(APITestCase):
             "/backend/graph/node-position/", request_data, format="json"
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_graph_title_set(self):
+        graph = Graph.objects.create(user=self.user)
+        request_data = {"id": str(graph.id), "title": "test"}
+        response = self.client.put(
+            "/backend/graph/title-set/", request_data, format="json"
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_graph_list_get(self):
+        graph = Graph.objects.create(user=self.user, title="test")
+        response = self.client.get(f"/backend/graph/list-get/{self.user.email}/")
+        assert response.data == [[graph.id, graph.title]]
+        assert response.status_code == status.HTTP_200_OK

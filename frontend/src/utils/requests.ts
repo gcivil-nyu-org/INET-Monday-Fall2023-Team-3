@@ -22,6 +22,7 @@ import {
   IUserUpdateBody,
   INodePositionBody,
   IGraphListBody,
+  IGraphTitleBody,
 } from "./bodies";
 import { IGraphList } from "./models";
 import {
@@ -48,6 +49,7 @@ import {
   IUserUpdateResponse,
   INodePositionResponse,
   IGraphListResponse,
+  IGraphTitleResponse,
 } from "./responses";
 
 // add endpoints to this type to enable code autocomplete
@@ -215,5 +217,12 @@ export type Endpoints = {
     method: "GET";
     bodyType: IGraphListBody;
     resultType: IGraphListResponse;
+  };
+  "/graph/title-set/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: IGraphTitleBody;
+    resultType: IGraphTitleResponse;
   };
 }
