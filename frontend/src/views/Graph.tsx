@@ -37,6 +37,7 @@ import {
   nodeGet,
   edgeGet,
   graphNodePosition,
+  graphUpdateDelete,
   graphTitleSet,
 } from "utils/backendRequests";
 import { useLocation } from "react-router-dom";
@@ -73,8 +74,8 @@ export default function Graph() {
     console.log("graph: ", graph);
     if (graph !== undefined) {
       sessionStorage.setItem("graphId", graph.id);
+      setTitle(graph.title);
       for(let i=0; i<graph.nodes.length; i++){
-        setTitle(graph.title);
         nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
           if (result.status) {
             const node = result.value;
@@ -125,7 +126,7 @@ export default function Graph() {
       }
     }
 
-  }, [graph, setEdges, setNodes]);
+  }, [graph, setEdges, setNodes, setTitle]);
 
   useEffect(() => {
     async function fetchPredefinedNodes() {
@@ -472,6 +473,8 @@ export default function Graph() {
         currentIds.filter((id) => !deleted.some((node) => node.id === id))
       );
 
+      // delete predefined node from from graph
+
       // get all attached edges
       const invalidEdges = deleted.flatMap((node) => getConnectedEdges([node], edges));
       // update edges
@@ -514,6 +517,17 @@ export default function Graph() {
           if (node.data.predefined === false) {
             // do not delete predefined data
             nodeDelete(node.id, sessionStorage.getItem("token")!);
+          } else {
+            graphUpdateDelete(
+              { id: sessionStorage.getItem("graphId")!, nodes: [node.data] },
+              sessionStorage.getItem("token")!
+            ).then((result) => {
+              if (result.status) {
+                console.log("Node deleted from graph");
+              } else {
+                console.log("Cannot delete node from graph");
+              };
+            });
           }
         });
       });

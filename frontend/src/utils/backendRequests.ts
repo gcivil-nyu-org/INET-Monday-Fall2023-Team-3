@@ -226,6 +226,11 @@ export const graphUpdateAdd: RestfulRequestHelper<"/graph/update-add/"> = (body,
   return restfulRequest("/graph/update-add/", "PUT", { body, token });
 };
 
+export const graphUpdateDelete: RestfulRequestHelper<"/graph/update-delete/"> = (body, token) => {
+  return restfulRequest("/graph/update-delete/", "PUT", { body, token });
+}
+
+
 export const graphDelete: RestfulRequestHelper<"/graph/delete/"> = (param, token) => {
   return restfulRequest("/graph/delete/", "DELETE", { param, token });
 };
