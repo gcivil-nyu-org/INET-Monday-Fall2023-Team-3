@@ -240,6 +240,13 @@ export type Endpoints = {
     bodyType: IGraphUpdateBody;
     resultType: IGraphUpdateResponse;
   };
+  "/graph/update-delete/": {
+    param: false;
+    authenticate: true;
+    method: "PUT";
+    bodyType: IGraphUpdateBody;
+    resultType: IGraphUpdateResponse;
+  };
   "/graph/delete/": {
     param: true;
     authenticate: true;

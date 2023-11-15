@@ -25,9 +25,14 @@ export default function User() {
     if(userEmail !== ""){
       graphListGet(userEmail, sessionStorage.getItem("token")!).then((result) => {
         if (result.status) {
-          setGraphList(result.value.graphList);
-          console.log("returned Graph list: ");
-          console.log(result.value.graphList);
+          if (result.value.graphList) {
+            setGraphList(result.value.graphList);
+            console.log("returned Graph list: ");
+            console.log(result.value.graphList);
+          }
+          else{
+            console.log("graph list is undefiend!");
+          }
         } else {
           console.log("could not get graph");
         }
