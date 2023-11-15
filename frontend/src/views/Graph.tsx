@@ -616,7 +616,7 @@ export default function Graph() {
           onBlur={handleTitleSubmit}
           onKeyDown={handleTitleSubmit}
           autoFocus
-          style={titleStyle} // Slightly smaller font for input
+          style={titleStyle}
         />
       );
     } else {
