@@ -1,5 +1,5 @@
 import { Handle, Position } from "reactflow";
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { INode } from "utils/models";
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -12,8 +12,18 @@ export type SmoothNodeProp = {
 };
 
 export default function SmoothNode({ data }: SmoothNodeProp) {
+  const nodeId = data.id
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
-  const [nodeColor, setNodeColor] = useState<string>('#87CEEB'); // Initial color is blue
+  const [nodeColor, setNodeColor] = useState<string>(() => {
+    // Retrieve the color from local storage, default to blue if not present
+    return localStorage.getItem(nodeId) || '#87CEEB';
+    // this allows you to save the color of each node
+  });
+
+  useEffect(() => {
+    // Update local storage when nodeColor changes
+    localStorage.setItem(nodeId, nodeColor);
+  }, [nodeId, nodeColor]);
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.preventDefault();
@@ -24,6 +34,7 @@ export default function SmoothNode({ data }: SmoothNodeProp) {
     }
   };
 
+  // note: the same predefined node in all your graphs will change color together
   const handleColorSelect = (color: string) => {
     // Update the node color
     setNodeColor(color);
@@ -53,10 +64,20 @@ export default function SmoothNode({ data }: SmoothNodeProp) {
         anchorEl={menuAnchor}
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
+        transformOrigin={{horizontal: 'left', vertical: 'top'}}
       >
-        <MenuItem onClick={() => handleColorSelect('#87CEEB')}>Blue</MenuItem>
-        <MenuItem onClick={() => handleColorSelect('#FFA500')}>Orange</MenuItem>
-        <MenuItem onClick={() => handleColorSelect('#808080')}>Gray</MenuItem>
+        <MenuItem onClick={() => handleColorSelect('#87CEEB')}>
+          Regular
+          <span style={{ width: '10px', height: '10px', marginRight: '8px', backgroundColor: '#87CEEB', borderRadius: '50%', display: 'inline-block', margin:'5px'}}></span>
+        </MenuItem>
+        <MenuItem onClick={() => handleColorSelect('#FFA500')}>
+          Urgent
+          <span style={{ width: '10px', height: '10px', marginRight: '8px', backgroundColor: '#FFA500', borderRadius: '50%', display: 'inline-block', margin:'5px'}}></span>
+        </MenuItem>
+        <MenuItem onClick={() => handleColorSelect('#808080')}>
+          Done
+          <span style={{ width: '10px', height: '10px', marginRight: '8px', backgroundColor: '#808080', borderRadius: '50%', display: 'inline-block', margin:'5px'}}></span>
+        </MenuItem>
       </Menu>
     </>
   );
