@@ -273,7 +273,7 @@ export default function Graph() {
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
-            position: { x: 0, y: 0 },
+            position: { x: 350, y: 350 },
             data: submittedNode,
           });
         }
