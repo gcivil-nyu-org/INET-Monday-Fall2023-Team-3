@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -160,7 +161,7 @@ CHANNEL_LAYERS = {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
             "hosts": [
-                ("rediscluster.t2msds.clustercfg.usw2.cache.amazonaws.com", 6379),
+                (os.environ.get("REDIS_ENDPOINT_URL"), os.environ.get("REDIS_PORT")),
                 ("127.0.0.1", 6379),
             ],
         },
