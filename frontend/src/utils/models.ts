@@ -58,6 +58,7 @@ export type IEdge = {
 export type IGraph = {
   id: string;
   editingEnabled: boolean;
+  title: string;
   nodes: INode[]
   edges: IEdge[]
   user: string;
@@ -90,3 +91,16 @@ export type IComment = {
   createdAt: string;
 }
 
+/**
+ * a type define a node's position on graph
+ */
+export type INodePosition = {
+  graphId: string;
+  nodeId: string;
+  x: number;
+  y: number;
+}
+
+export type IGraphList = {
+  graphList: string[][];
+};

@@ -181,7 +181,6 @@ class EdgeAPITest(APITestCase):
         response = self.client.post(
             "/backend/edge/create/", data=valid_edge, format="json"
         )
-
         response = self.client.delete(f"/backend/edge/delete/{response.data['id']}/")
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
