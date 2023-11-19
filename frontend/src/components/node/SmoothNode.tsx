@@ -13,20 +13,21 @@ export type SmoothNodeProp = {
 
 export default function SmoothNode({ data }: SmoothNodeProp) {
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
+  const [nodeColor, setNodeColor] = useState<string>('#87CEEB'); // Initial color is blue
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     event.preventDefault();
 
-    // Check if the right mouse button was clicked
+    // Check if the right mouse button was clicked. 2 refers to right click
     if (event.button === 2) {
       setMenuAnchor(event.currentTarget);
     }
   };
 
   const handleColorSelect = (color: string) => {
-    // Implement logic to update the node color based on the selected color
-    // ...
-
+    // Update the node color
+    setNodeColor(color);
+    console.log("new color is: " + nodeColor);
     // Close the menu
     setMenuAnchor(null);
   };
@@ -37,7 +38,7 @@ export default function SmoothNode({ data }: SmoothNodeProp) {
       <Handle type="target" position={Position.Top} />
       <Paper
         elevation={3}
-        style = {{backgroundColor: '#87CEEB'}}
+        style = {{backgroundColor: nodeColor}}
         className="p-4 rounded-md"
         onContextMenu={handleContextMenu}
       >
@@ -53,8 +54,9 @@ export default function SmoothNode({ data }: SmoothNodeProp) {
         open={Boolean(menuAnchor)}
         onClose={() => setMenuAnchor(null)}
       >
-        <MenuItem onClick={() => handleColorSelect('#87CEEB')}>Sky Blue</MenuItem>
-        {/* Add more color options as needed */}
+        <MenuItem onClick={() => handleColorSelect('#87CEEB')}>Blue</MenuItem>
+        <MenuItem onClick={() => handleColorSelect('#FFA500')}>Orange</MenuItem>
+        <MenuItem onClick={() => handleColorSelect('#808080')}>Gray</MenuItem>
       </Menu>
     </>
   );
