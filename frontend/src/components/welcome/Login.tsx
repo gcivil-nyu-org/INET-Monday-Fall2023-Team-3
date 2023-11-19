@@ -17,6 +17,7 @@ export default function Login() {
       email: email,
       password: password,
     }).then((result) => {
+      console.log(result);
       if (result.status) {
         setErrorMessage("");
         console.log(result.value);
