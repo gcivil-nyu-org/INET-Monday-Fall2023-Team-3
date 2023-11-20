@@ -1,6 +1,6 @@
 import { userGet, userUpdate } from "utils/backendRequests";
 import { IUser } from "utils/models";
-import { TextField, Alert, Button } from "@mui/material";
+import { TextField, Alert, Button, Avatar } from "@mui/material";
 import { ChangeEvent, useState, useEffect } from "react";
 
 export default function Update() {
@@ -66,8 +66,34 @@ export default function Update() {
     });
   };
 
+  const pokemonUrlPartial = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/0";
+  const [avatarSrc, setAvatarSrc] = useState(pokemonUrlPartial + "01.png");
+
+  const changeAvatar = () => {
+    console.log("avatar clicked");
+    const randomNum = Math.floor(Math.random() * 99) + 1;
+    console.log(randomNum);
+    let newUrl = pokemonUrlPartial + randomNum.toString() + ".png";
+    if (randomNum < 10) {
+      newUrl = pokemonUrlPartial + "0" + randomNum.toString() + ".png";
+    }
+    setAvatarSrc(newUrl);
+      return;
+  };
+
   return (
     <div className="w-full flex flex-col items-center bg-white">
+      <div className="mt-8 mb-4">
+        <Avatar
+          alt="Pokemon"
+          src={avatarSrc}
+          sx={{ width: 100, height: 100, border: "2px solid rgba(164, 164, 164, 0.8)",
+          cursor: "pointer", // Change cursor to hand on hover
+          transition: "transform 0.3s", }}
+          onClick={changeAvatar}
+        />
+      </div>
+
       <div className="h-24 w-full flex">
         <TextField
           className="h-16 m-4 flex-1"

@@ -106,7 +106,7 @@ export default function User() {
       </div>
 
       <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
-        <DialogTitle>Update</DialogTitle>
+        {/* <DialogTitle>Update</DialogTitle> */}
         <Update />
       </Dialog>
 
