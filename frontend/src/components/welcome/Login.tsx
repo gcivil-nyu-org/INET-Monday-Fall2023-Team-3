@@ -17,11 +17,13 @@ export default function Login() {
       email: email,
       password: password,
     }).then((result) => {
+      console.log(result);
       if (result.status) {
         setErrorMessage("");
         console.log(result.value);
 
         sessionStorage.setItem("token", result.value.token);
+        // only navigate to user page if login was successful
         navigate("/user");
       } else {
         setErrorMessage(result.error);

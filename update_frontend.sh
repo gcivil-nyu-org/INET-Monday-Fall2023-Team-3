@@ -19,4 +19,4 @@ cd ..
 cd ./backend
 black .
 flake8 .
-cd ..
+python manage.py runserver
