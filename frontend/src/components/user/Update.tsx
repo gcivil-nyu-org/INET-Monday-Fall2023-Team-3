@@ -3,7 +3,12 @@ import { IUser } from "utils/models";
 import { TextField, Alert, Button, Avatar } from "@mui/material";
 import { ChangeEvent, useState, useEffect } from "react";
 
-export default function Update() {
+interface UpdateProps {
+  onAvatarChanged: (newUrl: string) => void;
+  avatarSrc: string;
+}
+
+export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
   const [severity, setSeverity] = useState<"error" | "success">("error");
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
@@ -67,7 +72,6 @@ export default function Update() {
   };
 
   const pokemonUrlPartial = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/0";
-  const [avatarSrc, setAvatarSrc] = useState(pokemonUrlPartial + "01.png");
 
   const changeAvatar = () => {
     console.log("avatar clicked");
@@ -77,8 +81,7 @@ export default function Update() {
     if (randomNum < 10) {
       newUrl = pokemonUrlPartial + "0" + randomNum.toString() + ".png";
     }
-    setAvatarSrc(newUrl);
-      return;
+    onAvatarChanged(newUrl);
   };
 
   return (
