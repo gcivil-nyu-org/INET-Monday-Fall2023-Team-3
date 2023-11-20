@@ -1,15 +1,24 @@
 import GraphEntry, { IGraphEntryProp } from "./GraphEntry";
+import { Button } from "@mui/material";
 
 type IGraphListProp = {
   name: string;
   graphs: IGraphEntryProp[];
 };
 
+const onEditClicked = () => {
+  console.log("edit clicked");
+}
+
 export default function GraphList({ name, graphs }: IGraphListProp) {
   return (
     <div className="flex flex-col self-stretch">
       <div className="h-16 m-4">
-        <span className="h-16 flex items-center text-center m-auto text-lg">{name}</span>
+        <span className="text-lg">{name}</span>
+        <Button
+          className="h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60"
+          onClick={onEditClicked}
+        >Edit</Button>
       </div>
       <div className="flex flex-1 flex-row">
         {graphs.map((graph) => (
