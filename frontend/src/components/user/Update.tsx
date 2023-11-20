@@ -82,6 +82,8 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
       newUrl = pokemonUrlPartial + "0" + randomNum.toString() + ".png";
     }
     onAvatarChanged(newUrl);
+    localStorage.setItem("storedAvatarSrc", newUrl)
+    console.log("stored url from pop up:" + localStorage.getItem("storedAvatarSrc"));
   };
 
   return (

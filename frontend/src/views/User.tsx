@@ -10,7 +10,9 @@ export default function User() {
   const [update, setUpdate] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [graphList, setGraphList] = useState<string[][]>([]);
-  const [avatarSrc, setAvatarSrc] = useState("https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png");
+  const storedAvatarSrc = localStorage.getItem("storedAvatarSrc");
+  console.log("storedAvatarSrc: " + storedAvatarSrc);
+  const [avatarSrc, setAvatarSrc] = useState(storedAvatarSrc || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png");
 
   useEffect(() => {
     userGet(sessionStorage.getItem("token")!).then((result) => {
