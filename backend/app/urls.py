@@ -24,4 +24,5 @@ urlpatterns = [
     path(f"{BACKEND_URL_ENDPOINT}/user/", include("user.urls")),
     path(f"{BACKEND_URL_ENDPOINT}/node/", include("node.urls")),
     path(f"{BACKEND_URL_ENDPOINT}/edge/", include("edge.urls")),
+    path(f"{BACKEND_URL_ENDPOINT}/graph/", include("graph.urls")),
 ]
