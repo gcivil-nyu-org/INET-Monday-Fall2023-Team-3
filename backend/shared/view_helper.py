@@ -89,19 +89,19 @@ def handle_get(
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
-def handle_update(
+def handle_patch(
     model_class: Type[models.Model],
     instance_identifier: dict,
-    update_data: dict,
+    patch_data: dict,
     serializer_class: Type[serializers.Serializer],
     not_found_response: Response,
 ) -> Response:
-    """handle simple partial update for http request
+    """handle simple patch for http request
 
     Args:
         model_class (Type[models.Model]): model class of the instance
         instance_identifier (dict): keys and values to uniquely identify model instance
-        update_data (dict): request body containing update data
+        patch_data (dict): request body containing patch data
         serializer_class (Type[serializers.Serializer]): serializer for the instance model
         not_found_response (Response): response when instance not found
 
@@ -112,12 +112,12 @@ def handle_update(
     # instance not found -> not found response
     if instance is None:
         return not_found_response
-    # instantiate partial update serialzier
-    serializer = serializer_class(instance=instance, data=update_data, partial=True)
+    # instantiate patch serialzier
+    serializer = serializer_class(instance=instance, data=patch_data, partial=True)
     # serializer invalid -> invalid format response
     # serializer will never be invalid since partial=True
 
-    # update model instance
+    # patch model instance
     serializer.save()
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
