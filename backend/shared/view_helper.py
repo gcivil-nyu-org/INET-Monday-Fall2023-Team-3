@@ -116,7 +116,7 @@ def handle_patch(
     serializer = serializer_class(instance=instance, data=patch_data, partial=True)
     # serializer invalid -> invalid format response
     # serializer will never be invalid since partial=True
-
+    serializer.is_valid(raise_exception=True)
     # patch model instance
     serializer.save()
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
