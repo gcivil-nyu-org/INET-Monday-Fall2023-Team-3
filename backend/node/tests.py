@@ -48,12 +48,12 @@ class NodeTest(CustomTestCase):
 
     def test_node_create(self):
         create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
-        # test invalid format
+        # test for invalid format
         response = self.client.post(create_endpoint, data=invalid_node)
         self.assertResponseEqual(
             expect=views.NODE_CREATE_INVALID_FORMAT_RESPONSE, response=response
         )
-        # test success create
+        # test for success create
         response = self.client.post(create_endpoint, data=valid_node_1)
         self.assertResponseDataKeyEqual(
             key="name", expect=valid_node_1, response=response
