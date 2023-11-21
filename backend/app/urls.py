@@ -23,4 +23,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path(f"{BACKEND_URL_ENDPOINT}/user/", include("user.urls")),
     path(f"{BACKEND_URL_ENDPOINT}/node/", include("node.urls")),
+    path(f"{BACKEND_URL_ENDPOINT}/edge/", include("edge.urls")),
 ]
