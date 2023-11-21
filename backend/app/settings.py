@@ -37,6 +37,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django_extensions",
+    "rest_framework",
+    "rest_framework.authtoken",
+    "app",
+    "user",
+    "node",
+    "edge",
+    "graph",
+    "comment",
 ]
 
 MIDDLEWARE = [
@@ -123,4 +132,13 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Backend endpoint prefix
-BACKEND_URL_ENDPOINT: "backend/"
+BACKEND_URL_ENDPOINT = "backend"
+
+# Change anth user model
+AUTH_USER_MODEL = "user.User"
+
+# RESTful framework
+REST_FRAMEWORK = {
+    # default no permission
+    "DEFAULT_PERMISSION_CLASSES": []
+}
