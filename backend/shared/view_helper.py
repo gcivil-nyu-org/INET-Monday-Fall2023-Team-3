@@ -93,8 +93,9 @@ def handle_patch(
     model_class: Type[models.Model],
     instance_identifier: dict,
     patch_data: dict,
-    serializer_class: Type[serializers.Serializer],
+    patch_serializer_class: Type[serializers.Serializer],
     not_found_response: Response,
+    result_serializer_class: Type[serializers.Serializer] = None,
 ) -> Response:
     """handle simple patch for http request
 
@@ -102,8 +103,9 @@ def handle_patch(
         model_class (Type[models.Model]): model class of the instance
         instance_identifier (dict): keys and values to uniquely identify model instance
         patch_data (dict): request body containing patch data
-        serializer_class (Type[serializers.Serializer]): serializer for the instance model
+        patch_serializer_class (Type[serializers.Serializer]): serializer for patching the instance model
         not_found_response (Response): response when instance not found
+        result_serializer_class (Type[serializers.Serializer]): serializer for returning the instance model
 
     Returns:
         Response: corresponding response
@@ -113,12 +115,18 @@ def handle_patch(
     if instance is None:
         return not_found_response
     # instantiate patch serialzier
-    serializer = serializer_class(instance=instance, data=patch_data, partial=True)
+    serializer = patch_serializer_class(
+        instance=instance, data=patch_data, partial=True
+    )
     # serializer invalid -> invalid format response
     # serializer will never be invalid since partial=True
     serializer.is_valid(raise_exception=True)
-    # patch model instance
-    serializer.save()
+    if result_serializer_class is None:
+        # patch model instance
+        serializer.save()
+        return Response(ok(serializer.data), status=status.HTTP_200_OK)
+    instance = serializer.save()
+    serializer = result_serializer_class(instance=instance)
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 

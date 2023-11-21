@@ -94,7 +94,7 @@ def edge_patch(request: Request, edge_id: str):
         model_class=Edge,
         instance_identifier={"id": edge_id},
         patch_data=request.data,
-        serializer_class=EdgeSerializer,
+        patch_serializer_class=EdgeSerializer,
         not_found_response=EDGE_PATCH_NOT_FOUND_RESPONSE,
     )
 

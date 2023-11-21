@@ -94,7 +94,7 @@ def node_patch(request: Request, node_id: str):
         model_class=Node,
         instance_identifier={"id": node_id},
         patch_data=request.data,
-        serializer_class=NodeSerializer,
+        patch_serializer_class=NodeSerializer,
         not_found_response=NODE_PATCH_NOT_FOUND_RESPONSE,
     )
 
