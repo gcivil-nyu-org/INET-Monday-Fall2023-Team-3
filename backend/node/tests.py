@@ -1,7 +1,6 @@
 import uuid
 
 from rest_framework import status
-from rest_framework.authtoken.models import Token
 from shared.test_helper import CustomTestCase, get_actual_endpoint
 from user.models import User
 
@@ -43,13 +42,12 @@ class NodeTest(CustomTestCase):
 
     def test_node_ping(self):
         ping_endpoint = actual_endpoint(views.NODE_PING_PATH)
-        # tst ping response
+        # test ping response
         response = self.client.get(ping_endpoint)
         self.assertResponseEqual(expect=views.NODE_PING_OK_RESPONSE, response=response)
 
     def test_node_create(self):
         create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
-        # test create response
         # test invalid format
         response = self.client.post(create_endpoint, data=invalid_node)
         self.assertResponseEqual(
