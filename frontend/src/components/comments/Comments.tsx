@@ -37,6 +37,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
     // Establish WebSocket connection
 
     if (ws.current === null) {
+      console.log(wsUrl);
       ws.current = new WebSocket("ws://smooth-dirty.us-west-2.elasticbeanstalk.com:80/ws/comment/");
 
       ws.current.onopen = () => {
