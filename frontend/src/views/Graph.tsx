@@ -270,6 +270,52 @@ export default function Graph() {
               console.log("Cannot add node to graph");
             }
           });
+          if (submittedNode.predefined) {
+            // automatically add edges between predefined nodes
+            const dependencies = submittedNode.dependencies;
+            for (let i = 0; i < dependencies.length; i++) {
+              const dependency = dependencies[i];
+              if (onCanvasNodeIds.includes(dependency)) {  // this should be update with the algorithm
+                // TODO!!!
+                edgeCreate(
+                  { source: dependency, target: submittedNode.id },
+                  sessionStorage.getItem("token")!
+                ).then((result) => {
+                  if (result.status) {
+                    console.log(`created edge with id ${result.value.id}`);
+                    // add edge to graph
+                    graphUpdateAdd(
+                      { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+                      sessionStorage.getItem("token")!
+                    ).then((graphResult) => {
+                      if (graphResult.status) {
+                        console.log("edge added to graph");
+                      } else {
+                        console.log("Cannot add edge to graph");
+                      }
+                    });
+                    // add edge
+                    setEdges((edges) => {
+                      return edges.concat({
+                        id: result.value.id,
+                        source: result.value.source,
+                        target: result.value.target,
+                        style: {
+                          strokeWidth: 3,
+                        },
+                        markerEnd: {
+                          type: MarkerType.Arrow,
+                        }
+                      });
+                    });
+                  } else {
+                    console.log("Cannot create edge");
+                  }
+                });
+              }
+            }
+          }
+
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
