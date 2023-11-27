@@ -319,7 +319,7 @@ export default function Graph() {
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
-            position: { x: 0, y: 0 },
+            position: { x: 350, y: 100 },
             data: submittedNode,
           });
         }
@@ -650,6 +650,8 @@ export default function Graph() {
     fontSize: '28px', // Adjust font size as needed
     fontWeight: 'bold',
     fontFamily: '"Times New Roman", Times, serif',
+    zIndex: 100,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)'
   };
 
   const renderTitle = (): JSX.Element => {

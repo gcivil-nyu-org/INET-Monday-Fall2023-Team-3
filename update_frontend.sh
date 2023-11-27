@@ -9,14 +9,14 @@ mkdir static
 cd ..
 # copy frontend files to backend
 cp -r ./frontend/build/* ./backend/static
-# backend migration
-cd ./backend
-python manage.py makemigrations
-python manage.py migrate
-cd ..
+# # backend migration
+# cd ./backend
+# python manage.py makemigrations
+# python manage.py migrate
+# cd ..
 
-# fix format
+# # fix format
 cd ./backend
-black .
-flake8 .
-cd ..
+# black .
+# flake8 .
+python manage.py runserver

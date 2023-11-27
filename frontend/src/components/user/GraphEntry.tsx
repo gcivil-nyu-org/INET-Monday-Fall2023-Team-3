@@ -1,6 +1,9 @@
-import { Card, CardContent, CardHeader } from "@mui/material";
+import { Card, CardContent, CardHeader, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { graphGet } from "utils/backendRequests";
+import { useState } from "react";
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+
 
 export type IGraphEntryProp = {
   id: string;
@@ -8,8 +11,12 @@ export type IGraphEntryProp = {
   imgUrl: string;
 };
 
+
+
 export default function GraphEntry({ id, title, imgUrl }: IGraphEntryProp) {
   const navigate = useNavigate();
+  const [closeButton, setcloseButton] = useState(false);
+
   const onGraphClicked = () => {
     console.log(`redirect to graph`);
     graphGet(id, sessionStorage.getItem("token")!).then((result) => {
@@ -30,9 +37,14 @@ export default function GraphEntry({ id, title, imgUrl }: IGraphEntryProp) {
 
   return (
     <div className="flex flex-1" onClick={onGraphClicked}>
-      <Card>
-        <CardHeader title={title} />
+      <Card className="relative">
+        <CardHeader title={title}></CardHeader>
         <CardContent>
+          <IconButton color="error" className="absolute top-1 right-1">
+              <DeleteForeverIcon
+                onClick={() => console.log("delete button clicked")}
+              />
+          </IconButton>
           <img src={imgUrl} alt="graph" />
         </CardContent>
       </Card>

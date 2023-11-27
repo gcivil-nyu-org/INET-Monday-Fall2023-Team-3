@@ -10,6 +10,9 @@ export default function User() {
   const [update, setUpdate] = useState(false);
   const [userEmail, setUserEmail] = useState("");
   const [graphList, setGraphList] = useState<string[][]>([]);
+  const storedAvatarSrc = localStorage.getItem("storedAvatarSrc");
+  console.log("storedAvatarSrc: " + storedAvatarSrc);
+  const [avatarSrc, setAvatarSrc] = useState(storedAvatarSrc || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png");
 
   useEffect(() => {
     userGet(sessionStorage.getItem("token")!).then((result) => {
@@ -82,6 +85,12 @@ export default function User() {
     imgUrl: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
   }));
 
+  const onAvatarChange = (newUrl:string) => {
+    setAvatarSrc(newUrl);
+    setUpdate(false);
+  }
+
+
 
   return (
     <div className="w-full h-full flex flex-col min-h-screen">
@@ -100,14 +109,16 @@ export default function User() {
             className="h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60"
             onClick={() => setUpdate(true)}
           >
-            <Avatar className="w-12 h-12" src="https://mui.com/static/images/avatar/1.jpg" />
+            <Avatar className="w-12 h-12" src={avatarSrc} />
           </Button>
         </div>
       </div>
 
       <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
-        <DialogTitle>Update</DialogTitle>
-        <Update />
+         <Update
+          onAvatarChanged={onAvatarChange}
+          avatarSrc={avatarSrc}
+         />
       </Dialog>
 
       <GraphList

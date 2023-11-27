@@ -82,7 +82,7 @@ export const parseResponse = async <ResultType extends {} | undefined>(
   }
 
   // When calling graphUpdateAdd, the server will return 200 with empty body
-  if (response.ok && response.headers.get("content-length") === "0") {
+  if (response.headers.get("content-length") === "0") { // fixed !response.ok bug
     return {
       status: true,
       value: {} as ResultType,

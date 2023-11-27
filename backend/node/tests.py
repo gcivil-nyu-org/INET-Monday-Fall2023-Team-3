@@ -134,6 +134,19 @@ class NodeAPITest(APITestCase):
         self.assertEqual(len(response.data["dependencies"]), 1)
         self.assertEqual(str(response.data["dependencies"][0]), node2_id)
 
+        response = self.client.put(
+            "/backend/node/update/",
+            {
+                "id": node1_id,
+                "name": "CSE 163",
+                "description": "CSE 163 class(Updated)",
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["name"], "CSE 163")
+        self.assertEqual(response.data["id"], node1_id)
+
     def test_node_delete(self):
         response = self.client.delete(f"/backend/node/delete/{uuid.uuid4()}/")
 
