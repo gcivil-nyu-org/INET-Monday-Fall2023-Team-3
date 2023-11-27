@@ -6,6 +6,7 @@ import json
 
 class CommentConsumer(WebsocketConsumer):
     def connect(self):
+        
         self.group_name = "comments"
         async_to_sync(self.channel_layer.group_add)(self.group_name, self.channel_name)
         self.accept()

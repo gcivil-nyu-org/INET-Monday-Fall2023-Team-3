@@ -162,8 +162,7 @@ def graph_update_delete(request):
 @permission_classes([IsAuthenticated])
 def graph_list_get(request, user_email):
     graph_id_title_list = Graph.objects.filter(user__email=user_email).values_list(
-        "id",
-        "title",
+        "id", "title",
     )
     graph_id_title_list = list(graph_id_title_list)
     for i in range(len(graph_id_title_list)):

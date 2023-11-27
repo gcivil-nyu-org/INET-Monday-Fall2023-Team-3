@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
   Controls,
+  ControlButton,
   Panel,
   Node,
   Connection,
@@ -54,6 +55,7 @@ export default function Graph() {
   const [successMessage, setSuccessMessage] = useState("");
   const [showInfo, setShowInfo] = useState(false);
   const [infoMessage, setInfoMessage] = useState("");
+  const [interactiveStatus, setInteractiveStatus] = useState(true);
 
   const [predefinedNodes, setPredefinedNodes] = useState<INode[]>([]);
   const [onCanvasNodeIds, setOnCanvasNodeIds] = useState<string[]>([]); // only record ids for predefined nodes
@@ -556,6 +558,9 @@ export default function Graph() {
       });
   };
 
+  const onInteractive = (interactiveStatus: boolean): void => {
+    setInteractiveStatus(true);
+  };
 
   const handleTitleClick = (): void => {
     setIsEditing(true);
@@ -689,7 +694,7 @@ export default function Graph() {
               </Button>
             </div>
           </Panel>
-          <Controls />
+          <Controls onInteractiveChange={onInteractive}/>
         </ReactFlow>
 
         <div>
