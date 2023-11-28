@@ -275,6 +275,8 @@ export default function Graph() {
             const dependencies = submittedNode.dependencies;
             for (let i = 0; i < dependencies.length; i++) {
               const dependency = dependencies[i];
+              // first, we check if newly added node's prerequisite is already on the canvas
+              // if so, we create an edge between the two nodes
               if (onCanvasNodeIds.includes(dependency)) {  // this should be update with the algorithm
                 // TODO!!!
                 edgeCreate(
@@ -313,6 +315,55 @@ export default function Graph() {
                   }
                 });
               }
+              // otherwise, we add the dependency to global dependency record
+              else {
+                /*
+                if dependency in dependencyRecord:
+                  dependencyRecord[dependency].append(submittedNode.id)
+                else:
+                  dependencyRecord[dependency] = [submittedNode.id]
+                */
+              }
+              // Finally, we check whether the newly added node is a prerequisite for any other nodes
+              // If so, we create an edge between the two nodes
+              /*
+              if submittedNode.id in dependencyRecord:
+                edgeCreate(
+                  { source: dependency, target: submittedNode.id },
+                  sessionStorage.getItem("token")!
+                ).then((result) => {
+                  if (result.status) {
+                    console.log(`created edge with id ${result.value.id}`);
+                    // add edge to graph
+                    graphUpdateAdd(
+                      { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+                      sessionStorage.getItem("token")!
+                    ).then((graphResult) => {
+                      if (graphResult.status) {
+                        console.log("edge added to graph");
+                      } else {
+                        console.log("Cannot add edge to graph");
+                      }
+                    });
+                    // add edge
+                    setEdges((edges) => {
+                      return edges.concat({
+                        id: result.value.id,
+                        source: result.value.source,
+                        target: result.value.target,
+                        style: {
+                          strokeWidth: 3,
+                        },
+                        markerEnd: {
+                          type: MarkerType.Arrow,
+                        }
+                      });
+                    });
+                  } else {
+                    console.log("Cannot create edge");
+                  }
+                });
+              */
             }
           }
 
@@ -503,6 +554,8 @@ export default function Graph() {
     [nodes, setNodes]
   );
 
+  const updateDependencyRecord = () => {};  // TODO: update dependency record
+
   const onNodesDelete = useCallback(
     async (deleted: Node[]) => {
       // Check if the clicked node is among the deleted nodes
@@ -576,8 +629,10 @@ export default function Graph() {
             });
           }
         });
+        updateDependencyRecord();
       });
       await Promise.all(nodeUpdatePromises).catch(onError);
+
     },
     [clickNode, nodes, edges, setEdges, setNodes]
   );
