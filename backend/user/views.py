@@ -145,6 +145,19 @@ def user_get(request: Request, email: str):
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
+# get endpoint
+USER_GET_SELF_PATH = "self/"
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def user_get_self(request: Request):
+    instance = request.user
+    serializer = serializers.GetSerializer(instance=instance)
+    return Response(ok(serializer.data), status=status.HTTP_200_OK)
+
+
 # get_all endpoint
 USER_GET_ALL_PATH = "all/"
 

@@ -10,5 +10,6 @@ urlpatterns = [
     path(views.USER_LOGIN_PATH, views.user_login, name="login"),
     path(views.USER_PATCH_PATH, views.user_patch, name="patch"),
     path(views.USER_GET_PATH, views.user_get, name="get"),
+    path(views.USER_GET_SELF_PATH, views.user_get_self, name="get-self"),
     path(views.USER_GET_ALL_PATH, views.user_get_all, name="all"),
 ]

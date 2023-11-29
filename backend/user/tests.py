@@ -1,6 +1,6 @@
 from rest_framework import status
 from rest_framework.authtoken.models import Token
-from shared.test_helper import CustomTestCase, get_actual_endpoint
+from shared.test_helper import CustomTestCase, basic_user, get_actual_endpoint
 
 from . import serializers, views
 from .models import User
@@ -123,6 +123,19 @@ class UserTest(CustomTestCase):
         self.assertResponseOk(response=response)
         self.assertResponseDataKeyEqual(
             key="username", expect=valid_user, response=response
+        )
+
+    def test_user_get_self(self):
+        get_self_endpoint = actual_endpoint(views.USER_GET_SELF_PATH)
+        # test success get
+        response = self.client.get(get_self_endpoint)
+        self.assertResponseOk(response=response)
+
+        self.assertResponseDataKeyEqual(
+            key="email", expect=basic_user, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="username", expect=basic_user, response=response
         )
 
     def test_user_get_all(self):
