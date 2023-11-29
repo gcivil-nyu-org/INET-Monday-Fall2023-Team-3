@@ -24,6 +24,7 @@ export default function Login() {
       setError("");
       console.log(result.value);
       sessionStorage.setItem("token", result.value.token);
+      sessionStorage.setItem("email", loginData.email);
       navigate("/user");
     } else {
       setError(result.detail);
@@ -65,7 +66,7 @@ export default function Login() {
       </div>
       {error !== "" && (
         <div className="h-24 w-full flex">
-          <Alert className="h-16 w-full m-4" severity="error">
+          <Alert className="h-12 w-full m-4" severity="error">
             {error}
           </Alert>
         </div>

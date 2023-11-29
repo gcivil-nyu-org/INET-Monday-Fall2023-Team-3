@@ -30,7 +30,7 @@ export default function SignUp() {
   };
 
   const onSignUpButtonClicked = async () => {
-    console.log(`user: ${signUpData}`);
+    console.log(`user: ${JSON.stringify(signUpData)}`);
     if (!validateSignUp()) return;
 
     const result = await RequestMethods.userSignUp({ body: signUpData });
@@ -39,6 +39,7 @@ export default function SignUp() {
       setError("");
       console.log(result.value);
       sessionStorage.setItem("token", result.value.token);
+      sessionStorage.setItem("email", signUpData.email);
       navigate("/user");
     } else {
       setError(result.detail);
@@ -106,7 +107,7 @@ export default function SignUp() {
       </div>
       {error !== "" && (
         <div className="h-24 w-full flex">
-          <Alert className="h-16 w-full m-4" severity="error">
+          <Alert className="h-12 w-full m-4" severity="error">
             {error}
           </Alert>
         </div>
