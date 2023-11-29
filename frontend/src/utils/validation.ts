@@ -1,25 +1,33 @@
 import validator from "validator";
 
+const validateOption = {
+  minLength: 0,
+  minLowercase: 0,
+  minUppercase: 0,
+  minNumbers: 0,
+  minSymbols: 0,
+};
+
 export namespace Validate {
   export const validatePasswordLength = (password: string) => {
-    const validateOption = {
+    return validator.isStrongPassword(password, {
+      ...validateOption,
       minLength: 8,
-    };
-    return validator.isStrongPassword(password, validateOption);
+    });
   };
 
   export const validatePasswordUppercase = (password: string) => {
-    const validateOption = {
+    return validator.isStrongPassword(password, {
+      ...validateOption,
       minUppercase: 1,
-    };
-    return validator.isStrongPassword(password, validateOption);
+    });
   };
 
   export const validatePasswordSymbol = (password: string) => {
-    const validateOption = {
+    return validator.isStrongPassword(password, {
+      ...validateOption,
       minSymbols: 1,
-    };
-    return validator.isStrongPassword(password, validateOption);
+    });
   };
 
   export const validateEmailHost = (email: string) => {
