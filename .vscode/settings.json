@@ -10,4 +10,7 @@
         "--profile",
         "black"
     ],
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+    }
 }
