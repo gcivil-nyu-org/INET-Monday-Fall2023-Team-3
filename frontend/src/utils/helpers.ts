@@ -2,6 +2,8 @@ import { ResponseModels } from "./models";
 
 const pokemonAvatarSrc = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/";
 
+export const defaultAvatarSrc = `${pokemonAvatarSrc}001.png`;
+
 export const refreshPokemonAvatar = () => {
   const avatarIndex = String(Math.floor(Math.random() * 99) + 1).padStart(3, "0");
   const avatarSrc = `${pokemonAvatarSrc}${avatarIndex}.png`;
