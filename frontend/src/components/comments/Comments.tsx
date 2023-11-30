@@ -19,6 +19,7 @@ import {
   commentDelete,
 } from "utils/backendRequests";
 import { IComment, INode } from "utils/models";
+import usePusher from "./usePusher";
 
 interface CommentsProps {
   node: INode;
@@ -37,7 +38,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
     // Establish WebSocket connection
 
     if (ws.current === null) {
-      console.log("url="+wsUrl);
+      console.log("url=" + wsUrl);
       ws.current = new WebSocket("ws://smooth-dirty.us-west-2.elasticbeanstalk.com/ws/comment/");
 
       ws.current.onopen = () => {
@@ -155,18 +156,25 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
         const newComment = [result.value, ...comments];
         setComments(newComment);
         setActiveComment(null);
+
         // Check if the WebSocket is connected
-        if (ws && ws.current?.readyState === WebSocket.OPEN) {
+        //if (ws && ws.current?.readyState === WebSocket.OPEN) {
           // Send the comment data through the WebSocket
-          ws.current.send(JSON.stringify({ action: "create", data: result.value }));
-        } else {
-          console.error("WebSocket is not connected.");
-        }
+        //  ws.current.send(JSON.stringify({ action: "create", data: result.value }));
+        //} else {
+        //  console.error("WebSocket is not connected.");
+        //}
       } else {
         console.log(result.error);
       }
     });
   };
+
+  // Subscribe to Pusher channel and events
+  usePusher("comments-channel", "new-comment", (newComment: IComment) => {
+    setComments((prevComments) => [...prevComments, newComment]);
+    console.log('usePusher');
+  });
 
   const updateComment = (text: string, commentId: string) => {
     const payload = {

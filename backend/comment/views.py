@@ -12,6 +12,9 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import CommentSerializer
 from .models import Comment, Node
 
+from .pusher import pusher_client
+import json
+
 
 # Helper function to create a detail message
 def detail(msg: str):
@@ -50,12 +53,12 @@ def comment_create(request):
     serializer = CommentSerializer(data=request.data, partial=True)
     if not serializer.is_valid():
         return COMMENT_INVALID_FORMAT_RESPONSE
-
     comment_id = serializer.validated_data.get("id")
     if comment_id and Comment.objects.filter(id=comment_id).exists():
         return COMMENT_ID_ALREADY_EXISTS_RESPONSE
-
     serializer.save()  # Assuming the user is assigned from the request
+    data = json.loads(json.dumps(serializer.data, default=str))
+    pusher_client.trigger("comments-channel", "new-comment", data)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -108,6 +111,7 @@ def comment_update(request):
         serializer.instance = instance
         serializer.save()
         serializer = CommentSerializer(instance=serializer.instance)
+        # pusher_client.trigger('comments-channel', 'update-comment', serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
     except Comment.DoesNotExist:
         return COMMENT_NOT_FOUND_RESPONSE

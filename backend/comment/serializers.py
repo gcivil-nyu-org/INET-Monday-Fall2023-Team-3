@@ -22,6 +22,8 @@ class CommentSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # Create a new Comment instance using the validated data
+        print("create")
+        print(validated_data)
         return Comment.objects.create(**validated_data)
 
     def update(self, instance: Comment, validated_data):
