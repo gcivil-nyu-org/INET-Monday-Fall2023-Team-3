@@ -1,4 +1,11 @@
-import React, { useState, useMemo, useCallback, useEffect, ChangeEvent, KeyboardEvent } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  ChangeEvent,
+  KeyboardEvent,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
@@ -14,7 +21,7 @@ import ReactFlow, {
   Edge,
   MarkerType,
 } from "reactflow";
-import { Alert, Button, Dialog, DialogTitle, Snackbar } from "@mui/material";
+import { Alert, Button, Dialog, DialogTitle, Snackbar, Tooltip } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
 import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment } from "utils/models";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
@@ -75,14 +82,16 @@ export default function Graph() {
     if (graph !== undefined) {
       sessionStorage.setItem("graphId", graph.id);
       setTitle(graph.title);
-      for(let i=0; i<graph.nodes.length; i++){
+      for (let i = 0; i < graph.nodes.length; i++) {
         nodeGet(graph.nodes[i], sessionStorage.getItem("token")!).then((result) => {
           if (result.status) {
             const node = result.value;
             if (node.predefined) {
               setOnCanvasNodeIds((prevIds) => [...prevIds, node.id]);
             }
-            var curNodePosition = graph.nodePositions.find((nodePosition: { id: string, x:number, y:number }) => nodePosition.id === node.id);
+            var curNodePosition = graph.nodePositions.find(
+              (nodePosition: { id: string; x: number; y: number }) => nodePosition.id === node.id
+            );
             if (curNodePosition === undefined) {
               curNodePosition = { id: node.id, x: 0, y: 0 };
             }
@@ -99,7 +108,7 @@ export default function Graph() {
           }
         });
       }
-      for(let i=0; i<graph.edges.length; i++){
+      for (let i = 0; i < graph.edges.length; i++) {
         edgeGet(graph.edges[i], sessionStorage.getItem("token")!).then((result) => {
           if (result.status) {
             const edge = result.value;
@@ -114,7 +123,7 @@ export default function Graph() {
                   },
                   markerEnd: {
                     type: MarkerType.Arrow,
-                  }
+                  },
                 },
                 edges
               )
@@ -125,7 +134,6 @@ export default function Graph() {
         });
       }
     }
-
   }, [graph, setEdges, setNodes, setTitle]);
 
   useEffect(() => {
@@ -474,7 +482,7 @@ export default function Graph() {
               },
               markerEnd: {
                 type: MarkerType.Arrow,
-              }
+              },
             },
             edges
           )
@@ -625,7 +633,7 @@ export default function Graph() {
                 console.log("Node deleted from graph");
               } else {
                 console.log("Cannot delete node from graph");
-              };
+              }
             });
           }
         });
@@ -657,20 +665,25 @@ export default function Graph() {
       if (nodeIndex === -1) {
         return nodes;
       }
-      const newNode = { ...nodes[nodeIndex], position: node.position };  // update node position
+      const newNode = { ...nodes[nodeIndex], position: node.position }; // update node position
       return [...nodes.slice(0, nodeIndex), newNode, ...nodes.slice(nodeIndex + 1)];
     });
     graphNodePosition(
-      { graphId: sessionStorage.getItem("graphId")!, nodeId: node.id, x: node.position.x, y: node.position.y },
-      sessionStorage.getItem("token")!).then((result) => {
-        if (result.status) {
-          console.log("Node position updated");
-        } else {
-          console.log("Cannot update node position");
-        }
-      });
+      {
+        graphId: sessionStorage.getItem("graphId")!,
+        nodeId: node.id,
+        x: node.position.x,
+        y: node.position.y,
+      },
+      sessionStorage.getItem("token")!
+    ).then((result) => {
+      if (result.status) {
+        console.log("Node position updated");
+      } else {
+        console.log("Cannot update node position");
+      }
+    });
   };
-
 
   const handleTitleClick = (): void => {
     setIsEditing(true);
@@ -680,33 +693,34 @@ export default function Graph() {
     setTitle(e.target.value);
   };
 
-  const handleTitleSubmit = (e: KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>): void => {
-    if (e.type === 'blur' || (e as KeyboardEvent<HTMLInputElement>).key === 'Enter') {
+  const handleTitleSubmit = (
+    e: KeyboardEvent<HTMLInputElement> | React.FocusEvent<HTMLInputElement>
+  ): void => {
+    if (e.type === "blur" || (e as KeyboardEvent<HTMLInputElement>).key === "Enter") {
       setIsEditing(false);
       graphTitleSet(
         { id: sessionStorage.getItem("graphId")!, title: title },
         sessionStorage.getItem("token")!
       ).then((result) => {
-          if (result.status) {
-            console.log("Graph title updated");
-          } else {
-            console.log("Cannot update graph title");
-          }
+        if (result.status) {
+          console.log("Graph title updated");
+        } else {
+          console.log("Cannot update graph title");
         }
-      );
+      });
     }
   };
 
   const titleStyle: React.CSSProperties = {
-    position: 'fixed',
-    top: '10px',    // Adjust top position as needed
-    left: '37.5%',     // Set left position to 50%
-    transform: 'translateX(-50%)', // Move the title left by 50% of its own width
-    fontSize: '28px', // Adjust font size as needed
-    fontWeight: 'bold',
+    position: "fixed",
+    top: "10px", // Adjust top position as needed
+    left: "37.5%", // Set left position to 50%
+    transform: "translateX(-50%)", // Move the title left by 50% of its own width
+    fontSize: "28px", // Adjust font size as needed
+    fontWeight: "bold",
     fontFamily: '"Times New Roman", Times, serif',
     zIndex: 100,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)'
+    backgroundColor: "rgba(255, 255, 255, 0.8)",
   };
 
   const renderTitle = (): JSX.Element => {
@@ -730,7 +744,6 @@ export default function Graph() {
       );
     }
   };
-
 
   return (
     <div className="w-full h-full flex flex-row min-h-screen overflow-hidden">
@@ -776,42 +789,48 @@ export default function Graph() {
         >
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onAddButtonClicked}
-              >
-                <Add />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onShareButtonClicked}
-              >
-                <Share />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onDoneButtonClicked}
-              >
-                <DoneAll />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onReturnButtonClicked}
-              >
-                <KeyboardReturnIcon />
-              </Button>
+              <Tooltip title="Add Node" placement="right">
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onAddButtonClicked}
+                >
+                  <Add />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Share Graph" placement="right">
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onShareButtonClicked}
+                >
+                  <Share />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Verify Dependencies" placement="right">
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onDoneButtonClicked}
+                >
+                  <DoneAll />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Return" placement="right">
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onReturnButtonClicked}
+                >
+                  <KeyboardReturnIcon />
+                </Button>
+              </Tooltip>
             </div>
           </Panel>
           <Controls />
         </ReactFlow>
 
-        <div>
-          {renderTitle()}
-        </div>
+        <div>{renderTitle()}</div>
       </div>
       <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500 overflow-hidden">
         {showNodeDiscussion && <Comments node={clickNode!} />}
