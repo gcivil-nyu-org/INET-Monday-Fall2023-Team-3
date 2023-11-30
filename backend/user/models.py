@@ -17,7 +17,9 @@ class CustomUser(AbstractUser):
         "email address",
         unique=True,
         help_text="Required.",
-        error_messages={"unique": "A user with this email address already exists",},
+        error_messages={
+            "unique": "A user with this email address already exists",
+        },
     )
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
