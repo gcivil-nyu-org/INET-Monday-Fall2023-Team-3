@@ -6,7 +6,7 @@ import React, {
   ChangeEvent,
   KeyboardEvent,
 } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLoaderData, useNavigate, useParams } from "react-router-dom";
 import ReactFlow, {
   useNodesState,
   Controls,
@@ -23,7 +23,7 @@ import ReactFlow, {
 } from "reactflow";
 import { Alert, Button, Dialog, DialogTitle, Snackbar, Tooltip } from "@mui/material";
 import { Add, Share, DoneAll, Storage } from "@mui/icons-material";
-import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment } from "utils/models";
+import { IEdge, INode, IMissingDependency, IWrongDepedency, IComment, IGraph } from "utils/models";
 import KeyboardReturnIcon from "@mui/icons-material/KeyboardReturn";
 
 import "reactflow/dist/style.css";
@@ -71,10 +71,24 @@ export default function Graph() {
   const [clickNode, setClickNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
-  const location = useLocation();
-  const graph = location.state?.graph;
+  // const location = useLocation();
+  // const graph = location.state?.graph;
   const [title, setTitle] = useState<string>("Untitled Graph");
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const graph_id = useParams();
+  const rawLoaderData = useLoaderData();
+
+  type GraphLoaderData = {
+    id: string;
+    editingEnabled: boolean;
+    title: string;
+    nodes: string[];
+    edges: any[];
+    user: string;
+    nodePositions: any[];  // will be modified based on the new backend
+  }
+
+  const graph: GraphLoaderData = rawLoaderData as GraphLoaderData;
 
   // if graph is passed in when user click a graph, load the graph
   useEffect(() => {
