@@ -393,7 +393,7 @@ export default function Graph() {
         return nodes;
       });
     },
-    [setNodes]
+    [setNodes, onCanvasNodeIds, predefinedNodes, setEdges]
   );
 
   const onEdgeConnect = useCallback(
