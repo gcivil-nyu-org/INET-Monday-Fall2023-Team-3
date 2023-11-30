@@ -71,11 +71,8 @@ export default function Graph() {
   const [clickNode, setClickNode] = useState<INode>();
   const [nodes, setNodes, onNodesChange] = useNodesState<INode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<IEdge>([]);
-  // const location = useLocation();
-  // const graph = location.state?.graph;
   const [title, setTitle] = useState<string>("Untitled Graph");
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const graph_id = useParams();
   const rawLoaderData = useLoaderData();
 
   type GraphLoaderData = {
@@ -90,7 +87,6 @@ export default function Graph() {
 
   const graph: GraphLoaderData = rawLoaderData as GraphLoaderData;
 
-  // if graph is passed in when user click a graph, load the graph
   useEffect(() => {
     console.log("graph: ", graph);
     if (graph !== undefined) {
@@ -299,15 +295,14 @@ export default function Graph() {
               const dependency = dependencies[i];
               // first, we check if newly added node's prerequisite is already on the canvas
               // if so, we create an edge between the two nodes
-              if (onCanvasNodeIds.includes(dependency)) {  // this should be update with the algorithm
-                // TODO!!!
+              if (onCanvasNodeIds.includes(dependency)) {
                 edgeCreate(
                   { source: dependency, target: submittedNode.id },
                   sessionStorage.getItem("token")!
                 ).then((result) => {
                   if (result.status) {
                     console.log(`created edge with id ${result.value.id}`);
-                    // add edge to graph
+                    // add an edge to graph through backend request
                     graphUpdateAdd(
                       { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
                       sessionStorage.getItem("token")!
@@ -318,7 +313,7 @@ export default function Graph() {
                         console.log("Cannot add edge to graph");
                       }
                     });
-                    // add edge
+                    // add an edge
                     setEdges((edges) => {
                       return edges.concat({
                         id: result.value.id,
@@ -337,26 +332,21 @@ export default function Graph() {
                   }
                 });
               }
-              // otherwise, we add the dependency to global dependency record
-              else {
-                /*
-                if dependency in dependencyRecord:
-                  dependencyRecord[dependency].append(submittedNode.id)
-                else:
-                  dependencyRecord[dependency] = [submittedNode.id]
-                */
-              }
-              // Finally, we check whether the newly added node is a prerequisite for any other nodes
-              // If so, we create an edge between the two nodes
-              /*
-              if submittedNode.id in dependencyRecord:
+            }
+            // Finally, we check whether the newly added node is a prerequisite for any other nodes
+            // If so, we create an edge between the two nodes
+            // find all the predefinedNodes that's on canvas
+            const onCanvasPredefinedNodes = predefinedNodes.filter((node) => onCanvasNodeIds.includes(node.id));
+            for (let i = 0; i < onCanvasPredefinedNodes.length; i++) {
+              const curNode = onCanvasPredefinedNodes[i];
+              if (curNode.dependencies.includes(submittedNode.id)) {
                 edgeCreate(
-                  { source: dependency, target: submittedNode.id },
-                  sessionStorage.getItem("token")!
+                { source: submittedNode.id, target: curNode.id },
+                sessionStorage.getItem("token")!
                 ).then((result) => {
                   if (result.status) {
                     console.log(`created edge with id ${result.value.id}`);
-                    // add edge to graph
+                    // add an edge to graph through backend request
                     graphUpdateAdd(
                       { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
                       sessionStorage.getItem("token")!
@@ -367,7 +357,7 @@ export default function Graph() {
                         console.log("Cannot add edge to graph");
                       }
                     });
-                    // add edge
+                    // add an edge on canvas
                     setEdges((edges) => {
                       return edges.concat({
                         id: result.value.id,
@@ -381,11 +371,12 @@ export default function Graph() {
                         }
                       });
                     });
+                    console.log("edge between two predefined nodes are automatically created!");
                   } else {
-                    console.log("Cannot create edge");
+                    console.log("Cannot create edge between two predefined nodes automatically");
                   }
                 });
-              */
+              }
             }
           }
 
@@ -593,8 +584,6 @@ export default function Graph() {
       setOnCanvasNodeIds((currentIds) =>
         currentIds.filter((id) => !deleted.some((node) => node.id === id))
       );
-
-      // delete predefined node from from graph
 
       // get all attached edges
       const invalidEdges = deleted.flatMap((node) => getConnectedEdges([node], edges));

@@ -32,5 +32,7 @@ urlpatterns = [
     path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("user/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("graph/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
-    re_path(r'^graph/.*', serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
+    re_path(
+        r"^graph/.*", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}
+    ),
 ]
