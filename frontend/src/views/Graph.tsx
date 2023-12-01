@@ -19,6 +19,7 @@ import ReactFlow, {
 } from "reactflow";
 import AddNode from "src/components/node/AddNode";
 import SmoothNode from "src/components/node/SmoothNode";
+import GraphSharing from "src/components/sharing/GraphShare";
 import { useCombinedStore } from "src/store/combinedStore";
 import { BackendModels } from "src/utils/models";
 import { RequestMethods } from "src/utils/utils";
@@ -52,6 +53,7 @@ export default function Graph() {
     addNode: false,
     editNode: false,
     faultyDependency: false,
+    graphShare: false,
   });
 
   const [infoState, setInfoState] = useState({
@@ -121,6 +123,7 @@ export default function Graph() {
       addNode: false,
       editNode: false,
       faultyDependency: false,
+      graphShare: false,
     });
   };
 
@@ -138,6 +141,7 @@ export default function Graph() {
       addNode: true,
       editNode: false,
       faultyDependency: false,
+      graphShare: false,
     });
   };
 
@@ -199,6 +203,7 @@ export default function Graph() {
       addNode: false,
       editNode: false,
       faultyDependency: true,
+      graphShare: false,
     });
   };
 
@@ -216,6 +221,7 @@ export default function Graph() {
       addNode: false,
       editNode: true,
       faultyDependency: false,
+      graphShare: false,
     });
   };
 
@@ -637,7 +643,14 @@ export default function Graph() {
     }
   };
 
-  const onShareButtonClicked = () => {};
+  const onShareButtonClicked = () => {
+    setShowState({
+      addNode: false,
+      editNode: false,
+      faultyDependency: false,
+      graphShare: true,
+    });
+  };
 
   const onError = (error: string) => {
     setErrorState({
@@ -660,6 +673,9 @@ export default function Graph() {
         </Snackbar>
         <Dialog open={showState.addNode} onClose={closeAllPanels} maxWidth="md" fullWidth={true}>
           <AddNode onSubmit={onNodeAdd} onError={onError} />
+        </Dialog>
+        <Dialog open={showState.graphShare} onClose={closeAllPanels} maxWidth="sm" fullWidth={true}>
+          <GraphSharing onClose={closeAllPanels} />
         </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}

@@ -10,6 +10,7 @@ urlpatterns = [
     path(views.GRAPH_GET_PATH, views.graph_get, name="get"),
     path(views.GRAPH_PATCH_PATH, views.graph_patch, name="patch"),
     path(views.GRAPH_DELETE_PATH, views.graph_delete, name="delete"),
+    path(views.GRAPH_SHARE_PATH, views.graph_share, name="share"),
     path(
         views.NODE_POSITION_CREATE_PATH,
         views.node_position_create,

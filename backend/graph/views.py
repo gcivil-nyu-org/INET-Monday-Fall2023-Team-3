@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import (
@@ -18,6 +20,7 @@ from shared.view_helper import (
 )
 
 from .models import Graph, NodePosition
+from .pusher import pusher_client
 from .serializers import GraphPatchSerializer, GraphSerializer, NodePositionSerializer
 
 GRAPH_PING_OK_MESSAGE = ok("graph: ok")
@@ -127,6 +130,29 @@ def graph_delete(request: Request, graph_id: str):
         edge.delete()
     graph.delete()
     return Response(ok({}), status=status.HTTP_200_OK)
+
+
+# share endpoint
+GRAPH_SHARE_PATH = "share/<str:graph_id>/"
+GRAPH_SHARE_PATH_FORMAT = "share/{graph_id}/"
+
+
+@api_view(["PATCH"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_share(request: Request, graph_id: str):
+    response = handle_patch(
+        model_class=Graph,
+        instance_identifier={"id": graph_id},
+        patch_data=request.data,
+        patch_serializer_class=GraphPatchSerializer,
+        result_serializer_class=GraphSerializer,
+        not_found_response=GRAPH_PATCH_NOT_FOUND_RESPONSE,
+    )
+    if response.status_code == 200:
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("graph-channel", "new-graph-share", data)
+    return response
 
 
 NODE_POSITION_CREATE_INVALID_FORMAT_MESSAGE = error("node_position: invalid format")

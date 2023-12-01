@@ -53,6 +53,9 @@ export namespace Requests {
       Pick<BackendModels.IGraph, "sharedWith" | "title"> & { nodes: string[]; edges: string[] }
     >;
     export type Delete = undefined;
+    export type Share = Partial<
+    Pick<BackendModels.IGraph, "sharedWith" | "title"> & { shared_with: string[] }
+  >;
   }
 
   /**

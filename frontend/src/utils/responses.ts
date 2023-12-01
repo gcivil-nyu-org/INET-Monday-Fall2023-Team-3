@@ -73,6 +73,8 @@ export namespace Responses {
     export type Patch = BackendModels.IGraph;
     // graph delete
     export type Delete = {};
+    // graph share
+    export type Share = BackendModels.IGraph;
   }
 
   /**
