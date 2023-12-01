@@ -1,9 +1,10 @@
-import GraphEntry, { GraphEntryProp } from "./GraphEntry";
+import { BackendModels } from "src/utils/models";
+import GraphEntry from "./GraphEntry";
 import { Button } from "@mui/material";
 
 export type GraphListProp = {
   name: string;
-  graphs: GraphEntryProp[];
+  graphs: BackendModels.IGraph[];
 };
 
 export default function GraphList({ name, graphs }: GraphListProp) {
@@ -19,10 +20,10 @@ export default function GraphList({ name, graphs }: GraphListProp) {
           Edit
         </Button>
       </div>
-      <div className="flex flex-1 flex-row">
+      <div className="flex flex-1 flex-row min-h-[16rem]">
         {graphs.map((graph) => (
           <div className="h-64 w-64 flex m-4" key={graph.id}>
-            <GraphEntry id={graph.id} title={graph.title} imgUrl={graph.imgUrl} />
+            <GraphEntry graph={graph} />
           </div>
         ))}
       </div>
