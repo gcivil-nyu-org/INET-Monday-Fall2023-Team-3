@@ -16,8 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.static import serve
 
-from .settings import BACKEND_URL_ENDPOINT
+from .settings import BACKEND_URL_ENDPOINT, STATIC_URL
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -26,4 +27,8 @@ urlpatterns = [
     path(f"{BACKEND_URL_ENDPOINT}/edge/", include("edge.urls")),
     path(f"{BACKEND_URL_ENDPOINT}/graph/", include("graph.urls")),
     path(f"{BACKEND_URL_ENDPOINT}/comment/", include("comment.urls")),
+    # frontend endpoints
+    path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
+    path("user/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
+    path("graph/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
 ]

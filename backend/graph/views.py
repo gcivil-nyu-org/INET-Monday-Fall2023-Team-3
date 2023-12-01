@@ -170,3 +170,24 @@ def node_position_patch(request: Request, graph_id: str, node_id: str):
         patch_serializer_class=NodePositionSerializer,
         not_found_response=NODE_POSITION_PATCH_NOT_FOUND_RESPONSE,
     )
+
+
+NODE_POSITION_DELETE_NOT_FOUND_MESSAGE = error("node_position: not found")
+NODE_POSITION_DELETE_NOT_FOUND_RESPONSE = Response(
+    NODE_POSITION_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+NODE_POSITION_DELETE_PATH = "node-position/delete/<str:graph_id>/<str:node_id>/"
+NODE_POSITION_DELETE_PATH_FORMAT = "node-position/delete/{graph_id}/{node_id}/"
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_position_delete(request: Request, graph_id: str, node_id: str):
+    return handle_delete(
+        model_class=NodePosition,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        not_found_response=NODE_POSITION_DELETE_NOT_FOUND_RESPONSE,
+    )

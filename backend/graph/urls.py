@@ -20,4 +20,9 @@ urlpatterns = [
         views.node_position_patch,
         name="node-position-patch",
     ),
+    path(
+        views.NODE_POSITION_DELETE_PATH,
+        views.node_position_delete,
+        name="node-position-delete",
+    ),
 ]
