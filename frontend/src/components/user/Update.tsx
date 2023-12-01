@@ -2,6 +2,8 @@ import { Alert, AlertColor, Avatar, TextField, Button } from "@mui/material";
 import { ChangeEvent, useEffect, useState } from "react";
 import { RequestMethods } from "src/utils/utils";
 import { refreshPokemonAvatar } from "src/utils/helpers";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
 
 interface UpdateProps {
   onAvatarChanged: (url: string) => void;
@@ -9,6 +11,9 @@ interface UpdateProps {
 }
 
 export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
+  const [token, user, setUser] = useCombinedStore(
+    useShallow((state) => [state.token, state.user, state.setUser])
+  );
   const [severity, setSeverity] = useState<AlertColor>("error");
   // use object state saves us a log of separate state definitions
   const [updateData, setUpdateData] = useState({
@@ -19,20 +24,11 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    RequestMethods.userGetSelf({
-      token: sessionStorage.getItem("token") ?? "",
-    }).then((result) => {
-      if (result.status) {
-        setUpdateData({
-          ...result.value,
-          ...updateData,
-        });
-      } else {
-        setSeverity("error");
-        setMessage("failed to get current user");
-      }
+    setUpdateData({
+      ...updateData,
+      username: user.username,
     });
-  }, []);
+  }, [user]);
 
   const onUsernameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
     setUpdateData({
@@ -64,9 +60,12 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
 
     RequestMethods.userPatch({
       body: updateData,
-      token: sessionStorage.getItem("token") ?? "",
+      token,
     }).then((result) => {
       if (result.status) {
+        // update store user information
+        setUser(result.value);
+
         setSeverity("success");
         setMessage("user update success");
       } else {
@@ -74,6 +73,10 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
         setMessage(result.detail);
       }
     });
+  };
+
+  const onLogOutButtonClicked = () => {
+    console.log("user log out");
   };
 
   const onRefreshAvatar = () => {
@@ -142,6 +145,16 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
           onClick={onUpdateButtonClicked}
         >
           Update
+        </Button>
+      </div>
+      <div className="h-24 w-full flex">
+        <Button
+          className="w-64 h-16 m-auto bg-red-400"
+          size="large"
+          variant="contained"
+          onClick={onUpdateButtonClicked}
+        >
+          Log out
         </Button>
       </div>
     </div>
