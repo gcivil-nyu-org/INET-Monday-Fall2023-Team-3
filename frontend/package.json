@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build --base=/static/ --mode development",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -18,7 +18,8 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.19.0",
     "reactflow": "^11.10.1",
-    "validator": "^13.11.0"
+    "validator": "^13.11.0",
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.37",
