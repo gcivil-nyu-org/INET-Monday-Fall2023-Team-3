@@ -1,5 +1,5 @@
 import { Add, DoneAll, Elderly, KeyboardReturn, Share } from "@mui/icons-material";
-import { Alert, Button, Dialog, Snackbar, TextField } from "@mui/material";
+import { Alert, Button, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
@@ -696,34 +696,42 @@ export default function Graph() {
           </Panel>
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onAddNodeButtonClicked}
-              >
-                <Add />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onShareButtonClicked}
-              >
-                <Share />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onDoneButtonClicked}
-              >
-                <DoneAll />
-              </Button>
-              <Button
-                variant="outlined"
-                sx={{ padding: "8px", minWidth: "32px" }}
-                onClick={onReturnButtonClicked}
-              >
-                <KeyboardReturn />
-              </Button>
+              <Tooltip title="Add Node" placement="right" arrow>
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onAddNodeButtonClicked}
+                >
+                  <Add />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Share" placement="right" arrow>
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onShareButtonClicked}
+                >
+                  <Share />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Verify Dependencies" placement="right" arrow>
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onDoneButtonClicked}
+                >
+                  <DoneAll />
+                </Button>
+              </Tooltip>
+              <Tooltip title="Return" placement="right" arrow>
+                <Button
+                  variant="outlined"
+                  sx={{ padding: "8px", minWidth: "32px" }}
+                  onClick={onReturnButtonClicked}
+                >
+                  <KeyboardReturn />
+                </Button>
+              </Tooltip>
             </div>
           </Panel>
           <Controls />
