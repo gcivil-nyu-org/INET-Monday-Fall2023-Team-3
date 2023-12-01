@@ -1,6 +1,6 @@
 from typing import Any, Type
 
-from django.db import models
+from django.db import models, transaction
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
@@ -58,8 +58,9 @@ def handle_create(
     # model serializer id field is read_only, therefore
     # id in request body will have no effect
 
-    # create model instance
-    serializer.save()
+    with transaction.atomic():
+        # create model instance
+        serializer.save()
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
@@ -121,12 +122,13 @@ def handle_patch(
     # serializer invalid -> invalid format response
     # serializer will never be invalid since partial=True
     serializer.is_valid(raise_exception=True)
-    if result_serializer_class is None:
-        # patch model instance
-        serializer.save()
-        return Response(ok(serializer.data), status=status.HTTP_200_OK)
-    instance = serializer.save()
-    serializer = result_serializer_class(instance=instance)
+    # patch model instance
+    with transaction.atomic():
+        instance = serializer.save()
+
+    if result_serializer_class is not None:
+        serializer = result_serializer_class(instance=instance)
+
     return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
@@ -150,5 +152,6 @@ def handle_delete(
     if instance is None:
         return not_found_response
     # delete model instance
-    instance.delete()
+    with transaction.atomic():
+        instance.delete()
     return Response(ok({}), status=status.HTTP_200_OK)
