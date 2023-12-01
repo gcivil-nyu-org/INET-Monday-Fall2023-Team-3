@@ -3,9 +3,16 @@ import { Alert, Button, TextField } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import { RequestMethods } from "src/utils/utils";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
 
 export default function Login() {
   const navigate = useNavigate();
+  // use store to persist user information
+  const [setUser, setToken] = useCombinedStore(
+    useShallow((state) => [state.setUser, state.setToken])
+  );
+
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
@@ -23,8 +30,17 @@ export default function Login() {
     if (result.status) {
       setError("");
       console.log(result.value);
-      sessionStorage.setItem("token", result.value.token);
-      sessionStorage.setItem("email", loginData.email);
+      // sessionStorage.setItem("token", result.value.token);
+      // sessionStorage.setItem("email", loginData.email);
+      // store user information in store
+      setUser({
+        email: result.value.email,
+        username: result.value.username,
+        createdGraphs: result.value.createdGraphs,
+        sharedGraphs: result.value.sharedGraphs,
+      });
+      setToken(result.value.token);
+
       navigate("/user");
     } else {
       setError(result.detail);
