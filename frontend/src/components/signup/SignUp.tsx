@@ -4,9 +4,15 @@ import { useNavigate } from "react-router-dom";
 
 import { RequestMethods } from "src/utils/utils";
 import { Validate } from "src/utils/validation";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  // use store to persist user information
+  const [setUser, setToken] = useCombinedStore(
+    useShallow((state) => [state.setUser, state.setToken])
+  );
   const [signUpData, setSignUpData] = useState({
     email: "",
     username: "",
@@ -38,8 +44,17 @@ export default function SignUp() {
     if (result.status) {
       setError("");
       console.log(result.value);
-      sessionStorage.setItem("token", result.value.token);
-      sessionStorage.setItem("email", signUpData.email);
+      // sessionStorage.setItem("token", result.value.token);
+      // sessionStorage.setItem("email", signUpData.email);
+      // store user information in store
+      setUser({
+        email: result.value.email,
+        username: result.value.username,
+        createdGraphs: result.value.createdGraphs,
+        sharedGraphs: result.value.sharedGraphs,
+      });
+      setToken(result.value.token);
+
       navigate("/user");
     } else {
       setError(result.detail);
