@@ -7,6 +7,7 @@ import reportWebVitals from "./reportWebVitals";
 import { createBrowserRouter, redirect, RouterProvider } from "react-router-dom";
 import User from "views/User";
 import Graph from "views/Graph";
+import { graphGet } from "utils/backendRequests";
 
 const router = createBrowserRouter([
   {
@@ -25,8 +26,17 @@ const router = createBrowserRouter([
     },
   },
   {
-    path: "/graph",
+    path: "/graph/:graph_id",
     element: <Graph />,
+    loader: async ({ params }) => {
+      const graphId: string = params.graph_id ?? "";
+      const result = await graphGet(graphId, sessionStorage.getItem("token")!)
+      if (result.status) {
+        return result.value;
+      } else {
+        return null;  // better error handling could be done here
+      }
+    },
   },
 ]);
 

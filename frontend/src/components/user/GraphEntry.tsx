@@ -19,14 +19,7 @@ export default function GraphEntry({ id, title, imgUrl }: IGraphEntryProp) {
 
   const onGraphClicked = () => {
     console.log(`redirect to graph`);
-    graphGet(id, sessionStorage.getItem("token")!).then((result) => {
-      if (result.status) {
-        const graph = result.value;
-        navigate("/graph", { state: { graph } });
-      } else {
-        console.log("could not get graph");
-      }
-    });
+    navigate("/graph/"+id);
   };
     /*
     TODO:
