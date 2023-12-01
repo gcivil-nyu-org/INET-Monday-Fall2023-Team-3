@@ -158,6 +158,10 @@ export namespace RequestMethods {
     return request("/graph/node-position/patch/", "PATCH", params);
   };
 
+  export const nodePositionDelete: RequestBuilder<"/graph/node-position/delete/"> = (params) => {
+    return request("/graph/node-position/delete/", "DELETE", params);
+  };
+
   export const commentPing: RequestBuilder<"/comment/ping/"> = (params) => {
     return request("/comment/ping/", "GET", params);
   };

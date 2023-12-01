@@ -181,6 +181,13 @@ export type Endpoints = {
     bodyType: Requests.NodePosition.Patch;
     resultType: Responses.NodePosition.Patch;
   };
+  "/graph/node-position/delete/": {
+    paramType: [string, string];
+    authenticate: true;
+    method: "DELETE";
+    bodyType: Requests.NodePosition.Delete;
+    resultType: Responses.NodePosition.Delete;
+  };
 
   "/comment/ping/": {
     paramType: undefined;

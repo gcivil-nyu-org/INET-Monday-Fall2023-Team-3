@@ -40,7 +40,7 @@ export namespace Responses {
     // node delete
     export type Delete = {};
     // node get predefined
-    export type Predefined = BackendModels.INode;
+    export type Predefined = BackendModels.INode[];
   }
 
   /**
@@ -83,6 +83,8 @@ export namespace Responses {
     export type Create = BackendModels.INodePosition;
     // node position patch
     export type Patch = BackendModels.INodePosition;
+    // node position delete
+    export type Delete = {};
   }
 
   /**

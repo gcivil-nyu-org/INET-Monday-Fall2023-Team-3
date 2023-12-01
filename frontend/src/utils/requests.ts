@@ -47,10 +47,10 @@ export namespace Requests {
    */
   export namespace Graph {
     export type Ping = undefined;
-    export type Create = Pick<BackendModels.IGraph, "title" | "createdBy">;
+    export type Create = Pick<BackendModels.IGraph, "createdBy">;
     export type Get = undefined;
     export type Patch = Partial<
-      AwareOmit<BackendModels.IGraph, "id" | "nodePositions" | "createdBy">
+      Pick<BackendModels.IGraph, "sharedWith" | "title"> & { nodes: string[]; edges: string[] }
     >;
     export type Delete = undefined;
   }
@@ -61,6 +61,7 @@ export namespace Requests {
   export namespace NodePosition {
     export type Create = BackendModels.INodePosition;
     export type Patch = Partial<AwareOmit<BackendModels.INodePosition, "graphId" | "nodeId">>;
+    export type Delete = undefined;
   }
 
   /**

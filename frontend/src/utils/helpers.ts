@@ -1,5 +1,7 @@
 import { ResponseModels } from "./models";
 
+const backendPrefix = "/backend";
+
 const pokemonAvatarSrc = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/";
 
 export const defaultAvatarSrc = `${pokemonAvatarSrc}001.png`;
@@ -35,7 +37,7 @@ export const fetchRestful = <T extends {}>(
     requestParam.body = JSON.stringify(body);
   }
 
-  return fetch(url, requestParam);
+  return fetch(`${backendPrefix}${url}`, requestParam);
 };
 
 export const parseResponse = async <ResultType extends {}>(
