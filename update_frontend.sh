@@ -8,7 +8,7 @@ rm -rf static
 mkdir static
 cd ..
 # copy frontend files to backend
-cp -r ./frontend/build/* ./backend/static
+cp -r ./frontend/build/* ./backend/static/
 # backend migration
 cd ./backend
 python manage.py makemigrations

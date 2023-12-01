@@ -600,7 +600,8 @@ export default function Graph() {
         // get all nodes that depend on current node
         const outgoers = getOutgoers(node, nodes, edges);
         // update dependencies of these nodes
-        const dependencyUpdatePromises = outgoers.map(async (targetNode) => {
+        const selfDefinedOutgoers = outgoers.filter((targetNode) => targetNode.data.predefined === false);
+        const dependencyUpdatePromises = selfDefinedOutgoers.map(async (targetNode) => {
           const newDependencies = targetNode.data.dependencies.filter(
             (parentNodeId) => parentNodeId !== node.id
           );
