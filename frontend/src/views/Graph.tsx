@@ -266,134 +266,138 @@ export default function Graph() {
   };
 
   const onNodeSubmit = useCallback(
-    (submittedNode: INode) => {
+    async (submittedNode: INode) => {
       closeAllNodePanels();
-
+      console.log("submitted node: ", submittedNode);
       // update nodes accordingly
+      const node = nodes.find((node) => node.id === submittedNode.id);
+      console.log("node in nodes with same id: ", node);
+      const predefinedNode = predefinedNodes.find((node) => node.id === submittedNode.id);
+      console.log("node in predefinedNodes with same id: ", predefinedNode);
       setNodes((nodes) => {
-        const node = nodes.find((node) => node.id === submittedNode.id);
-
         // new node
         if (node === undefined) {
-          if (submittedNode.predefined) {
-            setOnCanvasNodeIds((prevIds) => [...prevIds, submittedNode.id]);
-          }
-          graphUpdateAdd(
-            { id: sessionStorage.getItem("graphId")!, nodes: [submittedNode] },
-            sessionStorage.getItem("token")!
-          ).then((result) => {
-            if (result.status) {
-              console.log("Node added to graph");
-            } else {
-              console.log("Cannot add node to graph");
-            }
-          });
-          if (submittedNode.predefined) {
-            // automatically add edges between predefined nodes
-            const dependencies = submittedNode.dependencies;
-            for (let i = 0; i < dependencies.length; i++) {
-              const dependency = dependencies[i];
-              // first, we check if newly added node's prerequisite is already on the canvas
-              // if so, we create an edge between the two nodes
-              if (onCanvasNodeIds.includes(dependency)) {
-                edgeCreate(
-                  { source: dependency, target: submittedNode.id },
-                  sessionStorage.getItem("token")!
-                ).then((result) => {
-                  if (result.status) {
-                    console.log(`created edge with id ${result.value.id}`);
-                    // add an edge to graph through backend request
-                    graphUpdateAdd(
-                      { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
-                      sessionStorage.getItem("token")!
-                    ).then((graphResult) => {
-                      if (graphResult.status) {
-                        console.log("edge added to graph");
-                      } else {
-                        console.log("Cannot add edge to graph");
-                      }
-                    });
-                    // add an edge
-                    setEdges((edges) => {
-                      return edges.concat({
-                        id: result.value.id,
-                        source: result.value.source,
-                        target: result.value.target,
-                        style: {
-                          strokeWidth: 3,
-                        },
-                        markerEnd: {
-                          type: MarkerType.Arrow,
-                        }
-                      });
-                    });
-                  } else {
-                    console.log("Cannot create edge");
-                  }
-                });
-              }
-            }
-            // Finally, we check whether the newly added node is a prerequisite for any other nodes
-            // If so, we create an edge between the two nodes
-            // find all the predefinedNodes that's on canvas
-            const onCanvasPredefinedNodes = predefinedNodes.filter((node) => onCanvasNodeIds.includes(node.id));
-            for (let i = 0; i < onCanvasPredefinedNodes.length; i++) {
-              const curNode = onCanvasPredefinedNodes[i];
-              if (curNode.dependencies.includes(submittedNode.id)) {
-                edgeCreate(
-                { source: submittedNode.id, target: curNode.id },
-                sessionStorage.getItem("token")!
-                ).then((result) => {
-                  if (result.status) {
-                    console.log(`created edge with id ${result.value.id}`);
-                    // add an edge to graph through backend request
-                    graphUpdateAdd(
-                      { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
-                      sessionStorage.getItem("token")!
-                    ).then((graphResult) => {
-                      if (graphResult.status) {
-                        console.log("edge added to graph");
-                      } else {
-                        console.log("Cannot add edge to graph");
-                      }
-                    });
-                    // add an edge on canvas
-                    setEdges((edges) => {
-                      return edges.concat({
-                        id: result.value.id,
-                        source: result.value.source,
-                        target: result.value.target,
-                        style: {
-                          strokeWidth: 3,
-                        },
-                        markerEnd: {
-                          type: MarkerType.Arrow,
-                        }
-                      });
-                    });
-                    console.log("edge between two predefined nodes are automatically created!");
-                  } else {
-                    console.log("Cannot create edge between two predefined nodes automatically");
-                  }
-                });
-              }
-            }
-          }
-
           return nodes.concat({
             id: submittedNode.id,
             type: "smoothNode",
             position: { x: 350, y: 100 },
             data: submittedNode,
           });
+        } else {  // existing node
+          node.data = submittedNode;
+          return nodes;
+          // lack node update ?  TODO
         }
-
-        // existing ndoe
-        node.data = submittedNode;
-        return nodes;
       });
+      // new node
+      if (node === undefined) {
+        const result = await graphUpdateAdd(
+          { id: sessionStorage.getItem("graphId")!, nodes: [submittedNode] },
+          sessionStorage.getItem("token")!
+        );
+        if (result.status) {
+          console.log("here!");
+          console.log("Node added to graph");
+        } else {
+          console.log("Cannot add node to graph");
+        }
+        if (submittedNode.predefined) {
+          setOnCanvasNodeIds((prevIds) => [...prevIds, submittedNode.id]);
+          // automatically add edges between predefined nodes
+          const dependencies = submittedNode.dependencies;
+          console.log("all dependencies: " + dependencies);
+          console.log("on canvas node ids: " + onCanvasNodeIds);
+          for (let i = 0; i < dependencies.length; i++) {
+            const dependency = dependencies[i];
+            // first, we check if newly added node's prerequisite is already on the canvas
+            // if so, we create an edge between the two nodes
+            if (onCanvasNodeIds.includes(dependency)) {
+              edgeCreate(
+                { source: dependency, target: submittedNode.id },
+                sessionStorage.getItem("token")!
+              ).then((result) => {
+                if (result.status) {
+                  console.log(`created edge with id ${result.value.id}`);
+                  // add an edge to graph through backend request
+                  graphUpdateAdd(
+                    { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+                    sessionStorage.getItem("token")!
+                  ).then((graphResult) => {
+                    if (graphResult.status) {
+                      console.log("edge added to graph");
+                    } else {
+                      console.log("Cannot add edge to graph");
+                    }
+                  });
+                  // add an edge
+                  setEdges((edges) => {
+                    return edges.concat({
+                      id: result.value.id,
+                      source: result.value.source,
+                      target: result.value.target,
+                      style: {
+                        strokeWidth: 3,
+                      },
+                      markerEnd: {
+                        type: MarkerType.Arrow,
+                      }
+                    });
+                  });
+                } else {
+                  console.log("Cannot create edge");
+                }
+              });
+            }
+          }
+          // Finally, we check whether the newly added node is a prerequisite for any other nodes
+          // If so, we create an edge between the two nodes
+          // find all the predefinedNodes that's on canvas
+          const onCanvasPredefinedNodes = predefinedNodes.filter((node) => onCanvasNodeIds.includes(node.id));
+          for (let i = 0; i < onCanvasPredefinedNodes.length; i++) {
+            const curNode = onCanvasPredefinedNodes[i];
+            if (curNode.dependencies.includes(submittedNode.id)) {
+              edgeCreate(
+              { source: submittedNode.id, target: curNode.id },
+              sessionStorage.getItem("token")!
+              ).then((result) => {
+                if (result.status) {
+                  console.log(`created edge with id ${result.value.id}`);
+                  // add an edge to graph through backend request
+                  graphUpdateAdd(
+                    { id: sessionStorage.getItem("graphId")!, edges: [result.value] },
+                    sessionStorage.getItem("token")!
+                  ).then((graphResult) => {
+                    if (graphResult.status) {
+                      console.log("edge added to graph");
+                    } else {
+                      console.log("Cannot add edge to graph");
+                    }
+                  });
+                  // add an edge on canvas
+                  setEdges((edges) => {
+                    return edges.concat({
+                      id: result.value.id,
+                      source: result.value.source,
+                      target: result.value.target,
+                      style: {
+                        strokeWidth: 3,
+                      },
+                      markerEnd: {
+                        type: MarkerType.Arrow,
+                      }
+                    });
+                  });
+                  console.log("edge between two predefined nodes are automatically created!");
+                } else {
+                  console.log("Cannot create edge between two predefined nodes automatically");
+                }
+              });
+            }
+          }
+        }
+      }
     },
-    [setNodes, onCanvasNodeIds, predefinedNodes, setEdges]
+    [setNodes, onCanvasNodeIds, predefinedNodes, setEdges, nodes]
   );
 
   const onEdgeConnect = useCallback(
