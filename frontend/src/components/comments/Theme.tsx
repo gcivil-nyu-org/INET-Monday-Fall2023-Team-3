@@ -8,12 +8,12 @@ const themeOptions: ThemeOptions = {
     MuiCssBaseline: {
       styleOverrides: {
         body: darkScrollbar(
-            {
-                track: 'rgb(148, 163, 184)',
-                thumb: 'rgb(148, 163, 184)',
-                active: 'rgb(51, 65, 85)',
-            }
-            
+          {
+            track: 'rgba(97, 103, 122)',
+            thumb: 'rgba(97, 103, 122)',
+            active: 'rgba(97, 103, 122)',
+          }
+
         ),
       },
     },

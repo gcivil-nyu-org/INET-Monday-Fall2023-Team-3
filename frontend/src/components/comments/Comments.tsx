@@ -228,7 +228,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
             position: "absolute",
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(100, 116, 139, 0.5)", // Adjust transparency as needed
+            backgroundColor: "rgba(97, 103, 122, 1);", // Adjust transparency as needed
             zIndex: 2,
           }}
         />
@@ -249,7 +249,7 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
               maxWidth: "600px",
               width: "100%",
               maxHeight: "calc(100vh - 64px)",
-              overflowY: "auto", // allows for vertical scrolling inside the paper
+              //overflowY: "hidden", // allows for vertical scrolling inside the paper
               margin: "32px",
               overflowX: "hidden",
               backgroundColor: "rgba(255,255,255,0.3)",
@@ -268,9 +268,9 @@ const Comments: React.FC<CommentsProps> = ({ node }) => {
             {/* Scrollable comments area */}
             <Box
               sx={{
-                p: 2,
-                flex: 1,
-                overflowY: "auto", // Enable vertical scrolling for comments
+                p: 0,
+                flex: 2,
+                //overflowY: "auto", // Enable vertical scrolling for comments
               }}
             >
               {rootComments.map((rootComment) => (
