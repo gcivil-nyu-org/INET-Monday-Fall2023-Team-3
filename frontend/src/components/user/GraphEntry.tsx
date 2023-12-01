@@ -1,29 +1,31 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardContent, IconButton } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import { useCombinedStore } from "src/store/combinedStore";
+import { BackendModels } from "src/utils/models";
 
 export type GraphEntryProp = {
-  id: string;
-  title: string;
-  imgUrl: string;
+  graph: BackendModels.IGraph;
 };
 
-export default function GraphEntry({ id, title, imgUrl }: GraphEntryProp) {
+export default function GraphEntry({ graph }: GraphEntryProp) {
+  const imgUrl =
+    "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg";
   const navigate = useNavigate();
+  const setGraph = useCombinedStore((state) => state.setGraph);
 
   const onGraphClicked = () => {
-    console.log(`navigating to graph ${title}`);
-    console.log(`navigating to ${id}`);
-    // this will persist the graph state in url
-    // will not lose after refresh
-    // graph endpoint should handle get graph
-    navigate(`/graph/${id}/`);
+    console.log(`navigating to graph ${graph.title}`);
+    console.log(`navigating to ${graph.id}`);
+    // use store to persist graph id
+    setGraph(graph);
+    navigate(`/graph`);
   };
 
   return (
     <div className="flex flex-1" onClick={onGraphClicked}>
       <Card className="relative">
-        <CardHeader title={title}></CardHeader>
+        <CardHeader title={graph.title}></CardHeader>
         <CardContent>
           <IconButton color="error" className="absolute top-1 right-1">
             <DeleteForeverIcon onClick={() => console.log("delete button clicked")} />
