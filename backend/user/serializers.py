@@ -48,14 +48,23 @@ class SignUpSerializer(BaseSerializer):
 
 
 class PatchSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    password = serializers.CharField(required=True)
+    username = serializers.CharField(required=False, allow_blank=True)
+    password = serializers.CharField(required=False, allow_blank=True)
+    avatar = serializers.CharField(required=False, allow_blank=True)
 
     def update(self, instance: User, validated_data: dict) -> User:
-        # update username
-        instance.username = validated_data.get("username")
-        # update password
-        instance.set_password(validated_data.get("password"))
+        # if a new avatar is provide, only update avatar
+        if validated_data.get("avatar") is not None:
+            instance.avatar = validated_data["avatar"]
+        elif validated_data.get("username") is not None and validated_data.get("password") is not None:
+            # if an avatar is not provided, user wants to update password/username
+            # since required is set to False, check if there are inputs
+            # update username
+            instance.username = validated_data.get("username")
+            # update password
+            instance.set_password(validated_data.get("password"))
+        else:
+            raise serializers.ValidationError("At least one of 'avatar', 'username', or 'password' must be provided.")
 
         instance.save()
         return instance
@@ -71,3 +80,6 @@ class GetSerializer(BaseSerializer):
     shared_graphs = serializers.PrimaryKeyRelatedField(
         many=True, queryset=Graph.objects.all()
     )
+    avatar = serializers.CharField()
+
+
