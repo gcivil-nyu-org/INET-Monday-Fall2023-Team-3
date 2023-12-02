@@ -1,6 +1,6 @@
 import { Add, DoneAll, Elderly, KeyboardReturn, Share } from "@mui/icons-material";
 import { Alert, Button, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -46,13 +46,14 @@ export default function Graph() {
     setEdges,
     onNodesChange,
     onEdgesChange,
+    onConnect,
     addNode,
     editNode,
     addEdge,
     deleteNodes,
     deleteEdges,
     updateNodePosition,
-    onConnect,
+    udpateTitle,
   } = useCombinedStore((state) => ({
     token: state.token,
     predefinedNodeMap: state.predefinedNodeMap,
@@ -63,13 +64,14 @@ export default function Graph() {
     edges: state.edges,
     setEdges: state.setEdges,
     onEdgesChange: state.onEdgesChange,
+    onConnect: state.onConnect,
     addNode: state.addNode,
     editNode: state.editNode,
     deleteNodes: state.deleteNodes,
     addEdge: state.addEdge,
     deleteEdges: state.deleteEdges,
     updateNodePosition: state.updateNodePosition,
-    onConnect: state.onConnect,
+    udpateTitle: state.updateTitle,
   }));
 
   const [currNode, setCurrNode] = useState<Node<BackendModels.INode> | undefined>(undefined);
@@ -157,6 +159,18 @@ export default function Graph() {
     deleteEdges(deleted);
   };
 
+  const [title, setTitle] = useState(graph.title);
+
+  const onTitleInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+    setTitle(event.target.value);
+  };
+
+  const onTitleChangeSubmit = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      udpateTitle(title.trim());
+    }
+  };
+
   const [showAddNode, setShowAddNode] = useState(false);
 
   const onAddNodeButtonClicked = () => {
@@ -174,7 +188,7 @@ export default function Graph() {
   const onNodeDoubleClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
     console.log("node double clicked");
     setCurrNode(node);
-    setShowEditNode(true);
+    onEditNode();
   };
 
   const onEditNode = () => {
@@ -295,6 +309,13 @@ export default function Graph() {
           onConnect={onEdgeAdd}
           onEdgesDelete={onEdgesDelete}
         >
+          <Panel className="bg-transparent" position="top-center">
+            <TextField
+              value={title}
+              onChange={onTitleInputChanged}
+              onKeyDown={onTitleChangeSubmit}
+            ></TextField>
+          </Panel>
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
               <Tooltip title="Add Node" placement="right" arrow>

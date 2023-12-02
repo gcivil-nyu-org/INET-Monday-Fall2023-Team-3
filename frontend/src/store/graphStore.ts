@@ -13,4 +13,5 @@ export interface GraphSlice {
   addEdge: (edge: BackendModels.IEdge) => void;
   deleteEdges: (edge: BackendModels.IEdge[]) => void;
   updateNodePosition: (node: Node<BackendModels.INode>) => void;
+  updateTitle: (title: string) => void;
 }

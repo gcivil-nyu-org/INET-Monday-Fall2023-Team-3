@@ -269,6 +269,24 @@ const createGraphSlice: StateCreator<CombinedStoreType, [], [], GraphSlice> = (s
       },
     });
   },
+  updateTitle: (title) => {
+    const graph = get().graph;
+
+    set({
+      graph: {
+        ...graph,
+        title,
+      },
+    });
+
+    RequestMethods.graphPatch({
+      param: graph.id,
+      token: get().token,
+      body: {
+        title,
+      },
+    });
+  },
 });
 
 const createReactFlowSlice: StateCreator<CombinedStoreType, [], [], ReactFlowSlice> = (
