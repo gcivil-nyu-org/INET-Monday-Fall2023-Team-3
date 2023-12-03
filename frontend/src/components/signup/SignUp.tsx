@@ -52,6 +52,7 @@ export default function SignUp() {
         username: result.value.username,
         createdGraphs: result.value.createdGraphs,
         sharedGraphs: result.value.sharedGraphs,
+        avatar: result.value.avatar,
       });
       setToken(result.value.token);
 
