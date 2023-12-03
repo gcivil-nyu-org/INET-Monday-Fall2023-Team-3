@@ -11,7 +11,8 @@ export type GraphEntryProp = {
 
 export default function GraphEntry({ graph }: GraphEntryProp) {
   const user = useCombinedStore((state) => state.user);
-  const displayName = user.email == graph.createdBy ? "" : "@" + graph.createdBy;
+  const disabled = user.email !== graph.createdBy;
+  const displayName = user.email === graph.createdBy ? "" : "@" + graph.createdBy;
   const imgUrl =
     "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg";
   const navigate = useNavigate();
@@ -30,13 +31,15 @@ export default function GraphEntry({ graph }: GraphEntryProp) {
       <Card className="relative">
         <CardHeader title={graph.title + displayName}></CardHeader>
         <CardContent>
-          <IconButton
-            color="error"
-            className="absolute top-1 right-1"
-            onClick={() => console.log("delete button clicked")}
-          >
-            <DeleteForeverIcon />
-          </IconButton>
+          {!disabled && (
+            <IconButton
+              color="error"
+              className="absolute top-1 right-1"
+              onClick={() => console.log("delete button clicked")}
+            >
+              <DeleteForeverIcon />
+            </IconButton>
+          )}
           <img src={imgUrl} alt="graph" />
         </CardContent>
       </Card>
