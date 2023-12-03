@@ -39,15 +39,19 @@ const nodeTypes = {
 
 export default function Graph() {
   const navigate = useNavigate();
-  const { token, graph, setGraph, predefinedNodeMap, fetchPredefinedNodes } = useCombinedStore(
-    useShallow((state) => ({
-      token: state.token,
-      graph: state.graph,
-      setGraph: state.setGraph,
-      predefinedNodeMap: state.predefinedNodeMap,
-      fetchPredefinedNodes: state.fetchPredefinedNodes,
-    }))
-  );
+  const { user, token, graph, setGraph, predefinedNodeMap, fetchPredefinedNodes } =
+    useCombinedStore(
+      useShallow((state) => ({
+        user: state.user,
+        token: state.token,
+        graph: state.graph,
+        setGraph: state.setGraph,
+        predefinedNodeMap: state.predefinedNodeMap,
+        fetchPredefinedNodes: state.fetchPredefinedNodes,
+      }))
+    );
+
+  const disabled = user.email == graph.createdBy ? false : true;
 
   const [showState, setShowState] = useState({
     addNode: false,
@@ -690,39 +694,53 @@ export default function Graph() {
           onEdgesDelete={onEdgesDelete}
           onPaneClick={() => setCurrNode(undefined)}
           onNodeDragStop={onNodeDragStop}
+          edgesUpdatable={!disabled}
+          edgesFocusable={!disabled}
+          nodesDraggable={!disabled}
+          nodesConnectable={!disabled}
+          nodesFocusable={!disabled}
+          draggable={!disabled}
+          panOnDrag={!disabled}
+          elementsSelectable={!disabled}
         >
           <Panel className="bg-transparent" position="top-center">
             <TextField onChange={onTitleInputChanged} value={title} />
           </Panel>
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
-              <Tooltip title="Add Node" placement="right" arrow>
-                <Button
-                  variant="outlined"
-                  sx={{ padding: "8px", minWidth: "32px" }}
-                  onClick={onAddNodeButtonClicked}
-                >
-                  <Add />
-                </Button>
-              </Tooltip>
-              <Tooltip title="Share" placement="right" arrow>
-                <Button
-                  variant="outlined"
-                  sx={{ padding: "8px", minWidth: "32px" }}
-                  onClick={onShareButtonClicked}
-                >
-                  <Share />
-                </Button>
-              </Tooltip>
-              <Tooltip title="Verify Dependencies" placement="right" arrow>
-                <Button
-                  variant="outlined"
-                  sx={{ padding: "8px", minWidth: "32px" }}
-                  onClick={onDoneButtonClicked}
-                >
-                  <DoneAll />
-                </Button>
-              </Tooltip>
+              {!disabled && (
+                <Tooltip title="Add Node" placement="right" arrow>
+                  <Button
+                    variant="outlined"
+                    sx={{ padding: "8px", minWidth: "32px" }}
+                    onClick={onAddNodeButtonClicked}
+                  >
+                    <Add />
+                  </Button>
+                </Tooltip>
+              )}
+              {!disabled && (
+                <Tooltip title="Share" placement="right" arrow>
+                  <Button
+                    variant="outlined"
+                    sx={{ padding: "8px", minWidth: "32px" }}
+                    onClick={onShareButtonClicked}
+                  >
+                    <Share />
+                  </Button>
+                </Tooltip>
+              )}
+              {!disabled && (
+                <Tooltip title="Verify Dependencies" placement="right" arrow>
+                  <Button
+                    variant="outlined"
+                    sx={{ padding: "8px", minWidth: "32px" }}
+                    onClick={onDoneButtonClicked}
+                  >
+                    <DoneAll />
+                  </Button>
+                </Tooltip>
+              )}
               <Tooltip title="Return" placement="right" arrow>
                 <Button
                   variant="outlined"

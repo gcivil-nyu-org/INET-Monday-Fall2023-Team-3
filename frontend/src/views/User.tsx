@@ -51,15 +51,12 @@ export default function User() {
   // Subscribe to Pusher channel and events
   usePusher("graph-channel", "new-graph-share", async () => {
     console.log("usePusher");
-    console.log(sharedGraphs);
     const resp = await RequestMethods.userGetSelf({
       token
     });
     if (resp.status) {
       setUser({ sharedGraphs: resp.value.sharedGraphs})
     }
-
-    console.log(resp);
   });
 
   const onUpdateCancelled = () => {
