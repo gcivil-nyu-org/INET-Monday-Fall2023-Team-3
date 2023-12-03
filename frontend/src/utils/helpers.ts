@@ -58,7 +58,7 @@ export const parseResponse = async <ResultType extends {}>(
   if (body === undefined) {
     return {
       status: false,
-      detail: "failed to parse resposne body",
+      detail: "failed to parse response body",
     };
   }
 

@@ -52,19 +52,38 @@ class PatchSerializer(serializers.Serializer):
     password = serializers.CharField(required=False, allow_blank=True)
     avatar = serializers.CharField(required=False, allow_blank=True)
 
+    def is_valid(self, raise_exception=False):
+        """
+        Validate the serializer's fields.
+
+        Custom validation is added to check that either 'avatar' or both 'username' and 'password'
+        are provided.
+        """
+        valid = super().is_valid(raise_exception=raise_exception)
+
+        if not valid:
+            return False
+
+        avatar = self.validated_data.get("avatar")
+        username = self.validated_data.get("username")
+        password = self.validated_data.get("password")
+
+        if avatar is None and (username == "" or password == ""):
+            raise serializers.ValidationError('either avatar or both username and password must be present')
+            return False
+
+        return True
+
     def update(self, instance: User, validated_data: dict) -> User:
         # if a new avatar is provide, only update avatar
         if validated_data.get("avatar") is not None:
             instance.avatar = validated_data["avatar"]
-        elif validated_data.get("username") is not None and validated_data.get("password") is not None:
+        else:
             # if an avatar is not provided, user wants to update password/username
-            # since required is set to False, check if there are inputs
             # update username
             instance.username = validated_data.get("username")
             # update password
             instance.set_password(validated_data.get("password"))
-        else:
-            raise serializers.ValidationError("At least one of 'avatar', 'username', or 'password' must be provided.")
 
         instance.save()
         return instance
