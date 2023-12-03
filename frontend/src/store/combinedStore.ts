@@ -17,7 +17,7 @@ import {
   getIncomers,
   getOutgoers,
 } from "reactflow";
-import { subscribeWithSelector, devtools } from "zustand/middleware";
+import { subscribeWithSelector, devtools, persist, createJSONStorage } from "zustand/middleware";
 
 // add later slices here
 type CombinedStoreType = UserSlice & GraphSlice & ReactFlowSlice;
@@ -324,9 +324,10 @@ const createReactFlowSlice: StateCreator<CombinedStoreType, [], [], ReactFlowSli
 });
 
 export const useCombinedStore = create<CombinedStoreType>()(
-  subscribeWithSelector((...args) => ({
-    ...createUserSlice(...args),
-    ...createGraphSlice(...args),
-    ...createReactFlowSlice(...args),
-  }))
+  (...args) => ({
+    ...persist<CombinedStoreType>(createUserSlice, {name: "userStore", storage: createJSONStorage(() => sessionStorage)})(...args),
+    ...persist<CombinedStoreType>(createGraphSlice, {name: "graphStore", storage: createJSONStorage(() => sessionStorage)})(...args),
+    ...persist<CombinedStoreType>(createReactFlowSlice, {name: "reactFlowSliceStore", storage: createJSONStorage(() => sessionStorage)})(...args),
+  })
+
 );
