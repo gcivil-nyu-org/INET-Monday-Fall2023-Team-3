@@ -62,6 +62,10 @@ export namespace BackendModels {
      * reference to graphs shared with user
      */
     sharedGraphs: string[];
+    /**
+     * avatar of the user, can be blank (and will be set to balbasaur)
+     */
+    avatar: string;
   };
 
   /**
