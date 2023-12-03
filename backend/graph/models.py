@@ -22,7 +22,7 @@ class NodeColor(models.Model):
         "Graph", on_delete=models.CASCADE, related_name="node_colors"
     )
     node_id = models.ForeignKey(Node, on_delete=models.CASCADE)
-    color = models.CharField()
+    color = models.CharField(max_length=50)
 
     class Meta:
         unique_together = ("graph_id", "node_id")
