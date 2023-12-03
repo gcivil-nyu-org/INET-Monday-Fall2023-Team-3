@@ -117,6 +117,7 @@ class UserTest(CustomTestCase):
             patch_endpoint,
             data={
                 "username": patch_valid_user["username"],
+                "password": ""
             },
         )
         self.assertResponseNotOk(response=response)
@@ -124,6 +125,7 @@ class UserTest(CustomTestCase):
         response = self.client.patch(
             patch_endpoint,
             data={
+                "username": "",
                 "password": patch_valid_user["password"],
             },
         )
