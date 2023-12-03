@@ -1,6 +1,6 @@
 import { Add, DoneAll, Elderly, KeyboardReturn, Share } from "@mui/icons-material";
 import { Alert, Button, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
-import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -25,13 +25,10 @@ import { BackendModels } from "src/utils/models";
 import { RequestMethods } from "src/utils/utils";
 import { useShallow } from "zustand/react/shallow";
 import "reactflow/dist/style.css";
-
-type FaultyDependency = {
-  reason: "missing" | "wrong";
-  cause: "node" | "edge";
-  sourceName: string;
-  targetName: string;
-};
+import { Requests } from "src/utils/requests";
+import { SnackbarProvider, enqueueSnackbar } from "notistack";
+import EditNode from "src/components/node/EditNode";
+import FaultyDependency, { IFaultyDependency } from "src/components/node/FaultyDependency";
 
 const nodeTypes = {
   smoothNode: SmoothNode,
@@ -39,661 +36,283 @@ const nodeTypes = {
 
 export default function Graph() {
   const navigate = useNavigate();
-  const { user, token, graph, setGraph, predefinedNodeMap, fetchPredefinedNodes } =
-    useCombinedStore(
-      useShallow((state) => ({
-        user: state.user,
-        token: state.token,
-        graph: state.graph,
-        setGraph: state.setGraph,
-        predefinedNodeMap: state.predefinedNodeMap,
-        fetchPredefinedNodes: state.fetchPredefinedNodes,
+  const {
+    user,
+    token,
+    predefinedNodeMap,
+    graph,
+    nodes,
+    setNodes,
+    edges,
+    setEdges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    addNode,
+    editNode,
+    addEdge,
+    deleteNodes,
+    deleteEdges,
+    updateNodePosition,
+    udpateTitle,
+  } = useCombinedStore((state) => ({
+    user: state.user,
+    token: state.token,
+    predefinedNodeMap: state.predefinedNodeMap,
+    graph: state.graph,
+    nodes: state.nodes,
+    setNodes: state.setNodes,
+    onNodesChange: state.onNodesChange,
+    edges: state.edges,
+    setEdges: state.setEdges,
+    onEdgesChange: state.onEdgesChange,
+    onConnect: state.onConnect,
+    addNode: state.addNode,
+    editNode: state.editNode,
+    deleteNodes: state.deleteNodes,
+    addEdge: state.addEdge,
+    deleteEdges: state.deleteEdges,
+    updateNodePosition: state.updateNodePosition,
+    udpateTitle: state.updateTitle,
+  }));
+  const disabled = user.email == graph.createdBy ? false : true;
+
+
+  const [currNode, setCurrNode] = useState<Node<BackendModels.INode> | undefined>(undefined);
+
+  useEffect(() => {
+    setNodes(
+      graph.nodes.map((node) => ({
+        id: node.id,
+        position: graph.nodePositions.find((nodePosition) => nodePosition.nodeId === node.id)!,
+        type: "smoothNode",
+        data: node,
       }))
     );
 
-  const disabled = user.email == graph.createdBy ? false : true;
-
-  const [showState, setShowState] = useState({
-    addNode: false,
-    editNode: false,
-    faultyDependency: false,
-    graphShare: false,
-  });
-
-  const [infoState, setInfoState] = useState({
-    show: false,
-    message: "",
-  });
-  const [successState, setSuccessState] = useState({
-    show: false,
-    message: "",
-  });
-  const [errorState, setErrorState] = useState({
-    show: false,
-    message: "",
-  });
-
-  const [title, setTitle] = useState("");
-
-  const [faultyDependencies, setFaultyDependencies] = useState<FaultyDependency[]>([]);
-
-  const [currNode, setCurrNode] = useState<BackendModels.INode | undefined>(undefined);
-
-  const [nodes, setNodes, onNodesChange] = useNodesState<BackendModels.INode>([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState<BackendModels.IEdge>([]);
-
-  useEffect(() => {
-    fetchPredefinedNodes().then(() => {
-      console.log(graph);
-      setTitle(graph.title);
-
-      const mappedNodes = graph.nodes.map((node) => {
-        const currNodePosition = graph.nodePositions.find(
-          (nodePostion) => nodePostion.nodeId === node.id
-        )!;
-        return {
-          id: node.id,
-          type: "smoothNode",
-          position: { x: currNodePosition.x, y: currNodePosition.y },
-          data: node,
-        };
-      });
-
-      setNodes((nodes) => nodes.concat(...mappedNodes));
-
-      for (const edge of graph.edges) {
-        setEdges((edges) =>
-          addEdge(
-            {
-              id: edge.id,
-              source: edge.source,
-              target: edge.target,
-              style: {
-                strokeWidth: 3,
-              },
-              markerEnd: {
-                type: MarkerType.Arrow,
-              },
-            },
-            edges
-          )
-        );
-      }
-    });
-  }, [setNodes, setEdges]);
-
-  const closeAllPanels = () => {
-    setShowState({
-      addNode: false,
-      editNode: false,
-      faultyDependency: false,
-      graphShare: false,
-    });
-  };
-
-  const onSnackBarClose = (_event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason !== "clickaway") {
-      setErrorState({ show: false, message: "" });
-      setInfoState({ show: false, message: "" });
-      setSuccessState({ show: false, message: "" });
-    }
-  };
-
-  const onAddNodeButtonClicked = () => {
-    console.log("add node button clicked");
-    setShowState({
-      addNode: true,
-      editNode: false,
-      faultyDependency: false,
-      graphShare: false,
-    });
-  };
-
-  const onDoneButtonClicked = () => {
-    const usedPredefinedNodes = graph.nodes.filter(
-      (node) => predefinedNodeMap[node.id] !== undefined
+    setEdges(
+      graph.edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        style: {
+          strokeWidth: 3,
+        },
+        markerEnd: {
+          type: MarkerType.Arrow,
+        },
+      }))
     );
-    const tempFaultyDependencies: FaultyDependency[] = [];
+  }, []);
 
-    for (const usedPredefinedNode of usedPredefinedNodes) {
-      const nodeDependencies = usedPredefinedNode.dependencies;
-      for (const dependencyId of nodeDependencies) {
-        if (!nodes.some((node) => node.id === dependencyId)) {
-          // missing node
-          tempFaultyDependencies.push({
-            reason: "missing",
-            cause: "node",
-            sourceName: predefinedNodeMap[dependencyId]?.name,
-            targetName: usedPredefinedNode.name,
-          });
-        } else if (
-          !edges.some(
-            (edge) => edge.source === dependencyId && edge.target === usedPredefinedNode.id
-          )
-        ) {
-          // missing edge
-          tempFaultyDependencies.push({
-            reason: "missing",
-            cause: "edge",
-            sourceName: predefinedNodeMap[dependencyId]?.name,
-            targetName: usedPredefinedNode.name,
-          });
-        } else if (
-          edges.some(
-            (edge) => edge.source === usedPredefinedNode.id && edge.target === dependencyId
-          )
-        ) {
-          // wrong edge direction
-          tempFaultyDependencies.push({
-            reason: "wrong",
-            cause: "edge",
-            sourceName: predefinedNodeMap[dependencyId]?.name,
-            targetName: usedPredefinedNode.name,
-          });
-        }
-      }
-    }
-
-    if (tempFaultyDependencies.length == 0) {
-      setSuccessState({
-        show: true,
-        message: "all dependencies correct",
-      });
-      return;
-    }
-
-    setFaultyDependencies(tempFaultyDependencies);
-    setShowState({
-      addNode: false,
-      editNode: false,
-      faultyDependency: true,
-      graphShare: false,
+  const onNodeAdd = async (node: Requests.Node.Create) => {
+    const addNodeResult = await RequestMethods.nodeCreate({
+      token: token,
+      body: node,
     });
-  };
 
-  const onReturnButtonClicked = () => navigate("/user");
-
-  const onNodeClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
-    console.log(`node ${node.data.name} clicked`);
-    setCurrNode(node.data);
-  };
-
-  const onNodeDoubleClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
-    console.log(`node ${node.data.name} double clicked`);
-    setCurrNode(node.data);
-    setShowState({
-      addNode: false,
-      editNode: true,
-      faultyDependency: false,
-      graphShare: false,
-    });
-  };
-
-  const onNodeAdd = useCallback(
-    async (newNode: BackendModels.INode) => {
-      // node should be created by caller
-      closeAllPanels();
-
-      if (newNode.predefined && graph.nodes.some((node) => node.id === newNode.id)) {
-        // do nothing for existing predefined node
-        return;
-      }
-
-      const newNodePosition = { graphId: graph.id, nodeId: newNode.id, x: 350, y: 100 };
-
-      const createNodePositionResult = await RequestMethods.nodePositionCreate({
-        token: token,
-        body: newNodePosition,
-      });
-
-      if (!createNodePositionResult.status) {
-        setErrorState({
-          show: true,
-          message: `error when creating node position: ${createNodePositionResult.detail}`,
-        });
-        // stop if error happened during request
-        return;
-      }
-
-      const patchGraphResult = await RequestMethods.graphPatch({
-        param: graph.id,
-        token: token,
-        body: {
-          nodes: [...graph.nodes.map((node) => node.id), newNode.id],
-        },
-      });
-
-      if (!patchGraphResult.status) {
-        setErrorState({
-          show: true,
-          message: `error when updating graph: ${patchGraphResult.detail}`,
-        });
-        // stop if error happened during request
-        return;
-      }
-
-      const patchedGraph = patchGraphResult.value;
-
-      setGraph({
-        nodes: patchedGraph.nodes,
-        nodePositions: patchedGraph.nodePositions,
-      });
-
-      setNodes((nodes) =>
-        nodes.concat({
-          id: newNode.id,
-          type: "smoothNode",
-          position: { x: newNodePosition.x, y: newNodePosition.y },
-          data: newNode,
-        })
-      );
-    },
-    [graph, setNodes, setGraph]
-  );
-
-  const detectCycle = (source: Node, target: Node) => {
-    const stack = [source];
-
-    while (stack.length > 0) {
-      const currNode = stack.pop()!;
-      // current is target, cycle detected
-      if (currNode === target) {
-        return true;
-      }
-      // add all incomers to the stack
-      const incomers = getIncomers(currNode, nodes, edges);
-      stack.push(...incomers);
+    if (addNodeResult.status) {
+      addNode(addNodeResult.value);
+      setShowAddNode(false);
+    } else {
+      onError(addNodeResult.detail);
     }
-    // no cycle detected
-    return false;
   };
 
-  const onEdgeConnect = useCallback(
-    async ({ source, target }: Connection) => {
-      if (source === null || target === null) {
-        return;
-      }
-      console.log(`source is ${source}, target is ${target}`);
-      // nodes must exist for this callback to be called on them
-      const sourceNode = nodes.find((node) => node.data.id === source)!;
-      const targetNode = nodes.find((node) => node.data.id === target)!;
+  const onNodeEdit = async (id: string, node: Requests.Node.Patch) => {
+    const patchNodeResult = await RequestMethods.nodePatch({
+      param: id,
+      token: token,
+      body: node,
+    });
 
-      console.log(`connecting node ${sourceNode.data.name} to ${targetNode.data.name}`);
+    if (patchNodeResult.status) {
+      editNode(id, node);
+      setShowEditNode(false);
+    } else {
+      onError(patchNodeResult.detail);
+    }
+  };
 
-      if (detectCycle(sourceNode, targetNode)) {
-        setErrorState({
-          show: true,
-          message: "cycle detected",
-        });
-        return;
-      }
+  const onNodesDelete = async (deleted: Node<BackendModels.INode>[]) => {
+    deleteNodes(deleted.map((deletedNode) => deletedNode.data));
+  };
 
-      if (edges.some((edge) => edge.source === sourceNode.id && edge.target === targetNode.id)) {
-        setErrorState({
-          show: true,
-          message: "duplicate edge detected",
-        });
-        return;
-      }
+  const onNodeDragStop = async (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
+    updateNodePosition(node);
+  };
 
-      console.log(`created edge between ${sourceNode.data.name} and ${targetNode.data.name}`);
-
-      const createEdgeResult = await RequestMethods.edgeCreate({
-        token: token,
-        body: {
-          source: sourceNode.data.id,
-          target: targetNode.data.id,
-        },
-      });
-
-      if (!createEdgeResult.status) {
-        setErrorState({
-          show: true,
-          message: "cannot create edge",
-        });
-        return;
-      }
-
-      const newEdge = createEdgeResult.value;
-
-      const patchGraphResult = await RequestMethods.graphPatch({
-        token: token,
-        param: graph.id,
-        body: {
-          edges: [...graph.edges.map((edge) => edge.id), newEdge.id],
-        },
-      });
-
-      if (!patchGraphResult.status) {
-        setErrorState({
-          show: true,
-          message: "cannot update graph",
-        });
-        return;
-      }
-
-      setGraph({
-        edges: [...graph.edges, newEdge],
-      });
-
-      // add edge
-      setEdges((edges) =>
-        addEdge(
-          {
-            id: newEdge.id,
-            source: sourceNode.id,
-            target: targetNode.id,
-            style: {
-              strokeWidth: 3,
-            },
-            markerEnd: {
-              type: MarkerType.Arrow,
-            },
-          },
-          edges
-        )
-      );
-
-      // update dependencies
-      if (targetNode.data.predefined) {
-        // target is predefined, do not update
-        return;
-      }
-
-      const newDependecies = [...targetNode.data.dependencies, sourceNode.id];
-
-      const updateNodeDependencyResult = await RequestMethods.nodePatch({
-        param: targetNode.data.id,
-        token: token,
-        body: {
-          dependencies: newDependecies,
-        },
-      });
-
-      if (!updateNodeDependencyResult.status) {
-        setErrorState({
-          show: true,
-          message: "cannot update node dependency",
-        });
-        return;
-      }
-
-      setNodes((nodes) =>
-        nodes.map((node) => {
-          if (node.id === targetNode.id) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                dependencies: newDependecies,
-              },
-            };
-          }
-          return node;
-        })
-      );
-    },
-    [nodes, edges, graph, setNodes, setEdges, setGraph]
-  );
-
-  const onNodesDelete = useCallback(
-    async (deleted: Node<BackendModels.INode>[]) => {
-      console.log("on nodes delete");
-      console.log(deleted);
-      // reset currNode if it is deleted
-      if (deleted.some((deletedNode) => deletedNode.data.id === currNode?.id)) {
-        setCurrNode(undefined);
-      }
-      // update nodes first to inform edge delete
-      const updatedNodes = graph.nodes.filter(
-        (node) => !deleted.some((deletedNode) => deletedNode.data.id === node.id)
-      );
-      const updatedNodePositions = graph.nodePositions.filter(
-        (nodePosition) =>
-          !deleted.some((deletedNode) => deletedNode.data.id === nodePosition.nodeId)
-      );
-      const deletedNodePositions = graph.nodePositions.filter((nodePosition) =>
-        deleted.some((deletedNode) => deletedNode.data.id === nodePosition.nodeId)
-      );
-
-      setGraph({
-        nodes: updatedNodes,
-        nodePositions: updatedNodePositions,
-      });
-
-      // delete node ids from graph
-      await RequestMethods.graphPatch({
-        param: graph.id,
-        token: token,
-        body: {
-          nodes: updatedNodes.map((node) => node.id),
-        },
-      });
-
-      // delete node positions from graph
-      for (const deletedNodePosition of deletedNodePositions) {
-        await RequestMethods.nodePositionDelete({
-          param: [graph.id, deletedNodePosition.nodeId],
-          token: token,
-        });
-      }
-      // await Promise.all(
-      //   deletedNodePositions.map((deletedNodePosition) =>
-      //     RequestMethods.nodePositionDelete({
-      //       param: [graph.id, deletedNodePosition.nodeId],
-      //       token: token,
-      //     })
-      //   )
-      // );
-
-      // update dependencies
-      // skip predefined nodes
-      const outgoers = deleted
-        .flatMap((deletedNode) => getOutgoers(deletedNode, nodes, edges))
-        .filter((outgoer) => !outgoer.data.predefined);
-
-      const updatedDependenciesNodes = graph.nodes.map((node) => ({
-        ...node,
-        dependencies: node.dependencies.filter(
-          (dependencyId) => !deleted.some((deletedNode) => deletedNode.data.id === dependencyId)
-        ),
-      }));
-
-      setGraph({
-        nodes: updatedDependenciesNodes,
-      });
-
-      for (const outgoer of outgoers) {
-        await RequestMethods.nodePatch({
-          param: outgoer.id,
-          token: token,
-          body: {
-            dependencies: outgoer.data.dependencies.filter(
-              (dependencyId) => !deleted.some((deletedNode) => deletedNode.data.id === dependencyId)
-            ),
-          },
-        });
-      }
-
-      // await Promise.all(
-      //   outgoers.map((outgoer) =>
-      //     RequestMethods.nodePatch({
-      //       param: outgoer.id,
-      //       token: token,
-      //       body: {
-      //         dependencies: outgoer.data.dependencies.filter(
-      //           (dependencyId) =>
-      //             !deleted.some((deletedNode) => deletedNode.data.id === dependencyId)
-      //         ),
-      //       },
-      //     })
-      //   )
-      // );
-    },
-    [nodes, edges, setNodes, setEdges, setGraph]
-  );
-
-  const onEdgesDelete = useCallback(
-    async (deleted: Edge[]) => {
-      // udpate graph first to inform other callbacked
-      console.log("on edge delete");
-      console.log(deleted);
-
-      // do not delete edge because of sync issue
-
-      const updatedEdges = graph.edges.filter(
-        (edge) => !deleted.some((deletedEdge) => deletedEdge.id === edge.id)
-      );
-
-      console.log("updated edges");
-      console.log(updatedEdges);
-
-      setGraph({
-        edges: updatedEdges,
-      });
-
-      await RequestMethods.graphPatch({
-        param: graph.id,
-        token: token,
-        body: {
-          edges: updatedEdges.map((edge) => edge.id),
-        },
-      });
-
-      for (const node of graph.nodes) {
-        const edge = deleted.find((edge) => edge.target === node.id);
-        if (node === undefined || node.predefined || edge === undefined) return () => {};
-
-        await RequestMethods.nodePatch({
-          param: node.id,
-          token: token,
-          body: {
-            dependencies: node.dependencies.filter((dependencyId) => dependencyId !== edge.source),
-          },
-        });
-      }
-
-      // update dependencies
-      // await Promise.all(
-      //   graph.nodes.map((node) => {
-      //     const edge = deleted.find((edge) => edge.target === node.id);
-      //     if (node === undefined || node.predefined || edge === undefined) return () => {};
-
-      //     return RequestMethods.nodePatch({
-      //       param: node.id,
-      //       token: token,
-      //       body: {
-      //         dependencies: node.dependencies.filter(
-      //           (dependencyId) => dependencyId !== edge.source
-      //         ),
-      //       },
-      //     });
-      //   })
-      // );
-    },
-    [nodes, edges, setNodes, setEdges, setGraph]
-  );
-  const onNodeDragStop = async (
-    _event: React.MouseEvent,
-    draggedNode: Node<BackendModels.INode>
-  ) => {
-    console.log(`dragged node to position [${draggedNode.position.x}, ${draggedNode.position.y}]`);
-    const nodePositionPatchResult = await RequestMethods.nodePositionPatch({
-      param: [graph.id, draggedNode.data.id],
+  const onEdgeAdd = async (connection: Connection) => {
+    const addEdgeResult = await RequestMethods.edgeCreate({
       token: token,
       body: {
-        x: Math.floor(draggedNode.position.x),
-        y: Math.floor(draggedNode.position.y),
+        source: connection.source!,
+        target: connection.target!,
       },
     });
-    if (!nodePositionPatchResult.status) {
-      setErrorState({
-        show: true,
-        message: "cannot patch node position",
-      });
-      return;
+
+    if (addEdgeResult.status) {
+      addEdge(addEdgeResult.value);
+      onConnect(connection);
+    } else {
+      onError(addEdgeResult.detail);
     }
-    const nodePosition = graph.nodePositions.find(
-      (existingPosition) => existingPosition.nodeId === draggedNode.data.id
-    )!;
-    const newNodePosition = {
-      ...nodePosition,
-      x: Math.floor(draggedNode.position.x),
-      y: Math.floor(draggedNode.position.y),
-    };
-    setGraph({
-      nodePositions: [
-        ...graph.nodePositions.filter(
-          (existingPosition) => existingPosition.nodeId !== draggedNode.data.id
-        ),
-        newNodePosition,
-      ],
-    });
   };
+
+  const onEdgesDelete = async (deleted: Edge[]) => {
+    deleteEdges(deleted);
+  };
+
+  const [title, setTitle] = useState(graph.title);
 
   const onTitleInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
     setTitle(event.target.value);
   };
 
-  const onTitleSubmit = (event: React.KeyboardEvent) => {
+  const onTitleChangeSubmit = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      RequestMethods.graphPatch({
-        param: graph.id,
-        token: token,
-        body: {
-          title: title,
-        },
-      });
+      udpateTitle(title.trim());
     }
   };
 
-  const onShareButtonClicked = () => {
-    setShowState({
-      addNode: false,
-      editNode: false,
-      faultyDependency: false,
-      graphShare: true,
-    });
+  const [showAddNode, setShowAddNode] = useState(false);
+
+  const onAddNodeButtonClicked = () => {
+    console.log("add node button clicked");
+    setShowAddNode(true);
   };
 
-  const onError = (error: string) => {
-    setErrorState({
-      show: true,
-      message: error,
-    });
+  const [showEditNode, setShowEditNode] = useState(false);
+
+  const onNodeClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
+    console.log("node clicked");
+    setCurrNode(node);
+  };
+
+  const onNodeDoubleClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
+    console.log("node double clicked");
+    setCurrNode(node);
+    onEditNode();
+  };
+
+  const onEditNode = () => {
+    setShowEditNode(true);
+  };
+
+  const onShareButtonClicked = () => {
+    console.log("share button clicked");
+  };
+
+  const [faultyDependencies, setFaultyDependencies] = useState<IFaultyDependency[]>([]);
+  const [showFaultyDependency, setShowFaultyDependency] = useState(false);
+
+  const verifyDependencies = () => {
+    const nodes = graph.nodes.filter((node) => node.predefined);
+    const tempFaultyDependencies: IFaultyDependency[] = [];
+
+    for (const node of nodes) {
+      for (const dependency of node.dependencies) {
+        if (!nodes.some((node) => node.id === dependency)) {
+          tempFaultyDependencies.push({
+            reason: "missing",
+            cause: "node",
+            sourceName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
+            targetName: node.name,
+          });
+          continue;
+        }
+
+        const reversedEdge = graph.edges.find(
+          (edge) => edge.source === node.id && edge.target === dependency
+        );
+
+        if (reversedEdge !== undefined) {
+          tempFaultyDependencies.push({
+            reason: "wrong",
+            cause: "edge",
+            sourceName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
+            targetName: node.name,
+          });
+          continue;
+        }
+
+        const correctEdge = graph.edges.find(
+          (edge) => edge.target === node.id && edge.source === node.id
+        );
+
+        if (correctEdge === undefined) {
+          tempFaultyDependencies.push({
+            reason: "missing",
+            cause: "edge",
+            sourceName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
+            targetName: node.name,
+          });
+          continue;
+        }
+      }
+    }
+
+    return tempFaultyDependencies;
+  };
+
+  const onVerifyButtonClicked = () => {
+    console.log("verify button clicked");
+    const tempFaultyDependencies = verifyDependencies();
+
+    setFaultyDependencies(tempFaultyDependencies);
+
+    if (tempFaultyDependencies.length > 0) {
+      setShowFaultyDependency(true);
+    } else {
+      onSuccess("all dependencies good");
+    }
+  };
+
+  const onReturnButtonClicked = () => {
+    console.log("on return button clicked");
+    navigate("/user");
+  };
+
+  const onCancelDialog = () => {
+    setShowAddNode(false);
+    setShowEditNode(false);
+    setShowFaultyDependency(false);
+  };
+
+  const onSuccess = (message: string) => {
+    enqueueSnackbar(message, { variant: "success" });
+  };
+
+  const onError = (message: string) => {
+    enqueueSnackbar(message, { variant: "error" });
   };
 
   return (
     <div className="w-full flex flex-row min-h-screen min-w-full overflow-hidden">
+      <SnackbarProvider />
+      <Dialog open={showAddNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
+        <AddNode onSubmit={onNodeAdd} onError={onError} />
+      </Dialog>
+      <Dialog open={showEditNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
+        <EditNode onSubmit={onNodeEdit} onError={onError} node={currNode?.data} />
+      </Dialog>
+      <Dialog open={showFaultyDependency} onClose={onCancelDialog} maxWidth="md" fullWidth>
+        <FaultyDependency faultyDependencies={faultyDependencies}></FaultyDependency>
+      </Dialog>
       <div className="flex self-stretch basis-3/4 overflow-hidden">
-        <Snackbar open={successState.show} autoHideDuration={2000} onClose={onSnackBarClose}>
-          <Alert severity="success">{successState.message}</Alert>
-        </Snackbar>
-        <Snackbar open={infoState.show} autoHideDuration={2000} onClose={onSnackBarClose}>
-          <Alert severity="info">{infoState.message}</Alert>
-        </Snackbar>
-        <Snackbar open={errorState.show} autoHideDuration={2000} onClose={onSnackBarClose}>
-          <Alert severity="error">{errorState.message}</Alert>
-        </Snackbar>
-        <Dialog open={showState.addNode} onClose={closeAllPanels} maxWidth="md" fullWidth={true}>
-          <AddNode onSubmit={onNodeAdd} onError={onError} />
-        </Dialog>
-        <Dialog open={showState.graphShare} onClose={closeAllPanels} maxWidth="sm" fullWidth={true}>
-          <GraphSharing onClose={closeAllPanels} />
-        </Dialog>
         <ReactFlow
           nodeTypes={nodeTypes}
           nodes={nodes}
           onNodesChange={onNodesChange}
           onNodesDelete={onNodesDelete}
+          onNodeDragStop={onNodeDragStop}
           onNodeClick={onNodeClick}
           onNodeDoubleClick={onNodeDoubleClick}
           edges={edges}
           onEdgesChange={onEdgesChange}
-          onConnect={onEdgeConnect}
+          onConnect={onEdgeAdd}
           onEdgesDelete={onEdgesDelete}
           onPaneClick={() => setCurrNode(undefined)}
-          onNodeDragStop={onNodeDragStop}
           edgesUpdatable={!disabled}
           edgesFocusable={!disabled}
           nodesDraggable={!disabled}
@@ -704,7 +323,11 @@ export default function Graph() {
           elementsSelectable={!disabled}
         >
           <Panel className="bg-transparent" position="top-center">
-            <TextField onChange={onTitleInputChanged} value={title} />
+            <TextField
+              value={title}
+              onChange={onTitleInputChanged}
+              onKeyDown={onTitleChangeSubmit}
+            ></TextField>
           </Panel>
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
@@ -735,7 +358,7 @@ export default function Graph() {
                   <Button
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
-                    onClick={onDoneButtonClicked}
+                    onClick={onVerifyButtonClicked}
                   >
                     <DoneAll />
                   </Button>

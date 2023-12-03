@@ -30,8 +30,12 @@ export default function GraphEntry({ graph }: GraphEntryProp) {
       <Card className="relative">
         <CardHeader title={graph.title + displayName}></CardHeader>
         <CardContent>
-          <IconButton color="error" className="absolute top-1 right-1">
-            <DeleteForeverIcon onClick={() => console.log("delete button clicked")} />
+          <IconButton
+            color="error"
+            className="absolute top-1 right-1"
+            onClick={() => console.log("delete button clicked")}
+          >
+            <DeleteForeverIcon />
           </IconButton>
           <img src={imgUrl} alt="graph" />
         </CardContent>

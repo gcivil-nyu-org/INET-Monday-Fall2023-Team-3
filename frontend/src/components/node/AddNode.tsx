@@ -1,18 +1,17 @@
 import { useState, ChangeEvent } from "react";
-import { Button, TextField, Alert, Typography } from "@mui/material";
-import { BackendModels } from "utils/models";
-import { RequestMethods } from "src/utils/utils";
+import { Button, TextField } from "@mui/material";
 import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
+import { Requests } from "src/utils/requests";
 
 export type AddNodeProp = {
-  onSubmit: (node: BackendModels.INode) => void;
-  onError: (error: string) => void;
+  onSubmit: (node: Requests.Node.Create) => void;
+  onError: (message: string) => void;
 };
 
 export default function AddNode({ onSubmit, onError }: AddNodeProp) {
-  const [graph, predefinedNodeMap, token] = useCombinedStore(
-    useShallow((state) => [state.graph, state.predefinedNodeMap, state.token])
+  const [graph, predefinedNodeMap] = useCombinedStore(
+    useShallow((state) => [state.graph, state.predefinedNodeMap])
   );
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -20,24 +19,14 @@ export default function AddNode({ onSubmit, onError }: AddNodeProp) {
     name: "",
     description: "",
   });
-  const [error, setError] = useState("");
 
   const onSaveButtonClicked = () => {
     if (addNodeData.name === "") {
-      setError("name cannot be empty");
+      onError("name cannot be empty");
       return;
     }
 
-    RequestMethods.nodeCreate({
-      body: addNodeData,
-      token: token,
-    }).then((result) => {
-      if (result.status) {
-        onSubmit(result.value);
-      } else {
-        onError(result.detail);
-      }
-    });
+    onSubmit(addNodeData);
   };
 
   const onNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
@@ -104,13 +93,6 @@ export default function AddNode({ onSubmit, onError }: AddNodeProp) {
             onChange={onDescriptionInputChanged}
           />
         </div>
-        {error !== "" && (
-          <div className="w-full flex p-8 pb-0">
-            <Alert className="h-16 w-full m-4" severity="error">
-              {error}
-            </Alert>
-          </div>
-        )}
         <div className="flex flex-1"></div>
         <div className="w-full flex p-8 pb-0">
           <Button
