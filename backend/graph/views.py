@@ -17,8 +17,8 @@ from shared.view_helper import (
     ok,
 )
 
-from .models import Graph, NodePosition
-from .serializers import GraphPatchSerializer, GraphSerializer, NodePositionSerializer
+from .models import Graph, NodePosition, NodeColor
+from .serializers import GraphPatchSerializer, GraphSerializer, NodePositionSerializer, NodeColorSerializer
 
 GRAPH_PING_OK_MESSAGE = ok("graph: ok")
 GRAPH_PING_OK_RESPONSE = Response(GRAPH_PING_OK_MESSAGE, status=status.HTTP_200_OK)
@@ -190,4 +190,68 @@ def node_position_delete(request: Request, graph_id: str, node_id: str):
         model_class=NodePosition,
         instance_identifier={"graph_id": graph_id, "node_id": node_id},
         not_found_response=NODE_POSITION_DELETE_NOT_FOUND_RESPONSE,
+    )
+
+NODE_COLOR_CREATE_INVALID_FORMAT_MESSAGE = error("node_color: invalid format")
+NODE_COLOR_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    NODE_COLOR_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
+
+# create endpoint
+NODE_COLOR_CREATE_PATH = "node-color/create/"
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_color_create(request: Request):
+    return handle_create(
+        create_data=request.data,
+        serializer_class=NodeColorSerializer,
+        invalid_format_response=NODE_COLOR_CREATE_INVALID_FORMAT_RESPONSE,
+    )
+
+
+NODE_COLOR_PATCH_NOT_FOUND_MESSAGE = error("node_color: not found")
+NODE_COLOR_PATCH_NOT_FOUND_RESPONSE = Response(
+    NODE_COLOR_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+NODE_COLOR_PATCH_PATH = "node-color/patch/<str:graph_id>/<str:node_id>/"
+NODE_COLOR_PATCH_PATH_FORMAT = "node-color/patch/{graph_id}/{node_id}/"
+
+
+@api_view(["PATCH"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_color_patch(request: Request, graph_id: str, node_id: str):
+    return handle_patch(
+        model_class=NodeColor,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        patch_data=request.data,
+        patch_serializer_class=NodeColorSerializer,
+        not_found_response=NODE_COLOR_PATCH_NOT_FOUND_RESPONSE,
+    )
+
+
+
+NODE_COLOR_DELETE_NOT_FOUND_MESSAGE = error("node_color: not found")
+NODE_COLOR_DELETE_NOT_FOUND_RESPONSE = Response(
+    NODE_COLOR_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+NODE_COLOR_DELETE_PATH = "node-color/delete/<str:graph_id>/<str:node_id>/"
+NODE_COLOR_DELETE_PATH_FORMAT = "node-color/delete/{graph_id}/{node_id}/"
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_color_delete(request: Request, graph_id: str, node_id: str):
+    return handle_delete(
+        model_class=NodeColor,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        not_found_response=NODE_COLOR_DELETE_NOT_FOUND_RESPONSE,
     )

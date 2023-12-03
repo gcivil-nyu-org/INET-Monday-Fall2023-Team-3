@@ -25,4 +25,19 @@ urlpatterns = [
         views.node_position_delete,
         name="node-position-delete",
     ),
+    path(
+        views.NODE_COLOR_CREATE_PATH,
+        views.node_color_create,
+        name="node-color-create",
+    ),
+    path(
+        views.NODE_COLOR_PATCH_PATH,
+        views.node_color_patch,
+        name="node-color-patch",
+    ),
+    path(
+        views.NODE_COLOR_DELETE_PATH,
+        views.node_color_delete,
+        name="node-color-delete",
+    ),
 ]
