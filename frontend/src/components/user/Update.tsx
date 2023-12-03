@@ -81,8 +81,23 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
 
   const onRefreshAvatar = () => {
     console.log("refreshing avatar");
-    const avatarUrl = refreshPokemonAvatar();
-    onAvatarChanged(avatarUrl);
+    const newAvatarUrl = refreshPokemonAvatar();
+
+    RequestMethods.userPatch({
+      body: {avatar: newAvatarUrl},
+      token,
+    }).then((result) => {
+      if (result.status) {
+        setUser(result.value);
+        setSeverity("success");
+        setMessage("avatar update success");
+      } else {
+        setSeverity("error");
+        setMessage(result.detail);
+      }
+    });
+
+    onAvatarChanged(newAvatarUrl);
   };
 
   return (

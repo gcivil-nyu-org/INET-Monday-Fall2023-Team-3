@@ -3,6 +3,7 @@ import { UserSlice } from "./userStore";
 import { GraphSlice } from "./graphStore";
 import { RequestMethods } from "src/utils/utils";
 import { BackendModels, ResponseModels } from "src/utils/models";
+import { defaultAvatarSrc } from "src/utils/helpers";
 
 // add later slices here
 type CombinedStoreType = UserSlice & GraphSlice;
@@ -13,6 +14,7 @@ const createUserSlice: StateCreator<CombinedStoreType, [], [], UserSlice> = (set
     username: "",
     createdGraphs: [],
     sharedGraphs: [],
+    avatar: defaultAvatarSrc,
   },
 
   setUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),

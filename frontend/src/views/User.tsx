@@ -35,7 +35,8 @@ export default function User() {
     }))
   );
   const [avatarSrc, setAvatarSrc] = useState(
-    localStorage.getItem("smooth/avatar") ?? defaultAvatarSrc
+    // localStorage.getItem("smooth/avatar") ??
+    user.avatar == null ? defaultAvatarSrc : user.avatar
   );
 
   // when user content changed, we
@@ -46,6 +47,7 @@ export default function User() {
   }, [user]);
 
   const onUpdateCancelled = () => {
+    console.log("user avatar is:", user.avatar);
     console.log("update cancelled");
     setUpdate(false);
   };
