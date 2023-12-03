@@ -20,9 +20,7 @@ export default function GraphEntry({ graph, edit }: GraphEntryProp) {
     setUser,
     token,
     createdGraphs,
-    fetchCreatedGraphs,
     sharedGraphs,
-    fetchSharedGraphs,
     setGraph,
   } = useCombinedStore(
     useShallow((state) => ({
@@ -30,9 +28,7 @@ export default function GraphEntry({ graph, edit }: GraphEntryProp) {
       setUser: state.setUser,
       token: state.token,
       createdGraphs: state.createdGraphs,
-      fetchCreatedGraphs: state.fetchCreatedGraphs,
       sharedGraphs: state.sharedGraphs,
-      fetchSharedGraphs: state.fetchSharedGraphs,
       setGraph: state.setGraph,
     }))
   );
