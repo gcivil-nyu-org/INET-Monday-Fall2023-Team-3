@@ -342,7 +342,7 @@ export default function Graph() {
             <div className="flex flex-col space-y-2">
               {!disabled && (
                 <Tooltip title="Add Node" placement="right" arrow>
-                  <Button
+                  <Button className="bg-orange"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onAddNodeButtonClicked}
@@ -353,7 +353,7 @@ export default function Graph() {
               )}
               {!disabled && (
                 <Tooltip title="Share" placement="right" arrow>
-                  <Button
+                  <Button className="bg-pink"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onShareButtonClicked}
@@ -364,7 +364,7 @@ export default function Graph() {
               )}
               {!disabled && (
                 <Tooltip title="Verify Dependencies" placement="right" arrow>
-                  <Button
+                  <Button className="bg-yellow"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onVerifyButtonClicked}
@@ -374,7 +374,7 @@ export default function Graph() {
                 </Tooltip>
               )}
               <Tooltip title="Return" placement="right" arrow>
-                <Button
+                <Button className="bg-blue"
                   variant="outlined"
                   sx={{ padding: "8px", minWidth: "32px" }}
                   onClick={onReturnButtonClicked}
@@ -385,7 +385,7 @@ export default function Graph() {
             </div>
           </Panel>
           <Controls />
-          <Background color="#aaa" gap={16} />
+          <Background className="bg-beige" gap={16} />
         </ReactFlow>
       </div>
     </div>

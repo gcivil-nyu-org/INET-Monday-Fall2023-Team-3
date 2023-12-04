@@ -43,8 +43,7 @@ export default function GraphList({ name, graphs }: GraphListProp) {
       <div className="flex flex-1 flex-row overflow-x-auto min-h-[16rem]">
         {graphs.map((graph, index) => (
           <div key={graph.id}>
-            <GraphEntry graph={graph} edit={edit} index={index}
-            className="h-64 w-64 m-4 overflow-auto flex-shrink-0"/>
+            <GraphEntry graph={graph} edit={edit} index={index} />
           </div>
         ))}
       </div>
