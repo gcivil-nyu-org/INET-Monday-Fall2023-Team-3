@@ -160,10 +160,10 @@ export default function Welcome() {
             </div>
           )}
           {signUp && ( // if signup is true, then render the Signup component
-            <>
-              <DialogTitle>Sign Up</DialogTitle>
+            <div className="bg-beige">
+              <DialogTitle className="font-sans">Sign Up</DialogTitle>
               <SignUp />
-            </>
+            </div>
           )}
         </Dialog>
       </div>

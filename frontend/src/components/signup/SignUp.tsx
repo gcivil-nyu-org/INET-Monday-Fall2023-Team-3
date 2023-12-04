@@ -130,7 +130,7 @@ export default function SignUp() {
       )}
       <div className="h-24 w-full flex">
         <Button
-          className="w-64 h-16 m-auto bg-blue-400"
+          className="w-64 h-16 ml-auto mr-auto bg-beige text-olive border-2 border-solid rounded-full"
           size="large"
           variant="contained"
           onClick={onSignUpButtonClicked}
