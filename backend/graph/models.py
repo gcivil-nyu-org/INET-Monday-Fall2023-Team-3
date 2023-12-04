@@ -17,6 +17,7 @@ class NodePosition(models.Model):
     class Meta:
         unique_together = ("graph_id", "node_id")
 
+
 class NodeColor(models.Model):
     graph_id = models.ForeignKey(
         "Graph", on_delete=models.CASCADE, related_name="node_colors"

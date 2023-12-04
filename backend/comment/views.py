@@ -166,7 +166,7 @@ def graph_comment_create(request: Request):
         invalid_format_response=GRAPH_COMMENT_CREATE_INVALID_FORMAT_RESPONSE,
     )
     if response.status_code == 200:
-        print("send pusher")
+        print("create pusher")
         data = json.loads(json.dumps(response.data, default=str))
         print(data)
         pusher_client.trigger("comments-channel", "new-graph-comment", data)
@@ -227,13 +227,19 @@ GRAPH_COMMENT_PATCH_PATH_FORMAT = "graph/patch/{comment_id}/"
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_comment_patch(request: Request, comment_id: str):
-    return handle_patch(
+    response = handle_patch(
         model_class=GraphComment,
         instance_identifier={"id": comment_id},
         patch_data=request.data,
         patch_serializer_class=GraphCommentSerializer,
         not_found_response=GRAPH_COMMENT_PATCH_NOT_FOUND_RESPONSE,
     )
+    if response.status_code == 200:
+        print("patch pusher")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "patch-graph-comment", data)
+    return response
 
 
 GRAPH_COMMENT_DELETE_NOT_FOUND_MESSAGE = error("graph_comment: not found")
@@ -250,8 +256,14 @@ GRAPH_COMMENT_DELETE_PATH_FORMAT = "graph/delete/{comment_id}/"
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_comment_delete(request: Request, comment_id: str):
-    return handle_delete(
+    response = handle_delete(
         model_class=GraphComment,
         instance_identifier={"id": comment_id},
         not_found_response=GRAPH_COMMENT_DELETE_NOT_FOUND_RESPONSE,
     )
+    if response.status_code == 200:
+        print("delete pusher")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "delete-graph-comment", data)
+    return response

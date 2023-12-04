@@ -101,8 +101,32 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
     }
   });
 
+  usePusher("comments-channel", "patch-graph-comment", async (newComment: BackendModels.IComment) => {
+    const response = await RequestMethods.graphCommentGetByGraph({
+        token: token,
+        param: graph.id,
+    });
+    if (response.status) {
+        console.log("usePusher");
+        const commentsArray = Object.values(response.value);
+        setComments(commentsArray);
+    }
+  });
+
+  usePusher("comments-channel", "delete-graph-comment", async (newComment: BackendModels.IComment) => {
+    const response = await RequestMethods.graphCommentGetByGraph({
+        token: token,
+        param: graph.id,
+    });
+    if (response.status) {
+        console.log("usePusher");
+        const commentsArray = Object.values(response.value);
+        setComments(commentsArray);
+    }
+  });
+
   const updateComment = (text: string, commentId: string) => {
-    RequestMethods.nodeCommentPatch({
+    RequestMethods.graphCommentPatch({
       token: token,
       body: {
         body: text,
@@ -126,7 +150,7 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
 
   const deleteComment = (commentId: string) => {
     if (window.confirm("Are you sure you want to remove comment?")) {
-      RequestMethods.nodeCommentDelete({ token: token, param: commentId }).then((result) => {
+      RequestMethods.graphCommentDelete({ token: token, param: commentId }).then((result) => {
         console.log(result);
         if (result.status) {
           const updatedComments = comments.filter((comment) => comment.id !== commentId);
@@ -207,7 +231,7 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
                   addComment={addComment}
                   deleteComment={deleteComment}
                   updateComment={updateComment}
-                  currentUserId={email}
+                  currentUserId={user.email}
                 />
               ))}
             </Box>

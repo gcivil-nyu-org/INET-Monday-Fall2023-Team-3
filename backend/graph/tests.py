@@ -235,9 +235,7 @@ class GraphTest(CustomTestCase):
         node_position_patch_endpoint = actual_endpoint(
             views.NODE_POSITION_PATCH_PATH_FORMAT
         )
-        node_color_patch_endpoint = actual_endpoint(
-            views.NODE_COLOR_PATCH_PATH_FORMAT
-        )
+        node_color_patch_endpoint = actual_endpoint(views.NODE_COLOR_PATCH_PATH_FORMAT)
         # test for unknown graph_id
         response = self.client.patch(
             node_position_patch_endpoint.format(
@@ -298,12 +296,10 @@ class GraphTest(CustomTestCase):
         valid_node_color = {
             "graph_id": graph_data["id"],
             "node_id": node_1.id,
-            'color': "#FFA500",
+            "color": "#FFA500",
         }
 
-        response = self.client.post(
-            node_color_create_endpoint, data=valid_node_color
-        )
+        response = self.client.post(node_color_create_endpoint, data=valid_node_color)
         self.assertResponseOk(response=response)
 
         node_color_data = response.data["value"]
@@ -323,6 +319,6 @@ class GraphTest(CustomTestCase):
         self.assertResponseDataKeyEqual(
             key="node_id", expect=node_color_data, response=response
         )
-        self.assertResponseDataKeyEqual(key="color", expect=patch_data, response=response)
-
-
+        self.assertResponseDataKeyEqual(
+            key="color", expect=patch_data, response=response
+        )

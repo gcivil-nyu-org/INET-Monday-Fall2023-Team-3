@@ -12,6 +12,7 @@ class NodePositionSerializer(serializers.ModelSerializer):
         model = NodePosition
         fields = "__all__"
 
+
 class NodeColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = NodeColor
