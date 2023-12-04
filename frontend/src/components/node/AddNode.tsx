@@ -69,7 +69,7 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: A
         </div>
         <div className="w-full flex flex-col bg-gray-200 flex-1">
           {getSearchingNodes().map((node) => (
-            <div key={node.id} className="w-full h-40 p-6">
+            <div key={node.id} className="w-full h-28 p-6 cursor-pointer">
               <div className="w-full h-20 text-center bg-white" onClick={() => onSubmitPredefinedNode(node.id)}>
                 {node.name}
               </div>
