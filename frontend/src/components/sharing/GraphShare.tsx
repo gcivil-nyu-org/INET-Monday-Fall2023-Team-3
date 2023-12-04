@@ -96,7 +96,7 @@ export default function GraphSharing({ onClose }: GraphSharingProp) {
   };
 
   return (
-    <div className="w-full flex flex-col items-center bg-white">
+    <div className="w-full flex flex-col items-center bg-beige">
       <div className="w-full pl-8 pr-8 pt-4 flex justify-center items-center my-4 mt-8 flex-col items-center">
         <Stack spacing={2} sx={{ width: "100%", mb: 4 }}>
           <Autocomplete
@@ -127,13 +127,13 @@ export default function GraphSharing({ onClose }: GraphSharingProp) {
         </Stack>
       </div>
       <div className="w-full pl-8 pr-8 flex justify-center items-center my-4 mt-8 flex-col items-center">
-        <Alert severity="info" className="w-full">
+        <Alert severity="info" className="w-full bg-beige">
           The shared graph will not be able to modified by other users.
         </Alert>
       </div>
       <Stack spacing={2} sx={{ width: "100%", mb: 4 }}>
         <Button
-          className="w-64 h-16 m-auto bg-blue-400 my-4"
+          className="w-64 h-16 m-auto bg-beige text-olive font-sans my-4 border-2 border-solid rounded-full"
           size="large"
           variant="contained"
           onClick={onShareButtonClicked}
@@ -141,7 +141,7 @@ export default function GraphSharing({ onClose }: GraphSharingProp) {
           Share
         </Button>
         <Button
-          className="w-64 h-16 m-auto bg-blue-400 my-4"
+          className="w-64 h-16 m-auto bg-beige text-olive font-sans my-4 border-2 border-solid rounded-full"
           size="large"
           variant="contained"
           onClick={onClose}
