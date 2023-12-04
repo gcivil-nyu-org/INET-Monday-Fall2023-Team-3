@@ -91,7 +91,7 @@ export default function User() {
   };
 
   return (
-    <div className="bg-beige w-full h-full">
+    <div className="bg-beige w-full h-auto">
       <div className="bg-beige flex flex-row-reverse w-full">
         <div className="flex h-16 m-4">
           <Button

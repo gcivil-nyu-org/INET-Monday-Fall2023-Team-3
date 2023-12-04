@@ -39,9 +39,9 @@ export default function GraphList({ name, graphs }: GraphListProp) {
         </Button>
         }
       </div>
-      <div className="flex flex-1 flex-row min-h-[16rem]">
+      <div className="flex flex-1 flex-row overflow-x-auto min-h-[16rem]">
         {graphs.map((graph) => (
-          <div className="h-64 w-64 flex m-4" key={graph.id}>
+          <div className="h-64 w-64 m-4 overflow-auto flex-shrink-0" key={graph.id}>
             <GraphEntry graph={graph} edit={edit} />
           </div>
         ))}
