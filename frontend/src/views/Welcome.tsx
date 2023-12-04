@@ -150,13 +150,14 @@ export default function Welcome() {
         <div className="w-4/12 h-80 bg-yellow m-5 shadow-lg -rotate-20"></div>
       </div>
       <div className="w-full flex flex-row self-stretch items-stretch justify-between flex-1">
-        <div className="flex flex-1 bg-gray-500"></div>
-        <Dialog open={login || signUp} onClose={onCancel} maxWidth="sm" fullWidth={true}>
+        <Dialog className="border-solid border-2" open={login || signUp} onClose={onCancel} maxWidth="sm" fullWidth={true}>
+        {/* style don't work on Dialog  */}
+
           {login && ( // if login is true, then render the Login component
-            <>
-              <DialogTitle>Log In</DialogTitle>
+            <div className="bg-beige">
+              <DialogTitle className="font-sans">Log In</DialogTitle>
               <Login />
-            </>
+            </div>
           )}
           {signUp && ( // if signup is true, then render the Signup component
             <>
