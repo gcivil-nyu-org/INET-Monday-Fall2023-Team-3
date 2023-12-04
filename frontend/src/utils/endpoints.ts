@@ -166,7 +166,13 @@ export type Endpoints = {
     bodyType: Requests.Graph.Delete;
     resultType: Responses.Graph.Delete;
   };
-
+  "/graph/share/": {
+    paramType: string;
+    authenticate: true;
+    method: "PATCH";
+    bodyType: Requests.Graph.Share;
+    resultType: Responses.Graph.Share;
+  };
   "/graph/node-position/create/": {
     paramType: undefined;
     authenticate: true;

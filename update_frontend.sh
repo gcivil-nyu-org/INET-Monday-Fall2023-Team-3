@@ -8,15 +8,15 @@ rm -rf static
 mkdir static
 cd ..
 # copy frontend files to backend
-cp -r ./frontend/dist/* ./backend/static/
-# # backend migration
-# cd ./backend
-# python manage.py makemigrations
-# python manage.py migrate
-# cd ..
+cp -r frontend/dist/* backend/static/
+# backend migration
+cd ./backend
+python manage.py makemigrations
+python manage.py migrate
+cd ..
 
 # # fix format
 cd ./backend
-# black .
-# flake8 .
+black .
+flake8 .
 python manage.py runserver

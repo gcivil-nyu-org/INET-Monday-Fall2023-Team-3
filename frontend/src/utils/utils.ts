@@ -150,6 +150,10 @@ export namespace RequestMethods {
     return request("/graph/delete/", "DELETE", params);
   };
 
+  export const graphShare: RequestBuilder<"/graph/share/"> = (params) => {
+    return request("/graph/share/", "PATCH", params);
+  };
+
   export const nodePositionCreate: RequestBuilder<"/graph/node-position/create/"> = (params) => {
     return request("/graph/node-position/create/", "POST", params);
   };

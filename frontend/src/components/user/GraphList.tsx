@@ -10,7 +10,7 @@ export type GraphListProp = {
 
 export default function GraphList({ name, graphs }: GraphListProp) {
   const [edit, setEdit] = useState(false);
-
+  const disabled = name === "Shared Graph";
   const onEditClicked = () => {
     console.log("edit is clicked!");
     setEdit(true);

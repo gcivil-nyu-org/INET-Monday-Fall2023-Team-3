@@ -32,6 +32,8 @@ export default function GraphEntry({ graph, edit }: GraphEntryProp) {
       setGraph: state.setGraph,
     }))
   );
+  const disabled = user.email !== graph.createdBy;
+  const displayName = user.email === graph.createdBy ? "" : "@" + graph.createdBy;
 
   const onGraphClicked = () => {
     console.log(`navigating to graph ${graph.title}`);
@@ -73,7 +75,7 @@ export default function GraphEntry({ graph, edit }: GraphEntryProp) {
   return (
     <div className="flex flex-1" onClick={onGraphClicked}>
       <Card className="relative">
-        <CardHeader title={graph.title}></CardHeader>
+        <CardHeader title={graph.title + displayName}></CardHeader>
         <CardContent>
           {edit &&
           <IconButton color="error" className="absolute top-1 right-1" onClick={onDeleteClicked}>

@@ -10,6 +10,8 @@ import { defaultAvatarSrc } from "src/utils/helpers";
 import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
 
+import usePusher from "src/components/pusher/usePusher";
+
 export default function User() {
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
@@ -42,9 +44,21 @@ export default function User() {
   // when user content changed, we
   // fetch graphs again
   useEffect(() => {
+    console.log(user);
     fetchCreatedGraphs();
     fetchSharedGraphs();
   }, [user]);
+
+  // Subscribe to Pusher channel and events
+  usePusher("graph-channel", "new-graph-share", async () => {
+    console.log("usePusher");
+    const resp = await RequestMethods.userGetSelf({
+      token
+    });
+    if (resp.status) {
+      setUser({ sharedGraphs: resp.value.sharedGraphs})
+    }
+  });
 
   const onUpdateCancelled = () => {
     console.log("user avatar is:", user.avatar);
