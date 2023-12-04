@@ -125,6 +125,10 @@ export default function User() {
           <Update onAvatarChanged={onAvatarChanged} avatarSrc={avatarSrc} />
         </Dialog>
       </div>
+      <div className="font-sans text-olive">
+        <GraphList name="My Graph" graphs={createdGraphs} />
+        <GraphList name="Shared Graph" graphs={sharedGraphs} />
+      </div>
     </div>
 
     // <div className="w-full h-full flex flex-col min-h-screen">
@@ -152,9 +156,9 @@ export default function User() {
     //   <Update onAvatarChanged={onAvatarChanged} avatarSrc={avatarSrc} />
     // </Dialog>
 
-    //   <GraphList name="My Graph" graphs={createdGraphs} />
+    // <GraphList name="My Graph" graphs={createdGraphs} />
 
-    //   <GraphList name="Shared Graph" graphs={sharedGraphs} />
+    // <GraphList name="Shared Graph" graphs={sharedGraphs} />
     // </div>
     // <div className="bg-beige flex flex-row justify-center w-full">
     //   <div className="bg-beige flex h-24 flex-row ml-auto">

@@ -27,12 +27,14 @@ export default function GraphList({ name, graphs }: GraphListProp) {
       <div className="h-16 m-4">
         <span className="text-lg">{name}</span>
         { !edit &&
-        <Button className="h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60" onClick={onEditClicked}>
+        <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
+        border-2 border-solid border-olive text-olive m-5" onClick={onEditClicked}>
           Edit
         </Button>
         }
         { edit &&
-        <Button className="h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60" onClick={onDoneClicked}>
+        <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
+        border-2 border-solid border-olive text-olive m-5" onClick={onDoneClicked}>
           Done
         </Button>
         }
