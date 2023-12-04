@@ -352,7 +352,8 @@ export default function Graph() {
           nodesDraggable={!disabled}
           nodesConnectable={!disabled}
           nodesFocusable={!disabled}
-          draggable={!disabled}
+          // draggable={!disabled}
+          draggable={false}
           panOnDrag={!disabled}
           elementsSelectable={!disabled}
         >
