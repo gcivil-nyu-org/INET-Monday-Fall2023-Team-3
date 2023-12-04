@@ -25,7 +25,7 @@ export default function GraphList({ name, graphs }: GraphListProp) {
   return (
     <div className="flex flex-col self-stretch">
       <div className="h-16 m-4">
-        <span className="text-lg">{name}</span>
+        <span className="text-2xl">{name}</span>
         { !edit &&
         <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
         border-2 border-solid border-olive text-olive m-5" onClick={onEditClicked}>

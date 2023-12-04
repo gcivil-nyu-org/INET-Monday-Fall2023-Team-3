@@ -126,8 +126,8 @@ export default function User() {
         </Dialog>
       </div>
       <div className="font-sans text-olive">
-        <GraphList name="My Graph" graphs={createdGraphs} />
-        <GraphList name="Shared Graph" graphs={sharedGraphs} />
+        <GraphList name="MY GRAPHS" graphs={createdGraphs} />
+        <GraphList name="SHARED GRAPHS" graphs={sharedGraphs} />
       </div>
     </div>
 
