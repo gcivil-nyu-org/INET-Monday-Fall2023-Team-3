@@ -216,6 +216,13 @@ export type Endpoints = {
     bodyType: Requests.NodeComment.Get;
     resultType: Responses.NodeComment.Get;
   };
+  "/comment/node/get-by-node/": {
+    paramType: string;
+    authenticate: true;
+    method: "GET";
+    bodyType: Requests.NodeComment.GetByNode;
+    resultType: Responses.NodeComment.GetByNode;
+  };
   "/comment/node/patch/": {
     paramType: string;
     authenticate: true;
@@ -243,6 +250,13 @@ export type Endpoints = {
     method: "GET";
     bodyType: Requests.GraphComment.Get;
     resultType: Responses.GraphComment.Get;
+  };
+  "/comment/graph/get-by-graph/": {
+    paramType: string;
+    authenticate: true;
+    method: "GET";
+    bodyType: Requests.GraphComment.GetByGraph;
+    resultType: Responses.GraphComment.GetByGraph;
   };
   "/comment/graph/patch/": {
     paramType: string;

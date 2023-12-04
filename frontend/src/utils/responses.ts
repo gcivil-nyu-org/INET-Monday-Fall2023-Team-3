@@ -102,11 +102,13 @@ export namespace Responses {
    */
   export namespace NodeComment {
     // node comment create
-    export type Create = BackendModels.INodeComment;
+    export type Create = BackendModels.IComment;//BackendModels.INodeComment;
     // node comment get
-    export type Get = BackendModels.INodeComment;
+    export type Get = BackendModels.IComment;//BackendModels.INodeComment;
+
+    export type GetByNode = BackendModels.IComment[];//BackendModels.INodeComment;
     // node comment patch
-    export type Patch = BackendModels.INodeComment;
+    export type Patch = BackendModels.IComment;//BackendModels.INodeComment;
     // node comment delete
     export type Delete = {};
   }
@@ -116,11 +118,13 @@ export namespace Responses {
    */
   export namespace GraphComment {
     // graph comment create
-    export type Create = BackendModels.IGraphComment;
+    export type Create = BackendModels.IComment;// BackendModels.IGraphComment;
     // graph comment get
-    export type Get = BackendModels.IGraphComment;
+    export type Get = BackendModels.IComment;// BackendModels.IGraphComment;
+
+    export type GetByGraph = BackendModels.IComment[];//BackendModels.INodeComment;
     // graph comment patch
-    export type Patch = BackendModels.IGraphComment;
+    export type Patch = BackendModels.IComment;// BackendModels.IGraphComment;
     // graph comment delete
     export type Delete = {};
   }

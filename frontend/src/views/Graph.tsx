@@ -29,6 +29,8 @@ import { Requests } from "src/utils/requests";
 import { SnackbarProvider, enqueueSnackbar } from "notistack";
 import EditNode from "src/components/node/EditNode";
 import FaultyDependency, { IFaultyDependency } from "src/components/node/FaultyDependency";
+import Comments from "components/comment/Comments";
+import GraphComments from "components/comment/GraphComments";
 
 const nodeTypes = {
   smoothNode: SmoothNode,
@@ -79,8 +81,11 @@ export default function Graph() {
   }));
   const disabled = user.email == graph.createdBy ? false : true;
 
-
   const [currNode, setCurrNode] = useState<Node<BackendModels.INode> | undefined>(undefined);
+  const [clickNode, setClickNode] = useState<Node<BackendModels.INode> | undefined>(undefined);
+  const [showNodeDiscussion, setShowNodeDiscussion] = useState(false);
+  const [showGraphShare, setShowGraphShare] = useState(false);
+  
 
   useEffect(() => {
     setNodes(
@@ -144,6 +149,11 @@ export default function Graph() {
   };
 
   const onNodesDelete = async (deleted: Node<BackendModels.INode>[]) => {
+    const isClickNodeDeleted = deleted.some((node) => node.id === clickNode?.id);
+    if (isClickNodeDeleted) {
+      setClickNode(undefined);
+      setShowNodeDiscussion(false);
+    }
     deleteNodes(deleted.map((deletedNode) => deletedNode.data));
   };
 
@@ -195,6 +205,12 @@ export default function Graph() {
 
   const onNodeClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
     console.log("node clicked");
+    //if (node.data.predefined === false) {
+    //  console.log("Comments are only available for NYU courses.");
+    //  return;
+    //}
+    setShowNodeDiscussion(true);
+    setClickNode(node);
     setCurrNode(node);
   };
 
@@ -210,6 +226,7 @@ export default function Graph() {
 
   const onShareButtonClicked = () => {
     console.log("share button clicked");
+    setShowGraphShare(true);
   };
 
   const [faultyDependencies, setFaultyDependencies] = useState<IFaultyDependency[]>([]);
@@ -286,6 +303,7 @@ export default function Graph() {
     setShowAddNode(false);
     setShowEditNode(false);
     setShowFaultyDependency(false);
+    setShowGraphShare(false);
   };
 
   const onSuccess = (message: string) => {
@@ -308,6 +326,9 @@ export default function Graph() {
       <Dialog open={showFaultyDependency} onClose={onCancelDialog} maxWidth="md" fullWidth>
         <FaultyDependency faultyDependencies={faultyDependencies}></FaultyDependency>
       </Dialog>
+      <Dialog open={showGraphShare} onClose={onCancelDialog} maxWidth="sm" fullWidth={true}>
+        <GraphSharing onClose={onCancelDialog} />
+      </Dialog>
       <div className="flex self-stretch basis-3/4 overflow-hidden">
         <ReactFlow
           nodeTypes={nodeTypes}
@@ -321,7 +342,11 @@ export default function Graph() {
           onEdgesChange={onEdgesChange}
           onConnect={onEdgeAdd}
           onEdgesDelete={onEdgesDelete}
-          onPaneClick={() => setCurrNode(undefined)}
+          onPaneClick={() => {
+            setCurrNode(undefined);
+            setClickNode(undefined);
+            setShowNodeDiscussion(false);
+          }}
           edgesUpdatable={!disabled}
           edgesFocusable={!disabled}
           nodesDraggable={!disabled}
@@ -387,6 +412,9 @@ export default function Graph() {
           <Controls />
           <Background className="bg-beige" gap={16} />
         </ReactFlow>
+      </div>
+      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500 overflow-hidden">
+        {<GraphComments />}
       </div>
     </div>
   );
