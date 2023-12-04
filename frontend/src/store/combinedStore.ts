@@ -17,17 +17,18 @@ import {
   getIncomers,
   getOutgoers,
 } from "reactflow";
-import { subscribeWithSelector, devtools } from "zustand/middleware";
+import { subscribeWithSelector, devtools, persist, createJSONStorage } from "zustand/middleware";
 
 // add later slices here
 type CombinedStoreType = UserSlice & GraphSlice & ReactFlowSlice;
 
-const createUserSlice: StateCreator<CombinedStoreType, [], [], UserSlice> = (set, get) => ({
+const createUserSlice: StateCreator<CombinedStoreType, [["zustand/persist", unknown]], [], UserSlice> = (set, get) => ({
   user: {
     email: "",
     username: "",
     createdGraphs: [],
     sharedGraphs: [],
+    avatar: "",
   },
 
   setUser: (user) => set((state) => ({ user: { ...state.user, ...user } })),
@@ -63,7 +64,7 @@ const createUserSlice: StateCreator<CombinedStoreType, [], [], UserSlice> = (set
   },
 });
 
-const createGraphSlice: StateCreator<CombinedStoreType, [], [], GraphSlice> = (set, get) => ({
+const createGraphSlice: StateCreator<CombinedStoreType, [["zustand/persist", unknown]], [], GraphSlice> = (set, get) => ({
   graph: {
     id: "",
     title: "",
@@ -246,8 +247,8 @@ const createGraphSlice: StateCreator<CombinedStoreType, [], [], GraphSlice> = (s
     const nextNodePosition = {
       graphId: graph.id,
       nodeId: node.id,
-      x: node.position.x,
-      y: node.position.y,
+      x: Math.floor(node.position.x),
+      y: Math.floor(node.position.y),
     };
 
     set({
@@ -289,7 +290,7 @@ const createGraphSlice: StateCreator<CombinedStoreType, [], [], GraphSlice> = (s
   },
 });
 
-const createReactFlowSlice: StateCreator<CombinedStoreType, [], [], ReactFlowSlice> = (
+const createReactFlowSlice: StateCreator<CombinedStoreType, [["zustand/persist", unknown]], [], ReactFlowSlice> = (
   set,
   get
 ) => ({
@@ -324,9 +325,11 @@ const createReactFlowSlice: StateCreator<CombinedStoreType, [], [], ReactFlowSli
 });
 
 export const useCombinedStore = create<CombinedStoreType>()(
-  subscribeWithSelector((...args) => ({
+  persist((...args) => ({
     ...createUserSlice(...args),
     ...createGraphSlice(...args),
     ...createReactFlowSlice(...args),
-  }))
+  }), {name: "combinedStore", storage: createJSONStorage(() => sessionStorage)}
+  )
+
 );

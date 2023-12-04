@@ -9,7 +9,6 @@ export const defaultAvatarSrc = `${pokemonAvatarSrc}001.png`;
 export const refreshPokemonAvatar = () => {
   const avatarIndex = String(Math.floor(Math.random() * 99) + 1).padStart(3, "0");
   const avatarSrc = `${pokemonAvatarSrc}${avatarIndex}.png`;
-  localStorage.setItem("smooth/avatar", avatarSrc);
   console.log(`avatar refreshed to ${avatarSrc}`);
   return avatarSrc;
 };
@@ -58,7 +57,7 @@ export const parseResponse = async <ResultType extends {}>(
   if (body === undefined) {
     return {
       status: false,
-      detail: "failed to parse resposne body",
+      detail: "failed to parse response body",
     };
   }
 

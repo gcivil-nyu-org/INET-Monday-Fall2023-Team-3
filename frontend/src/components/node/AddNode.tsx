@@ -5,11 +5,12 @@ import { useShallow } from "zustand/react/shallow";
 import { Requests } from "src/utils/requests";
 
 export type AddNodeProp = {
+  onSubmitPredefinedNode: (id: string) => void;
   onSubmit: (node: Requests.Node.Create) => void;
   onError: (message: string) => void;
 };
 
-export default function AddNode({ onSubmit, onError }: AddNodeProp) {
+export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode}: AddNodeProp) {
   const [graph, predefinedNodeMap] = useCombinedStore(
     useShallow((state) => [state.graph, state.predefinedNodeMap])
   );
@@ -69,7 +70,7 @@ export default function AddNode({ onSubmit, onError }: AddNodeProp) {
         <div className="w-full flex flex-col bg-gray-200 flex-1 overflow-y-scroll">
           {getSearchingNodes().map((node) => (
             <div className="w-full h-80 p-4">
-              <div className="w-full h-64 leading-[16rem] text-center bg-white">{node.name}</div>
+              <div className="w-full h-64 leading-[16rem] text-center bg-white" onClick={() => onSubmitPredefinedNode(node.id)}>{node.name}</div>
             </div>
           ))}
         </div>

@@ -10,6 +10,7 @@ valid_user = {
     "email": "test@gmail.com",
     "username": "test",
     "password": "5p#:)=+}",
+    "avatar": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/012.png"
 }
 
 valid_user_wrong_password = {
@@ -24,6 +25,7 @@ invalid_user = {
 patch_valid_user = {
     "username": "basic",
     "password": "b~.t,2po",
+    "avatar": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
 }
 
 
@@ -104,9 +106,29 @@ class UserTest(CustomTestCase):
                 "email": valid_user["email"],
                 "username": patch_valid_user["username"],
                 "password": patch_valid_user["password"],
+                "avatar": patch_valid_user["avatar"],
             },
         )
         self.assertResponseOk(response=response)
+
+        # test invalid patch (no avatar, username or password field missing)
+        response = self.client.patch(
+            patch_endpoint,
+            data={
+                "username": patch_valid_user["username"],
+                "password": ""
+            },
+        )
+        self.assertResponseNotOk(response=response)
+
+        response = self.client.patch(
+            patch_endpoint,
+            data={
+                "username": "",
+                "password": patch_valid_user["password"],
+            },
+        )
+        self.assertResponseNotOk(response=response)
 
     def test_user_get(self):
         sign_up_endpoint = actual_endpoint(views.USER_SIGNUP_PATH)

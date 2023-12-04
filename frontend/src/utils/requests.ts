@@ -12,7 +12,7 @@ export namespace Requests {
     export type Ping = undefined;
     export type SignUp = Pick<BackendModels.IUser, "email" | "username" | "password">;
     export type Login = Pick<BackendModels.IUser, "email" | "password">;
-    export type Patch = Pick<BackendModels.IUser, "username" | "password">;
+    export type Patch = Partial<BackendModels.IUser>; // need to update avatar too
     export type Get = undefined;
     export type GetSelf = undefined;
     export type GetAll = undefined;

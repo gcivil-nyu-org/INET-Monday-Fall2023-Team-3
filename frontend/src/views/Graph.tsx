@@ -42,6 +42,7 @@ export default function Graph() {
     user,
     token,
     predefinedNodeMap,
+    fetchPredefinedNodes,
     graph,
     nodes,
     setNodes,
@@ -61,6 +62,7 @@ export default function Graph() {
     user: state.user,
     token: state.token,
     predefinedNodeMap: state.predefinedNodeMap,
+    fetchPredefinedNodes: state.fetchPredefinedNodes,
     graph: state.graph,
     nodes: state.nodes,
     setNodes: state.setNodes,
@@ -108,6 +110,8 @@ export default function Graph() {
         },
       }))
     );
+
+    fetchPredefinedNodes();
   }, []);
 
   const onNodeAdd = async (node: Requests.Node.Create) => {
@@ -123,6 +127,11 @@ export default function Graph() {
       onError(addNodeResult.detail);
     }
   };
+
+  const onNodeAddPredefined = async (id: string) => {
+    addNode(predefinedNodeMap[id]);
+    setShowAddNode(false);
+  }
 
   const onNodeEdit = async (id: string, node: Requests.Node.Patch) => {
     const patchNodeResult = await RequestMethods.nodePatch({
@@ -309,7 +318,7 @@ export default function Graph() {
     <div className="w-full flex flex-row min-h-screen min-w-full overflow-hidden">
       <SnackbarProvider />
       <Dialog open={showAddNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
-        <AddNode onSubmit={onNodeAdd} onError={onError} />
+        <AddNode onSubmit={onNodeAdd} onError={onError} onSubmitPredefinedNode={onNodeAddPredefined}/>
       </Dialog>
       <Dialog open={showEditNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
         <EditNode onSubmit={onNodeEdit} onError={onError} node={currNode?.data} />
