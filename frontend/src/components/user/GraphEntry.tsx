@@ -5,13 +5,15 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useCombinedStore } from "src/store/combinedStore";
 import { BackendModels } from "src/utils/models";
 import { useShallow } from "zustand/react/shallow";
+import { useState, useEffect } from 'react';
 
 export type GraphEntryProp = {
   graph: BackendModels.IGraph;
   edit: boolean;
+  index: number;
 };
 
-export default function GraphEntry({ graph, edit }: GraphEntryProp) {
+export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
   const imgUrl =
     "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg";
   const navigate = useNavigate();
@@ -71,20 +73,44 @@ export default function GraphEntry({ graph, edit }: GraphEntryProp) {
     }
   };
 
+  const colors = ['#F3AC42', '#FCF071', '#90D5D9', '#F2ADBE', '#9EDF76'];
+
+  const [currentColorIndex, setCurrentColorIndex] = useState(0);
+
+  const getColor  = (index: number) => {
+    const color = colors[index % 5];
+    console.log("picked random color", color);
+    return color;
+  }
+
+  // const getNextColor = () => {
+  //   const nextIndex = (currentColorIndex + 1) % colors.length;
+  //   return colors[nextIndex];
+  // };
+
+  // useEffect(() => {
+  //   setCurrentColorIndex(prevIndex => (prevIndex + 1) % colors.length);
+  // }, []);
+
+  const getcardStyle = () => {
+    return {
+      backgroundColor: getColor(index),
+    }
+  }
 
   return (
-    <div className="flex flex-1" onClick={onGraphClicked}>
-      <Card className="relative">
-        <CardHeader title={graph.title + displayName}></CardHeader>
-        <CardContent>
-          {edit &&
-          <IconButton color="error" className="absolute top-1 right-1" onClick={onDeleteClicked}>
-            <DeleteForeverIcon />
-          </IconButton>
-          }
-          <img src={imgUrl} alt="graph" />
-        </CardContent>
-      </Card>
+    <div className="flex flex-1 h-64 w-64 m-4 overflow-auto flex-shrink-0" onClick={onGraphClicked}>
+        <Card className="relative m-4" style={getcardStyle()}>
+          <CardHeader className="text-olive" title={graph.title + displayName}></CardHeader>
+          <CardContent>
+            {edit &&
+              <IconButton color="error" className="absolute top-1 right-1" onClick={onDeleteClicked}>
+                <DeleteForeverIcon />
+              </IconButton>
+            }
+            <img src={imgUrl} alt="graph" />
+          </CardContent>
+        </Card>
     </div>
   );
 }
