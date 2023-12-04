@@ -26,8 +26,8 @@ code {
 }
 
 * {
-  --sb-track-color: #2b541307;
-  --sb-thumb-color: #2b541308;
+  --sb-track-color: rgba(249, 249, 248, 0);
+  --sb-thumb-color: rgba(249, 249, 248, 0);
   --sb-size: 5px;
 
   scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
