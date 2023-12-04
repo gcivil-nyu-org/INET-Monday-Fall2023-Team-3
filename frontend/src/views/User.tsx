@@ -120,6 +120,11 @@ export default function User() {
           <span className="inline-block w-10 h-12 bg-yellow mt-6 mr-5" ></span>
         </div>
       </div>
+      <div>
+        <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
+          <Update onAvatarChanged={onAvatarChanged} avatarSrc={avatarSrc} />
+        </Dialog>
+      </div>
     </div>
 
     // <div className="w-full h-full flex flex-col min-h-screen">
@@ -143,9 +148,9 @@ export default function User() {
     // </div>
     //   </div>
 
-    //   <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
-    //     <Update onAvatarChanged={onAvatarChanged} avatarSrc={avatarSrc} />
-    //   </Dialog>
+    // <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
+    //   <Update onAvatarChanged={onAvatarChanged} avatarSrc={avatarSrc} />
+    // </Dialog>
 
     //   <GraphList name="My Graph" graphs={createdGraphs} />
 

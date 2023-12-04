@@ -101,15 +101,16 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
   };
 
   return (
-    <div className="w-full flex flex-col items-center bg-white">
+    <div className="w-full flex flex-col items-center bg-beige">
       <div className="mt-8 mb-4">
         <Avatar
+          className="border-olive"
           alt="Pokemon"
           src={avatarSrc}
           sx={{
             width: 100,
             height: 100,
-            border: "2px solid rgba(164, 164, 164, 0.8)",
+            border: "2px solid",
             cursor: "pointer", // Change cursor to hand on hover
             transition: "transform 0.3s",
           }}
@@ -154,7 +155,8 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
       )}
       <div className="h-24 w-full flex">
         <Button
-          className="w-64 h-16 m-auto bg-blue-400"
+          className="w-64 h-16 m-auto bg-beige text-olive font-sans rounded-full
+          border-2 border-solid"
           size="large"
           variant="contained"
           onClick={onUpdateButtonClicked}
@@ -164,7 +166,8 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
       </div>
       <div className="h-24 w-full flex">
         <Button
-          className="w-64 h-16 m-auto bg-red-400"
+          className="w-64 h-16 m-auto bg-beige text-olive font-sans rounded-full
+          border-2 border-solid"
           size="large"
           variant="contained"
           onClick={onUpdateButtonClicked}
