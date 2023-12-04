@@ -367,44 +367,44 @@ export default function Graph() {
             <div className="flex flex-col space-y-2">
               {!disabled && (
                 <Tooltip title="Add Node" placement="right" arrow>
-                  <Button className="bg-orange"
+                  <Button className="bg-orange border-none"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onAddNodeButtonClicked}
                   >
-                    <Add />
+                    <Add className="text-olive"/>
                   </Button>
                 </Tooltip>
               )}
               {!disabled && (
                 <Tooltip title="Share" placement="right" arrow>
-                  <Button className="bg-pink"
+                  <Button className="bg-pink border-none"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onShareButtonClicked}
                   >
-                    <Share />
+                    <Share className="text-olive"/>
                   </Button>
                 </Tooltip>
               )}
               {!disabled && (
                 <Tooltip title="Verify Dependencies" placement="right" arrow>
-                  <Button className="bg-yellow"
+                  <Button className="bg-yellow border-none"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onVerifyButtonClicked}
                   >
-                    <DoneAll />
+                    <DoneAll className="text-olive"/>
                   </Button>
                 </Tooltip>
               )}
               <Tooltip title="Return" placement="right" arrow>
-                <Button className="bg-blue"
+                <Button className="bg-blue border-none"
                   variant="outlined"
                   sx={{ padding: "8px", minWidth: "32px" }}
                   onClick={onReturnButtonClicked}
                 >
-                  <KeyboardReturn />
+                  <KeyboardReturn className="text-olive"/>
                 </Button>
               </Tooltip>
             </div>
@@ -414,7 +414,7 @@ export default function Graph() {
         </ReactFlow>
       </div>
       <div className="flex max-w-screen max-h-screen h-full bg-beige basis-1/4">
-        <div className="flex bg-green bg-opacity-60 mt-5 mb-5">
+        <div className="flex bg-green bg-opacity-60 mt-5 mb-5 rounded-xl">
           {<GraphComments />}
         </div>
       </div>
