@@ -134,6 +134,7 @@ const createGraphSlice: StateCreator<CombinedStoreType, [["zustand/persist", unk
       body: newNodePosition,
     });
   },
+
   editNode: (nodeId, node) => {
     const graph = get().graph;
     const nextNodes = graph.nodes.map((prevNode) => {
@@ -148,6 +149,15 @@ const createGraphSlice: StateCreator<CombinedStoreType, [["zustand/persist", unk
         ...graph,
         nodes: nextNodes,
       },
+      nodes: get().nodes.map((reactFlowNode) => {
+        if (reactFlowNode.id === nodeId) {
+          reactFlowNode.data = {
+            ...reactFlowNode.data,
+            ...node,
+          };
+        }
+        return reactFlowNode;
+      }),
     });
 
     RequestMethods.nodePatch({
@@ -156,6 +166,7 @@ const createGraphSlice: StateCreator<CombinedStoreType, [["zustand/persist", unk
       body: node,
     });
   },
+
   deleteNodes: (deletedNodes) => {
     const graph = get().graph;
     const nextNodes = graph.nodes.filter(
