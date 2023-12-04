@@ -10,7 +10,7 @@ export type AddNodeProp = {
   onError: (message: string) => void;
 };
 
-export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode}: AddNodeProp) {
+export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: AddNodeProp) {
   const [graph, predefinedNodeMap] = useCombinedStore(
     useShallow((state) => [state.graph, state.predefinedNodeMap])
   );
@@ -57,8 +57,8 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode}: Ad
   };
 
   return (
-    <div className="w-full flex flex-row max-h-[48rem]">
-      <div className="w-1/3 flex flex-col items-center">
+    <div className="w-full flex flex-row max-h-screen bg-beige">
+      <div className="w-1/3 flex flex-col items-center overflow-y-scroll">
         <div className="h-14 w-full flex">
           <TextField
             label="Search"
@@ -67,10 +67,12 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode}: Ad
             onChange={onSearchTermInputChanged}
           />
         </div>
-        <div className="w-full flex flex-col bg-gray-200 flex-1 overflow-y-scroll">
+        <div className="w-full flex flex-col bg-gray-200 flex-1">
           {getSearchingNodes().map((node) => (
-            <div className="w-full h-80 p-4">
-              <div className="w-full h-64 leading-[16rem] text-center bg-white" onClick={() => onSubmitPredefinedNode(node.id)}>{node.name}</div>
+            <div key={node.id} className="w-full h-40 p-6">
+              <div className="w-full h-20 text-center bg-white" onClick={() => onSubmitPredefinedNode(node.id)}>
+                {node.name}
+              </div>
             </div>
           ))}
         </div>
@@ -90,14 +92,13 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode}: Ad
             label="Description"
             variant="outlined"
             multiline
-            rows={12}
+            rows={10}
             onChange={onDescriptionInputChanged}
           />
         </div>
-        <div className="flex flex-1"></div>
-        <div className="w-full flex p-8 pb-0">
+        <div className="w-full flex m-8 pb-0">
           <Button
-            className="w-64 h-16 m-auto bg-blue-400 my-4"
+            className="w-64 h-16 m-auto bg-beige text-olive border-2 border-solid rounded-full"
             size="large"
             variant="contained"
             onClick={onSaveButtonClicked}
