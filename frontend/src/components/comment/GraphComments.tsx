@@ -14,7 +14,7 @@ import { Node } from "reactflow";
 interface CommentsProps {
 }
 
-const GraphComments: React.FC<CommentsProps> = ({  }) => {
+const GraphComments: React.FC<CommentsProps> = ({ }) => {
   const { user, token, graph } = useCombinedStore(
     useShallow((state) => ({
       user: state.user,
@@ -87,41 +87,41 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
   };
 
   // Subscribe to Pusher channel and events
- 
+
 
   usePusher("comments-channel", "new-graph-comment", async (newComment: BackendModels.IComment) => {
     const response = await RequestMethods.graphCommentGetByGraph({
-        token: token,
-        param: graph.id,
+      token: token,
+      param: graph.id,
     });
     if (response.status) {
-        console.log("usePusher");
-        const commentsArray = Object.values(response.value);
-        setComments(commentsArray);
+      console.log("usePusher");
+      const commentsArray = Object.values(response.value);
+      setComments(commentsArray);
     }
   });
 
   usePusher("comments-channel", "patch-graph-comment", async (newComment: BackendModels.IComment) => {
     const response = await RequestMethods.graphCommentGetByGraph({
-        token: token,
-        param: graph.id,
+      token: token,
+      param: graph.id,
     });
     if (response.status) {
-        console.log("usePusher");
-        const commentsArray = Object.values(response.value);
-        setComments(commentsArray);
+      console.log("usePusher");
+      const commentsArray = Object.values(response.value);
+      setComments(commentsArray);
     }
   });
 
   usePusher("comments-channel", "delete-graph-comment", async (newComment: BackendModels.IComment) => {
     const response = await RequestMethods.graphCommentGetByGraph({
-        token: token,
-        param: graph.id,
+      token: token,
+      param: graph.id,
     });
     if (response.status) {
-        console.log("usePusher");
-        const commentsArray = Object.values(response.value);
-        setComments(commentsArray);
+      console.log("usePusher");
+      const commentsArray = Object.values(response.value);
+      setComments(commentsArray);
     }
   });
 
@@ -170,16 +170,6 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
     <ThemeProvider theme={Theme}>
       <CssBaseline />
       <Box sx={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden" }}>
-        {/* Semi-transparent overlay */}
-        <Box
-          sx={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(100, 116, 139, 0.5)", // Adjust transparency as needed
-            zIndex: 2,
-          }}
-        />
         {/* Centered content block with overflow allowed on y-axis */}
         <Box
           sx={{
@@ -191,7 +181,7 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
             height: "100%",
           }}
         >
-          <Paper
+          {/* <Paper
             elevation={3}
             sx={{
               maxWidth: "600px",
@@ -206,10 +196,11 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
               height: "100%",
               position: "relative",
             }}
-          >
+          > */}
+          <div className="flex flex-col relative h-full overflow-y-auto">
             <Box sx={{ p: 2, textAlign: "center" }}>
-              <Box sx={{ fontWeight: "bold", fontSize: "24px", mb: 2, p: 2, textAlign: "center" }}>
-                Discussion Section
+              <Box className="text-olive font-sans text-2xl">
+                DISCUSSION
               </Box>
               <CommentForm submitLabel="Write" handleSubmit={addComment} />
             </Box>
@@ -235,7 +226,8 @@ const GraphComments: React.FC<CommentsProps> = ({  }) => {
                 />
               ))}
             </Box>
-          </Paper>
+          </div>
+          {/* </Paper> */}
         </Box>
       </Box>
     </ThemeProvider>

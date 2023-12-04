@@ -85,7 +85,7 @@ export default function Graph() {
   const [clickNode, setClickNode] = useState<Node<BackendModels.INode> | undefined>(undefined);
   const [showNodeDiscussion, setShowNodeDiscussion] = useState(false);
   const [showGraphShare, setShowGraphShare] = useState(false);
-  
+
 
   useEffect(() => {
     setNodes(
@@ -318,7 +318,7 @@ export default function Graph() {
     <div className="w-full flex flex-row min-h-screen min-w-full overflow-hidden">
       <SnackbarProvider />
       <Dialog open={showAddNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
-        <AddNode onSubmit={onNodeAdd} onError={onError} onSubmitPredefinedNode={onNodeAddPredefined}/>
+        <AddNode onSubmit={onNodeAdd} onError={onError} onSubmitPredefinedNode={onNodeAddPredefined} />
       </Dialog>
       <Dialog open={showEditNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
         <EditNode onSubmit={onNodeEdit} onError={onError} node={currNode?.data} />
@@ -413,8 +413,10 @@ export default function Graph() {
           <Background className="bg-beige" gap={16} />
         </ReactFlow>
       </div>
-      <div className="flex self-stretch flex-1 basis-1/4 bg-slate-500 overflow-hidden">
-        {<GraphComments />}
+      <div className="flex max-w-screen max-h-screen h-full bg-beige basis-1/4">
+        <div className="flex bg-green bg-opacity-60 mt-5 mb-5">
+          {<GraphComments />}
+        </div>
       </div>
     </div>
   );
