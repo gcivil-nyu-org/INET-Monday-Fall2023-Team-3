@@ -57,9 +57,9 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: A
   };
 
   return (
-    <div className="w-full flex flex-row max-h-screen bg-beige">
+    <div className="w-full flex flex-row max-h-screen bg-beige overflow-hidden">
       <div className="w-1/3 flex flex-col items-center overflow-y-scroll">
-        <div className="h-14 w-full flex">
+        <div className="h-14 w-full flex sticky top-0 z-10">
           <TextField
             label="Search"
             variant="filled"
