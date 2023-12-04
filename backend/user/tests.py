@@ -1,8 +1,8 @@
-from rest_framework import status
-from rest_framework.authtoken.models import Token
+from rest_framework import status  # noqa: F401
+from rest_framework.authtoken.models import Token  # noqa: F401
 from shared.test_helper import CustomTestCase, basic_user, get_actual_endpoint
 
-from . import serializers, views
+from . import serializers, views  # noqa: F401
 from .models import User
 from .urls import app_name
 
@@ -91,7 +91,6 @@ class UserTest(CustomTestCase):
         )
 
     def test_user_patch(self):
-        login_endpoint = actual_endpoint(views.USER_LOGIN_PATH)
         patch_endpoint = actual_endpoint(views.USER_PATCH_PATH_FORMAT)
         # test success patch
         response = self.client.patch(patch_endpoint, data=patch_valid_user)

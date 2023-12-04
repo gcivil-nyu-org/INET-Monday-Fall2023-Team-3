@@ -1,3 +1,5 @@
+import json
+
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import (
@@ -17,7 +19,8 @@ from shared.view_helper import (
     ok,
 )
 
-from .models import GraphComment, NodeComment
+from .models import Graph, GraphComment, Node, NodeComment
+from .pusher import pusher_client
 from .serializers import GraphCommentSerializer, NodeCommentSerializer
 
 COMMENT_PING_OK_MESSAGE = ok("comment: ok")
@@ -47,11 +50,17 @@ NODE_COMMENT_CREATE_PATH = "node/create/"
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def node_comment_create(request: Request):
-    return handle_create(
+    response = handle_create(
         create_data=request.data,
         serializer_class=NodeCommentSerializer,
         invalid_format_response=NODE_COMMENT_CREATE_INVALID_FORMAT_RESPONSE,
     )
+    if response.status_code == 200:
+        print("success")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "new-comment", data)
+    return response
 
 
 NODE_COMMENT_GET_NOT_FOUND_MESSAGE = error("node_comment: not found")
@@ -74,6 +83,24 @@ def node_comment_get(request: Request, comment_id: str):
         serializer_class=NodeCommentSerializer,
         not_found_response=NODE_COMMENT_GET_NOT_FOUND_RESPONSE,
     )
+
+
+# get endpoint
+NODE_COMMENT_GET_BY_NODE_PATH = "node/get-by-node/<str:node_id>/"
+NODE_COMMENT_GET_BY_NODE_PATH_FORMAT = "node/get-by-node/{node_id}/"
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_comment_get_by_node(request: Request, node_id: str):
+    try:
+        node = Node.objects.get(id=node_id)
+    except Node.DoesNotExist:
+        return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
+    comments = NodeComment.objects.filter(belongs_to=node)
+    serializer = NodeCommentSerializer(comments, many=True)
+    return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
 NODE_COMMENT_PATCH_NOT_FOUND_MESSAGE = error("node_comment: not found")
@@ -133,11 +160,17 @@ GRAPH_COMMENT_CREATE_PATH = "graph/create/"
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def graph_comment_create(request: Request):
-    return handle_create(
+    response = handle_create(
         create_data=request.data,
         serializer_class=GraphCommentSerializer,
         invalid_format_response=GRAPH_COMMENT_CREATE_INVALID_FORMAT_RESPONSE,
     )
+    if response.status_code == 200:
+        print("send pusher")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "new-graph-comment", data)
+    return response
 
 
 GRAPH_COMMENT_GET_NOT_FOUND_MESSAGE = error("graph_comment: not found")
@@ -160,6 +193,24 @@ def graph_comment_get(request: Request, comment_id: str):
         serializer_class=GraphCommentSerializer,
         not_found_response=GRAPH_COMMENT_GET_NOT_FOUND_RESPONSE,
     )
+
+
+# get endpoint
+GRAPH_COMMENT_GET_BY_GRAPH_PATH = "graph/get-by-graph/<str:graph_id>/"
+GRAPH_COMMENT_GET_BY_GRAPH_PATH_FORMAT = "graph/get-by-graph/{graph_id}/"
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_comment_get_by_graph(request: Request, graph_id: str):
+    try:
+        node = Graph.objects.get(id=graph_id)
+    except Graph.DoesNotExist:
+        return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
+    comments = GraphComment.objects.filter(belongs_to=node)
+    serializer = GraphCommentSerializer(comments, many=True)
+    return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
 GRAPH_COMMENT_PATCH_NOT_FOUND_MESSAGE = error("graph: not found")

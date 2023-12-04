@@ -2,12 +2,12 @@ import uuid
 
 from edge.models import Edge
 from node.models import Node
-from rest_framework import status
+from rest_framework import status  # noqa: F401
 from shared.test_helper import CustomTestCase, get_actual_endpoint
 from user.models import User
 
 from . import serializers, views
-from .models import Graph, NodePosition
+from .models import Graph, NodePosition  # noqa: F401
 from .urls import app_name
 
 valid_user = {
@@ -104,7 +104,6 @@ class GraphTest(CustomTestCase):
 
     def test_graph_patch(self):
         create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
-        get_endpoint = actual_endpoint(views.GRAPH_GET_PATH_FORMAT)
         patch_endpoint = actual_endpoint(views.GRAPH_PATCH_PATH_FORMAT)
         # test for unknown graph
         response = self.client.patch(
@@ -232,7 +231,6 @@ class GraphTest(CustomTestCase):
     def test_node_position_patch(self):
         node_position_create_endpoint = actual_endpoint(views.NODE_POSITION_CREATE_PATH)
         create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
-        patch_endpoint = actual_endpoint(views.GRAPH_PATCH_PATH_FORMAT)
         node_position_patch_endpoint = actual_endpoint(
             views.NODE_POSITION_PATCH_PATH_FORMAT
         )

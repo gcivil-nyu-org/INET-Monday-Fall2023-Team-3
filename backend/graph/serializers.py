@@ -1,6 +1,6 @@
-from edge.models import Edge
+from edge.models import Edge  # noqa: F401
 from edge.serializers import EdgeSerializer
-from node.models import Node
+from node.models import Node  # noqa: F401
 from node.serializers import NodeSerializer
 from rest_framework import serializers
 

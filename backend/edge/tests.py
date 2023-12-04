@@ -1,12 +1,12 @@
 import uuid
 
 from node.models import Node
-from rest_framework import status
+from rest_framework import status  # noqa: F401
 from shared.test_helper import CustomTestCase, get_actual_endpoint
 from user.models import User
 
-from . import serializers, views
-from .models import Edge
+from . import serializers, views  # noqa: F401
+from .models import Edge  # noqa: F401
 from .urls import app_name
 
 valid_node_1 = {
@@ -94,7 +94,6 @@ class EdgeTest(CustomTestCase):
 
     def test_edge_patch(self):
         create_endpoint = actual_endpoint(views.EDGE_CREATE_PATH)
-        get_endpoint = actual_endpoint(views.EDGE_GET_PATH_FORMAT)
         patch_endpoint = actual_endpoint(views.EDGE_PATCH_PATH_FORMAT)
         # test for unknown edge
         response = self.client.patch(

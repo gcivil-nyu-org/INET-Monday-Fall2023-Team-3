@@ -1,4 +1,4 @@
-from typing import Any, Callable, Type
+from typing import Any, Callable, Type  # noqa: F401
 
 from app.settings import BACKEND_URL_ENDPOINT
 from django.db import models

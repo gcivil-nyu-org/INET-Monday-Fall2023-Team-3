@@ -14,6 +14,11 @@ urlpatterns = [
     ),
     path(views.NODE_COMMENT_GET_PATH, views.node_comment_get, name="node-comment-get"),
     path(
+        views.NODE_COMMENT_GET_BY_NODE_PATH,
+        views.node_comment_get_by_node,
+        name="node-comment-get-by-node",
+    ),
+    path(
         views.NODE_COMMENT_PATCH_PATH,
         views.node_comment_patch,
         name="node-comment-patch",
@@ -31,6 +36,11 @@ urlpatterns = [
     ),
     path(
         views.GRAPH_COMMENT_GET_PATH, views.graph_comment_get, name="graph-comment-get"
+    ),
+    path(
+        views.GRAPH_COMMENT_GET_BY_GRAPH_PATH,
+        views.graph_comment_get_by_graph,
+        name="graph-comment-get-by-graph",
     ),
     path(
         views.GRAPH_COMMENT_PATCH_PATH,

@@ -178,6 +178,10 @@ export namespace RequestMethods {
     return request("/comment/node/get/", "GET", params);
   };
 
+  export const nodeCommentGetByNode: RequestBuilder<"/comment/node/get-by-node/"> = (params) => {
+    return request("/comment/node/get-by-node/", "GET", params);
+  };
+
   export const nodeCommentPatch: RequestBuilder<"/comment/node/patch/"> = (params) => {
     return request("/comment/node/patch/", "PATCH", params);
   };
@@ -192,6 +196,10 @@ export namespace RequestMethods {
 
   export const graphCommentGet: RequestBuilder<"/comment/graph/get/"> = (params) => {
     return request("/comment/graph/get/", "GET", params);
+  };
+
+  export const graphCommentGetByGraph: RequestBuilder<"/comment/graph/get-by-graph/"> = (params) => {
+    return request("/comment/graph/get-by-graph/", "GET", params);
   };
 
   export const graphCommentPatch: RequestBuilder<"/comment/graph/patch/"> = (params) => {

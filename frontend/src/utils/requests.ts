@@ -81,6 +81,7 @@ export namespace Requests {
     export type Create = Pick<BackendModels.INodeComment, "body" | "createdBy" | "belongsTo"> &
       Partial<Pick<BackendModels.INodeComment, "parent">>;
     export type Get = undefined;
+    export type GetByNode = undefined;
     export type Patch = Partial<Pick<BackendModels.INodeComment, "body" | "createdAt">>;
     export type Delete = undefined;
   }
@@ -92,6 +93,7 @@ export namespace Requests {
     export type Create = Pick<BackendModels.IGraphComment, "body" | "createdBy" | "belongsTo"> &
       Partial<Pick<BackendModels.IGraphComment, "parent">>;
     export type Get = undefined;
+    export type GetByGraph = undefined;
     export type Patch = Partial<Pick<BackendModels.IGraphComment, "body" | "createdAt">>;
     export type Delete = undefined;
   }

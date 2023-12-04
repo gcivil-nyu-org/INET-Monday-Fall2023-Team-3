@@ -228,10 +228,40 @@ export namespace BackendModels {
     /**
      * parent of the comment, if any
      */
-    parent: string;
+    parent?: string;
     /**
      * which graph this comment belongs to
      */
     belongsTo: string;
   };
+
+    /**
+   * Comment on a graph
+   */
+    export type IComment = {
+      /**
+       * identifier of the comment
+       */
+      id: string;
+      /**
+       * content of the comment
+       */
+      body: string;
+      /**
+       * reference to the user who create this comment
+       */
+      createdBy: string;
+      /**
+       * when this comment is created
+       */
+      createdAt: string;
+      /**
+       * parent of the comment, if any
+       */
+      parent?: string;
+      /**
+       * which graph this comment belongs to
+       */
+      belongsTo: string;
+    };
 }
