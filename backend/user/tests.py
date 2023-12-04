@@ -1,8 +1,8 @@
-from rest_framework import status
-from rest_framework.authtoken.models import Token
+# from rest_framework import status
+# from rest_framework.authtoken.models import Token
 from shared.test_helper import CustomTestCase, basic_user, get_actual_endpoint
 
-from . import serializers, views
+from . import views
 from .models import User
 from .urls import app_name
 
@@ -10,7 +10,7 @@ valid_user = {
     "email": "test@gmail.com",
     "username": "test",
     "password": "5p#:)=+}",
-    "avatar": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/012.png"
+    "avatar": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/012.png",
 }
 
 valid_user_wrong_password = {
@@ -25,7 +25,7 @@ invalid_user = {
 patch_valid_user = {
     "username": "basic",
     "password": "b~.t,2po",
-    "avatar": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png"
+    "avatar": "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png",
 }
 
 
@@ -93,7 +93,7 @@ class UserTest(CustomTestCase):
         )
 
     def test_user_patch(self):
-        login_endpoint = actual_endpoint(views.USER_LOGIN_PATH)
+        # login_endpoint = actual_endpoint(views.USER_LOGIN_PATH)
         patch_endpoint = actual_endpoint(views.USER_PATCH_PATH_FORMAT)
         # test success patch
         response = self.client.patch(patch_endpoint, data=patch_valid_user)
@@ -115,10 +115,7 @@ class UserTest(CustomTestCase):
         # test invalid patch (no avatar, username or password field missing)
         response = self.client.patch(
             patch_endpoint,
-            data={
-                "username": patch_valid_user["username"],
-                "password": ""
-            },
+            data={"username": patch_valid_user["username"], "password": ""},
         )
         self.assertResponseNotOk(response=response)
 

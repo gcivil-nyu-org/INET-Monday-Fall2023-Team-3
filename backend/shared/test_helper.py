@@ -1,4 +1,4 @@
-from typing import Any, Callable, Type
+from typing import Callable, Type
 
 from app.settings import BACKEND_URL_ENDPOINT
 from django.db import models

@@ -1,6 +1,7 @@
-from edge.models import Edge
+# from edge.models import Edge
 from edge.serializers import EdgeSerializer
-from node.models import Node
+
+# from node.models import Node
 from node.serializers import NodeSerializer
 from rest_framework import serializers
 
@@ -11,6 +12,7 @@ class NodePositionSerializer(serializers.ModelSerializer):
     class Meta:
         model = NodePosition
         fields = "__all__"
+
 
 class NodeColorSerializer(serializers.ModelSerializer):
     class Meta:

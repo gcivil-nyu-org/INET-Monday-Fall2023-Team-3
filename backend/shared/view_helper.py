@@ -45,7 +45,8 @@ def handle_create(
 
     Args:
         create_data (dict): request body containing create data
-        serializer_class (Type[serializers.Serializer]): serializer class for the instance model
+        serializer_class (Type[serializers.Serializer]):
+        serializer class for the instance model
         invalid_format_response (Response): response when request body is invalid
 
     Returns:
@@ -75,7 +76,8 @@ def handle_get(
     Args:
         model_class (Type[models.Model]): model class of the instance
         instance_identifier (dict): keys and values to uniquely identify model instance
-        serializer_class (Type[serializers.Serializer]): serializer class for the instance model
+        serializer_class (Type[serializers.Serializer]):
+        serializer class for the instance model
         not_found_response (Response): response when model instance not found
 
     Returns:
@@ -104,9 +106,11 @@ def handle_patch(
         model_class (Type[models.Model]): model class of the instance
         instance_identifier (dict): keys and values to uniquely identify model instance
         patch_data (dict): request body containing patch data
-        patch_serializer_class (Type[serializers.Serializer]): serializer for patching the instance model
+        patch_serializer_class (Type[serializers.Serializer]):
+        serializer for patching the instance model
         not_found_response (Response): response when instance not found
-        result_serializer_class (Type[serializers.Serializer]): serializer for returning the instance model
+        result_serializer_class (Type[serializers.Serializer]):
+        serializer for returning the instance model
 
     Returns:
         Response: corresponding response

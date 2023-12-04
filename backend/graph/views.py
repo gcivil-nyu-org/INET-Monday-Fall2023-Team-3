@@ -20,7 +20,12 @@ from shared.view_helper import (
 )
 
 from .models import Graph, NodePosition, NodeColor
-from .serializers import GraphPatchSerializer, GraphSerializer, NodePositionSerializer, NodeColorSerializer
+from .serializers import (
+    GraphPatchSerializer,
+    GraphSerializer,
+    NodePositionSerializer,
+    NodeColorSerializer,
+)
 from .pusher import pusher_client
 
 GRAPH_PING_OK_MESSAGE = ok("graph: ok")
@@ -218,6 +223,7 @@ def node_position_delete(request: Request, graph_id: str, node_id: str):
         not_found_response=NODE_POSITION_DELETE_NOT_FOUND_RESPONSE,
     )
 
+
 NODE_COLOR_CREATE_INVALID_FORMAT_MESSAGE = error("node_color: invalid format")
 NODE_COLOR_CREATE_INVALID_FORMAT_RESPONSE = Response(
     NODE_COLOR_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
@@ -259,7 +265,6 @@ def node_color_patch(request: Request, graph_id: str, node_id: str):
         patch_serializer_class=NodeColorSerializer,
         not_found_response=NODE_COLOR_PATCH_NOT_FOUND_RESPONSE,
     )
-
 
 
 NODE_COLOR_DELETE_NOT_FOUND_MESSAGE = error("node_color: not found")

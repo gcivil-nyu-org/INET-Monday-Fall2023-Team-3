@@ -56,7 +56,8 @@ class PatchSerializer(serializers.Serializer):
         """
         Validate the serializer's fields.
 
-        Custom validation is added to check that either 'avatar' or both 'username' and 'password'
+        Custom validation is added to check that either 'avatar'
+        or both 'username' and 'password'
         are provided.
         """
         valid = super().is_valid(raise_exception=raise_exception)
@@ -69,7 +70,9 @@ class PatchSerializer(serializers.Serializer):
         password = self.validated_data.get("password")
 
         if avatar is None and (username == "" or password == ""):
-            raise serializers.ValidationError('either avatar or both username and password must be present')
+            raise serializers.ValidationError(
+                "either avatar or both username and password must be present"
+            )
             return False
 
         return True
@@ -100,5 +103,3 @@ class GetSerializer(BaseSerializer):
         many=True, queryset=Graph.objects.all()
     )
     avatar = serializers.CharField()
-
-

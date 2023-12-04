@@ -1,11 +1,12 @@
 import uuid
 
-from rest_framework import status
+# from rest_framework import status
 from shared.test_helper import CustomTestCase, get_actual_endpoint
 from user.models import User
 
-from . import serializers, views
-from .models import Node
+from . import views
+
+# from .models import Node
 from .urls import app_name
 
 valid_node_1 = {
@@ -87,7 +88,7 @@ class NodeTest(CustomTestCase):
 
     def test_node_patch(self):
         create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
-        get_endpoint = actual_endpoint(views.NODE_GET_PATH_FORMAT)
+        # get_endpoint = actual_endpoint(views.NODE_GET_PATH_FORMAT)
         patch_endpoint = actual_endpoint(views.NODE_PATCH_PATH_FORMAT)
         # test for unknown patch
         response = self.client.patch(

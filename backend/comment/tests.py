@@ -2,12 +2,14 @@ import uuid
 
 from graph.models import Graph
 from node.models import Node
-from rest_framework import status
+
+# from rest_framework import status
 from shared.test_helper import CustomTestCase, get_actual_endpoint
 from user.models import User
 
-from . import serializers, views
-from .models import GraphComment, NodeComment
+from . import views
+
+# from .models import GraphComment, NodeComment
 from .urls import app_name
 
 valid_user = {
@@ -71,7 +73,7 @@ class NodeCommentTest(CustomTestCase):
 
         response = self.client.post(create_endpoint, data=valid_comment)
         self.assertResponseOk(response=response)
-        comment_data = response.data["value"]
+        # comment_data = response.data["value"]
 
         self.assertResponseDataKeyEqual(
             key="body", expect=valid_comment, response=response
@@ -191,7 +193,7 @@ class GraphCommentTest(CustomTestCase):
 
         response = self.client.post(create_endpoint, data=valid_comment)
         self.assertResponseOk(response=response)
-        comment_data = response.data["value"]
+        # comment_data = response.data["value"]
 
         self.assertResponseDataKeyEqual(
             key="body", expect=valid_comment, response=response
@@ -233,7 +235,7 @@ class GraphCommentTest(CustomTestCase):
 
     def test_graph_comment_patch(self):
         create_endpoint = actual_endpoint(views.GRAPH_COMMENT_CREATE_PATH)
-        get_endpoint = actual_endpoint(views.GRAPH_COMMENT_GET_PATH_FORMAT)
+        actual_endpoint(views.GRAPH_COMMENT_GET_PATH_FORMAT)
         patch_endpoint = actual_endpoint(views.GRAPH_COMMENT_PATCH_PATH_FORMAT)
         # test for unknown comment
         response = self.client.patch(
