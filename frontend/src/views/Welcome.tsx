@@ -100,9 +100,9 @@ export default function Welcome() {
             <span className="text-olive"> AND ESTABLISH DEPENDENCIES BETWEEN THEM BY DRAWING EDGES. </span>
           </div>
         </div>
-        <div className="flex flex-col">
-          <div className="flex flex-row-reverse basis-1/2 m-5">
-            <div className="ml-4 mr-4">
+        <div className="flex flex-col basis-1/2">
+          <div className="flex flex-row-reverse w-full">
+            <div className="mt-5 mr-5">
               <Button
                 className="bg-beige text-olive font-sans rounded-full
               border-2 border-solid"
@@ -113,7 +113,7 @@ export default function Welcome() {
                 Log In
               </Button>
             </div>
-            <div className="ml-4 mr-4">
+            <div className="mt-5 mr-5">
               <Button
                 className="bg-beige text-olive font-sans rounded-full
               border-2 border-solid"
@@ -124,7 +124,7 @@ export default function Welcome() {
                 Sign Up
               </Button>
             </div>
-            <div className="ml-4 mr-4">
+            <div className="mt-5 mr-5">
               <Button
                 className="bg-beige text-olive font-sans rounded-full
               border-2 border-solid"
@@ -135,7 +135,7 @@ export default function Welcome() {
               </Button>
             </div>
           </div>
-          <div>
+          <div className="flex justify-center mt-10">
             <span className="bg-orange">...</span>
             <span className="bg-pink">....</span>
             <span className="bg-green">....</span>
@@ -148,6 +148,23 @@ export default function Welcome() {
         <div className="w-4/12 h-80 bg-blue m-5 shadow-lg -rotate-20"></div>
         <div className="w-3/12 h-80 bg-pink m-5 shadow-lg rotate-15"></div>
         <div className="w-4/12 h-80 bg-yellow m-5 shadow-lg -rotate-20"></div>
+      </div>
+      <div className="w-full flex flex-row self-stretch items-stretch justify-between flex-1">
+        <div className="flex flex-1 bg-gray-500"></div>
+        <Dialog open={login || signUp} onClose={onCancel} maxWidth="sm" fullWidth={true}>
+          {login && ( // if login is true, then render the Login component
+            <>
+              <DialogTitle>Log In</DialogTitle>
+              <Login />
+            </>
+          )}
+          {signUp && ( // if signup is true, then render the Signup component
+            <>
+              <DialogTitle>Sign Up</DialogTitle>
+              <SignUp />
+            </>
+          )}
+        </Dialog>
       </div>
     </div>
 
@@ -225,24 +242,24 @@ export default function Welcome() {
     //         </div>
     //       </div>
     //     </div>
-    //     <div className="w-full flex flex-row self-stretch items-stretch justify-between flex-1">
-    //      <div className="flex flex-1 bg-gray-500"></div>
-    //      <Dialog open={login || signUp} onClose={onCancel} maxWidth="sm" fullWidth={true}>
-    //       {login && ( // if login is true, then render the Login component
-    //          <>
-    //            <DialogTitle>Log In</DialogTitle>
-    //            <Login />
-    //          </>
-    //        )}
-    //        {signUp && ( // if signup is true, then render the Signup component
-    //          <>
-    //            <DialogTitle>Sign Up</DialogTitle>
-    //            <SignUp />
-    //          </>
-    //        )}
-    //      </Dialog>
-    //    </div>
-    //   </div>
+    //   <div className="w-full flex flex-row self-stretch items-stretch justify-between flex-1">
+    //    <div className="flex flex-1 bg-gray-500"></div>
+    //    <Dialog open={login || signUp} onClose={onCancel} maxWidth="sm" fullWidth={true}>
+    //     {login && ( // if login is true, then render the Login component
+    //        <>
+    //          <DialogTitle>Log In</DialogTitle>
+    //          <Login />
+    //        </>
+    //      )}
+    //      {signUp && ( // if signup is true, then render the Signup component
+    //        <>
+    //          <DialogTitle>Sign Up</DialogTitle>
+    //          <SignUp />
+    //        </>
+    //      )}
+    //    </Dialog>
+    //  </div>
+    // </div>
     // </div>
   );
 }
