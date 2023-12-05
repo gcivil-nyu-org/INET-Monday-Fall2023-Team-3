@@ -4,6 +4,7 @@ import { RequestMethods } from "src/utils/utils";
 import { refreshPokemonAvatar } from "src/utils/helpers";
 import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
+import { Validate } from "src/utils/validation";
 
 interface UpdateProps {
   onAvatarChanged: (url: string) => void;
@@ -22,6 +23,7 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
   });
   const [verifyPassword, setVerifyPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     setUpdateData({
@@ -29,6 +31,19 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
       username: user.username,
     });
   }, [user]);
+
+  const validateUpdate = () => {
+    if (verifyPassword !== updateData.password) {
+      setSeverity("error");
+      setMessage("password mismatch");
+      return false;
+    }
+    if (!Validate.validatePassword(updateData.password, setMessage)) {
+      setSeverity("error");
+      return false;
+    }
+    return true;
+  };
 
   const onUsernameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
     setUpdateData({
@@ -52,11 +67,7 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
     console.log(`new username ${updateData.username}`);
     console.log(`new password ${updateData.password}`);
 
-    if (updateData.password !== verifyPassword) {
-      setSeverity("error");
-      setMessage("password mismatch, please try again");
-      return;
-    }
+    if (!validateUpdate()) return;
 
     RequestMethods.userPatch({
       body: updateData,
