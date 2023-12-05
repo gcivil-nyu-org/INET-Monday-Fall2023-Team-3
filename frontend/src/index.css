@@ -26,15 +26,15 @@ code {
 }
 
 * {
-  --sb-track-color: rgba(249, 249, 248, 0);
-  --sb-thumb-color: rgba(249, 249, 248, 0);
+  --sb-track-color: #F9F4EB;
+  --sb-thumb-color: #F9F4EB;
   --sb-size: 5px;
-
+  scrollbar-width: none;
   scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
 }
 
 *::-webkit-scrollbar {
-  width: var(--sb-size);
+  width: 1px;
 }
 
 *::-webkit-scrollbar-track {
