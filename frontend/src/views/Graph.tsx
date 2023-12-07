@@ -1,6 +1,6 @@
 import { Add, DoneAll, Elderly, KeyboardReturn, Share } from "@mui/icons-material";
 import { Alert, Button, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, FocusEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -188,8 +188,14 @@ export default function Graph() {
     setTitle(event.target.value);
   };
 
-  const onTitleChangeSubmit = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
+  const onTitleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      udpateTitle(title.trim());
+    }
+  };
+
+  const onTitleBlur = (event: FocusEvent<HTMLInputElement>) => {
+    if (event.type === 'blur') {
       udpateTitle(title.trim());
     }
   };
@@ -361,7 +367,8 @@ export default function Graph() {
             <TextField
               value={title}
               onChange={onTitleInputChanged}
-              onKeyDown={onTitleChangeSubmit}
+              onKeyDown={onTitleKeyDown}
+              onBlur={onTitleBlur}
             ></TextField>
           </Panel>
           <Panel className="bg-transparent" position="top-left">
