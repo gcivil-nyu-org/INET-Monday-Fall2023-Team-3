@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardContent, IconButton } from "@mui/material";
 import { RequestMethods } from "src/utils/utils";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
+import ClearIcon from '@mui/icons-material/Clear';
 import { useCombinedStore } from "src/store/combinedStore";
 import { BackendModels } from "src/utils/models";
 import { useShallow } from "zustand/react/shallow";
@@ -104,8 +105,8 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
           <CardHeader className="text-olive" title={graph.title + displayName}></CardHeader>
           <CardContent>
             {edit &&
-              <IconButton color="error" className="absolute top-1 right-1" onClick={onDeleteClicked}>
-                <DeleteForeverIcon />
+              <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
+                <ClearIcon/>
               </IconButton>
             }
             <img src={imgUrl} alt="graph" />
