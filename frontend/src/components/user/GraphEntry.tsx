@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Card, CardHeader, CardContent, IconButton } from "@mui/material";
 import { RequestMethods } from "src/utils/utils";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import ClearIcon from '@mui/icons-material/Clear';
 import { useCombinedStore } from "src/store/combinedStore";
 import { BackendModels } from "src/utils/models";
@@ -102,7 +101,13 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
   return (
     <div className="flex flex-1 h-64 w-64 m-4 overflow-auto flex-shrink-0" onClick={onGraphClicked}>
         <Card className="relative m-4" style={getcardStyle()}>
-          <CardHeader className="text-olive" title={graph.title + displayName}></CardHeader>
+          <CardHeader
+            className="text-olive"
+            style={{
+              fontFamily: "Comic Sans MS",
+              textAlign: "center"
+            }}
+            title={graph.title + displayName}></CardHeader>
           <CardContent>
             {edit &&
               <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
