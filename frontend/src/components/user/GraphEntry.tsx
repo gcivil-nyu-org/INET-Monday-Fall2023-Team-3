@@ -103,11 +103,9 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
         <Card className="relative m-4" style={getcardStyle()}>
           <CardHeader
             className="text-olive"
-            style={{
-              fontFamily: "Comic Sans MS",
-              textAlign: "center"
-            }}
-            title={graph.title + displayName}></CardHeader>
+            titleTypographyProps={{style: {fontFamily: "Comic Sans MS", textAlign: "center"} }}
+            title={graph.title + displayName}>
+          </CardHeader>
           <CardContent>
             {edit &&
               <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
