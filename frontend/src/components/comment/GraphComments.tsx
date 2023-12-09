@@ -67,13 +67,22 @@ const GraphComments: React.FC<CommentsProps> = ({}) => {
   };
 
   const addComment = (text: string, parentId: string | null) => {
+    const body = parentId
+      ? {
+          body: text,
+          createdBy: user.email,
+          belongsTo: graph.id,
+          parent: parentId,
+        }
+      : {
+          body: text,
+          createdBy: user.email,
+          belongsTo: graph.id,
+        };
+
     RequestMethods.graphCommentCreate({
       token: token,
-      body: {
-        body: text,
-        createdBy: user.email,
-        belongsTo: graph.id,
-      },
+      body: body,
     }).then((result) => {
       if (result.status) {
         const newComment = [result.value, ...comments];

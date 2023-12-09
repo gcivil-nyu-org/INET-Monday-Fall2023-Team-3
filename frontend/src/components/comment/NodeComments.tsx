@@ -53,13 +53,21 @@ export default function NodeComments({ node }: NodeCommentProps) {
   };
 
   const addComment = (text: string, parentId: string | null) => {
+    const body = parentId
+      ? {
+          body: text,
+          createdBy: user.email,
+          belongsTo: graph.id,
+          parent: parentId,
+        }
+      : {
+          body: text,
+          createdBy: user.email,
+          belongsTo: graph.id,
+        };
     RequestMethods.nodeCommentCreate({
       token: token,
-      body: {
-        body: text,
-        createdBy: user.email,
-        belongsTo: node.id,
-      },
+      body: body,
     }).then((result) => {
       if (result.status) {
         setComments([...comments, result.value]);
