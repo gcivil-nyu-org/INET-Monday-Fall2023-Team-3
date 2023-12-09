@@ -25,9 +25,9 @@ const CommentForm: React.FC<CommentFormProps> = ({
     };
 
     return (
-        <form onSubmit={onSubmit} className="flex flex-col items-center">
+        <form onSubmit={onSubmit} className="flex flex-col-reverse mx-auto">
             <textarea
-                className="w-full h-32 mr-4 ml-4 mb-4 mt-4 border border-white"
+                className="w-full h-32 mr-4 ml-4 mb-4 mt-4 rounded-xl "
                 value={text}
                 onChange={(e) => setText(e.target.value)}
             />

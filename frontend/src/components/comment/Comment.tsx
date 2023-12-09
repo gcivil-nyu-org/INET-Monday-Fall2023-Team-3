@@ -4,7 +4,7 @@ import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
 import { RequestMethods } from "src/utils/utils";
 import { BackendModels } from "src/utils/models";
-import CommentForm from "./CommentFrom";
+import CommentForm from "./CommentForm";
 
 export interface CommentProps {
   comment: BackendModels.IComment;

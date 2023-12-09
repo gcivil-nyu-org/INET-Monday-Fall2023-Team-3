@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import CommentForm from "./CommentFrom";
+import CommentForm from "./CommentForm";
 import Comment from "./Comment";
 import { CommentState } from "./Comment";
 import { ThemeProvider, CssBaseline, Grid, Paper, Box } from "@mui/material";
