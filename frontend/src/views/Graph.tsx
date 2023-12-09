@@ -256,8 +256,8 @@ export default function Graph() {
           tempFaultyDependencies.push({
             reason: "missing",
             cause: "node",
-            sourceName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
-            targetName: node.name,
+            sourceName: node.name,
+            targetName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
           });
           continue;
         }
