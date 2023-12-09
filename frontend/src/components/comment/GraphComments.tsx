@@ -11,10 +11,9 @@ import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
 import { Node } from "reactflow";
 
-interface CommentsProps {
-}
+interface CommentsProps {}
 
-const GraphComments: React.FC<CommentsProps> = ({ }) => {
+const GraphComments: React.FC<CommentsProps> = ({}) => {
   const { user, token, graph } = useCombinedStore(
     useShallow((state) => ({
       user: state.user,
@@ -38,8 +37,8 @@ const GraphComments: React.FC<CommentsProps> = ({ }) => {
           token: token,
           param: graph.id,
         });
-        console.log(response)
-        console.log(response.status)
+        console.log(response);
+        console.log(response.status);
         if (response.status) {
           console.log(response.value);
           const commentsArray = Object.values(response.value);
@@ -88,7 +87,6 @@ const GraphComments: React.FC<CommentsProps> = ({ }) => {
 
   // Subscribe to Pusher channel and events
 
-
   usePusher("comments-channel", "new-graph-comment", async (newComment: BackendModels.IComment) => {
     const response = await RequestMethods.graphCommentGetByGraph({
       token: token,
@@ -101,29 +99,37 @@ const GraphComments: React.FC<CommentsProps> = ({ }) => {
     }
   });
 
-  usePusher("comments-channel", "patch-graph-comment", async (newComment: BackendModels.IComment) => {
-    const response = await RequestMethods.graphCommentGetByGraph({
-      token: token,
-      param: graph.id,
-    });
-    if (response.status) {
-      console.log("usePusher");
-      const commentsArray = Object.values(response.value);
-      setComments(commentsArray);
+  usePusher(
+    "comments-channel",
+    "patch-graph-comment",
+    async (newComment: BackendModels.IComment) => {
+      const response = await RequestMethods.graphCommentGetByGraph({
+        token: token,
+        param: graph.id,
+      });
+      if (response.status) {
+        console.log("usePusher");
+        const commentsArray = Object.values(response.value);
+        setComments(commentsArray);
+      }
     }
-  });
+  );
 
-  usePusher("comments-channel", "delete-graph-comment", async (newComment: BackendModels.IComment) => {
-    const response = await RequestMethods.graphCommentGetByGraph({
-      token: token,
-      param: graph.id,
-    });
-    if (response.status) {
-      console.log("usePusher");
-      const commentsArray = Object.values(response.value);
-      setComments(commentsArray);
+  usePusher(
+    "comments-channel",
+    "delete-graph-comment",
+    async (newComment: BackendModels.IComment) => {
+      const response = await RequestMethods.graphCommentGetByGraph({
+        token: token,
+        param: graph.id,
+      });
+      if (response.status) {
+        console.log("usePusher");
+        const commentsArray = Object.values(response.value);
+        setComments(commentsArray);
+      }
     }
-  });
+  );
 
   const updateComment = (text: string, commentId: string) => {
     RequestMethods.graphCommentPatch({
@@ -197,11 +203,9 @@ const GraphComments: React.FC<CommentsProps> = ({ }) => {
               position: "relative",
             }}
           > */}
-          <div className="flex flex-col relative h-full overflow-y-auto">
+          <div className="flex flex-col relative h-full w-full overflow-y-auto">
             <Box sx={{ p: 2, textAlign: "center" }}>
-              <Box className="text-olive font-sans text-2xl">
-                DISCUSSION
-              </Box>
+              <Box className="text-olive font-sans text-2xl">DISCUSSION</Box>
               <CommentForm submitLabel="Write" handleSubmit={addComment} />
             </Box>
             {/* Scrollable comments area */}
