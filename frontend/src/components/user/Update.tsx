@@ -5,6 +5,7 @@ import { refreshPokemonAvatar } from "src/utils/helpers";
 import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
 import { Validate } from "src/utils/validation";
+import { useNavigate } from "react-router-dom";
 
 interface UpdateProps {
   onAvatarChanged: (url: string) => void;
@@ -12,8 +13,8 @@ interface UpdateProps {
 }
 
 export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
-  const [token, user, setUser] = useCombinedStore(
-    useShallow((state) => [state.token, state.user, state.setUser])
+  const [token, user, setUser, setToken] = useCombinedStore(
+    useShallow((state) => [state.token, state.user, state.setUser, state.setToken])
   );
   const [severity, setSeverity] = useState<AlertColor>("error");
   // use object state saves us a log of separate state definitions
@@ -24,6 +25,7 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
   const [verifyPassword, setVerifyPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     setUpdateData({
@@ -88,6 +90,9 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
 
   const onLogOutButtonClicked = () => {
     console.log("user log out");
+    const token = "";
+    setToken(token);
+    navigate("/");
   };
 
   const onRefreshAvatar = () => {
@@ -181,7 +186,7 @@ export default function Update({ onAvatarChanged, avatarSrc }: UpdateProps) {
           border-2 border-solid"
           size="large"
           variant="contained"
-          onClick={onUpdateButtonClicked}
+          onClick={onLogOutButtonClicked}
         >
           Log out
         </Button>
