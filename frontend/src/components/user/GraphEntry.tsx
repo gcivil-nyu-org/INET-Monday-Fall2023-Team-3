@@ -51,6 +51,15 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
     console.log("delete button clicked");
     // there needs to be an if statement to tell whether ur own graph or a shared graph is being deleted
     // for now just assume it's ur own graph
+    if (graph.createdBy !== user.email) {
+      console.log("it's not your graph, only deleting from 'shared graphs'.")
+      const postDeletionGraphs = sharedGraphs.filter((g)=> g.id != graph.id)
+      setUser({
+        sharedGraphs: postDeletionGraphs.map(g => g.id)
+      })
+      console.log("post deletion graphs are", postDeletionGraphs)
+      return;
+    }
     console.log(graph.id);
     console.log("Combined store state before delete:", useCombinedStore.getState())
 
@@ -113,19 +122,17 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
             title={graph.title}>
           </CardHeader>
           <CardContent>
+            {edit && (
+              <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
+                <ClearIcon />
+              </IconButton>
+            )}
             {graph.createdBy !== user.email && showInfo ? (
               <div className="top-0 left-0 right-0 bottom-0 text-olive text-xl bg-gray-800 text-white p-4 transition-opacity">
                 shared by {graph.createdBy}
               </div>
             ) : (
-              <>
-                {edit && (
-                  <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
-                    <ClearIcon />
-                  </IconButton>
-                )}
                 <img src={imgUrl} alt="graph" />
-              </>
             )}
           </CardContent>
         </Card>
