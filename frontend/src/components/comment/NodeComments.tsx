@@ -57,13 +57,13 @@ export default function NodeComments({ node }: NodeCommentProps) {
       ? {
           body: text,
           createdBy: user.email,
-          belongsTo: graph.id,
+          belongsTo: node.id,
           parent: parentId,
         }
       : {
           body: text,
           createdBy: user.email,
-          belongsTo: graph.id,
+          belongsTo: node.id,
         };
     RequestMethods.nodeCommentCreate({
       token: token,
@@ -84,7 +84,9 @@ export default function NodeComments({ node }: NodeCommentProps) {
       param: node.id,
     }).then((result) => {
       if (result.status) {
-        setComments(result.value);
+        console.log("usePusher");
+        const commentsArray = Object.values(result.value);
+        setComments(commentsArray);
       } else {
         setMessage("error when fetching comment on new-node-comment");
       }
@@ -97,9 +99,26 @@ export default function NodeComments({ node }: NodeCommentProps) {
       param: node.id,
     }).then((result) => {
       if (result.status) {
-        setComments(result.value);
+        console.log("usePusher");
+        const commentsArray = Object.values(result.value);
+        setComments(commentsArray);
       } else {
         setMessage("error when fetching comment on delete-node-comment");
+      }
+    });
+  });
+
+  usePusher("comments-channel", "patch-node-comment", () => {
+    RequestMethods.nodeCommentGetByNode({
+      token: token,
+      param: node.id,
+    }).then((result) => {
+      if (result.status) {
+        console.log("usePusher");
+        const commentsArray = Object.values(result.value);
+        setComments(commentsArray);
+      } else {
+        setMessage("error when fetching comment on patch-node-comment");
       }
     });
   });
