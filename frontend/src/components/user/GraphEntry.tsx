@@ -35,7 +35,7 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
     }))
   );
   const disabled = user.email !== graph.createdBy;
-  const displayName = user.email === graph.createdBy ? "" : "@" + graph.createdBy;
+  // const displayName = user.email === graph.createdBy ? "" : "@" + graph.createdBy;
 
   const onGraphClicked = () => {
     console.log(`navigating to graph ${graph.title}`);
@@ -103,8 +103,9 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
         <Card className="relative m-4" style={getcardStyle()}>
           <CardHeader
             className="text-olive"
-            titleTypographyProps={{style: {fontFamily: "Comic Sans MS", textAlign: "center"} }}
-            title={graph.title + displayName}>
+            sx={{fontFamily: "font-sans"}}
+            titleTypographyProps={{style: {fontFamily: "Archivo Black", textAlign: "center"} }}
+            title={graph.title}>
           </CardHeader>
           <CardContent>
             {edit &&
