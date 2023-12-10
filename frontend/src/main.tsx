@@ -4,6 +4,7 @@ import "./index.css";
 import { RouterProvider, createBrowserRouter, redirect } from "react-router-dom";
 import Welcome from "./views/Welcome";
 import User from "./views/User";
+import About from "./views/About";
 import { useCombinedStore } from "./store/combinedStore";
 import Graph from "./views/Graph";
 
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: "/graph",
     element: <Graph />,
+  },
+  {
+    path: "/about",
+    element: <About />,
   },
 ]);
 
