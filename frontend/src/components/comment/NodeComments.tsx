@@ -198,7 +198,7 @@ export default function NodeComments({ node }: NodeCommentProps) {
           > */}
           <div className="flex flex-col relative h-full w-full overflow-y-auto">
             <Box sx={{ p: 2, textAlign: "center" }}>
-              <Box className="text-olive font-sans text-2xl">DISCUSSION</Box>
+              <Box className="text-olive font-sans text-2xl">NODE DISCUSSION</Box>
               <CommentForm submitLabel="Write" handleSubmit={addComment} />
             </Box>
             {/* Scrollable comments area */}
