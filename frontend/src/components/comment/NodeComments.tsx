@@ -9,7 +9,7 @@ import usePusher from "../pusher/usePusher";
 import { ThemeProvider } from "@emotion/react";
 import Theme from "./Theme";
 import { Box, CssBaseline } from "@mui/material";
-import CommentForm from "./CommentFrom";
+import CommentForm from "./CommentForm";
 import Comment from "./Comment";
 
 interface NodeCommentProps {
