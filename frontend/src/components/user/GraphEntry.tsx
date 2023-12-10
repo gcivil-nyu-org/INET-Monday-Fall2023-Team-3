@@ -77,7 +77,7 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
 
   const [currentColorIndex, setCurrentColorIndex] = useState(0);
 
-  const getColor  = (index: number) => {
+  const getColor = (index: number) => {
     const color = colors[index % 5];
     console.log("picked random color", color);
     return color;
@@ -99,23 +99,22 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
   }
 
   return (
-    <div className="flex flex-1 h-64 w-64 m-4 overflow-auto flex-shrink-0" onClick={onGraphClicked}>
-        <Card className="relative m-4" style={getcardStyle()}>
-          <CardHeader
-            className="text-olive"
-            sx={{fontFamily: "font-sans"}}
-            titleTypographyProps={{style: {fontFamily: "Archivo Black", textAlign: "center"} }}
-            title={graph.title}>
-          </CardHeader>
-          <CardContent>
-            {edit &&
-              <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
-                <ClearIcon/>
-              </IconButton>
-            }
-            <img src={imgUrl} alt="graph" />
-          </CardContent>
-        </Card>
+    <div className="flex flex-1 h-64 w-64 m-4 overflow-auto flex-shrink-0 cursor-pointer" onClick={onGraphClicked}>
+      <Card className="relative m-4" style={getcardStyle()}>
+        <CardHeader
+          className="text-olive"
+          titleTypographyProps={{ style: { fontFamily: "Archivo Black", textAlign: "center" } }}
+          title={graph.title}>
+        </CardHeader>
+        <CardContent>
+          {edit &&
+            <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
+              <ClearIcon />
+            </IconButton>
+          }
+          <img src={imgUrl} alt="graph" />
+        </CardContent>
+      </Card>
     </div>
   );
 }

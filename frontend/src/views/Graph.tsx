@@ -376,12 +376,17 @@ export default function Graph() {
           elementsSelectable={!disabled}
         >
           <Panel className="bg-transparent" position="top-center">
-            <TextField
-              value={title}
-              onChange={onTitleInputChanged}
-              onKeyDown={onTitleKeyDown}
-              onBlur={onTitleBlur}
-            ></TextField>
+            {disabled ? (
+              <div className="text-2xl text-center font-sans text-olive">{title}</div>
+            ) : (
+              <TextField
+                value={title}
+                onChange={onTitleInputChanged}
+                onKeyDown={onTitleKeyDown}
+                onBlur={onTitleBlur}
+              />
+            )}
+            {/* user who does not own the graph should not be able to change the title */}
           </Panel>
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
