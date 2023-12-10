@@ -57,8 +57,8 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: A
   };
 
   return (
-    <div className="w-full flex flex-row bg-beige overflow-hidden">
-      <div className="w-1/3 flex flex-col items-center overflow-y-scroll">
+    <div className="w-full flex flex-row bg-beige">
+      <div className="w-1/3 flex flex-col items-center max-h-96 overflow-auto">
         <div className="h-14 w-full flex sticky top-0 z-10">
           <TextField
             label="Search"
@@ -67,9 +67,9 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: A
             onChange={onSearchTermInputChanged}
           />
         </div>
-        <div className="w-full flex flex-col bg-gray-200 flex-1">
+        <div className="w-full flex flex-col flex-1 overflow-auto max-h-min">
           {getSearchingNodes().map((node) => (
-            <div key={node.id} className="w-full h-28 p-6 cursor-pointer">
+            <div key={node.id} className="w-full h-24 p-6 cursor-pointer">
               <div className="w-full h-20 text-center bg-white" onClick={() => onSubmitPredefinedNode(node.id)}>
                 {node.name}
               </div>
@@ -110,3 +110,7 @@ export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: A
     </div>
   );
 }
+
+
+
+
