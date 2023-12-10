@@ -18,7 +18,7 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
   };
 
   const onDescriptionInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value.trim());
+    setDescription(event.target.value);
   };
 
   const onSaveButtonClicked = () => {
