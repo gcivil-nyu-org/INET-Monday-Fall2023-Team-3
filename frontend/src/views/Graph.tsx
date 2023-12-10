@@ -1,6 +1,14 @@
 import { Add, DoneAll, Elderly, KeyboardReturn, Share } from "@mui/icons-material";
 import { Alert, Button, Dialog, Snackbar, TextField, Tooltip } from "@mui/material";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  FocusEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import ReactFlow, {
   Background,
@@ -31,6 +39,7 @@ import EditNode from "src/components/node/EditNode";
 import FaultyDependency, { IFaultyDependency } from "src/components/node/FaultyDependency";
 import Comments from "components/comment/Comments";
 import GraphComments from "components/comment/GraphComments";
+import NodeComments from "src/components/comment/NodeComments";
 
 const nodeTypes = {
   smoothNode: SmoothNode,
@@ -86,7 +95,6 @@ export default function Graph() {
   const [showNodeDiscussion, setShowNodeDiscussion] = useState(false);
   const [showGraphShare, setShowGraphShare] = useState(false);
 
-
   useEffect(() => {
     setNodes(
       graph.nodes.map((node) => ({
@@ -131,7 +139,7 @@ export default function Graph() {
   const onNodeAddPredefined = async (id: string) => {
     addNode(predefinedNodeMap[id]);
     setShowAddNode(false);
-  }
+  };
 
   const onNodeEdit = async (id: string, node: Requests.Node.Patch) => {
     const patchNodeResult = await RequestMethods.nodePatch({
@@ -188,8 +196,14 @@ export default function Graph() {
     setTitle(event.target.value);
   };
 
-  const onTitleChangeSubmit = (event: KeyboardEvent<HTMLInputElement>) => {
+  const onTitleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
+      udpateTitle(title.trim());
+    }
+  };
+
+  const onTitleBlur = (event: FocusEvent<HTMLInputElement>) => {
+    if (event.type === "blur") {
       udpateTitle(title.trim());
     }
   };
@@ -242,8 +256,8 @@ export default function Graph() {
           tempFaultyDependencies.push({
             reason: "missing",
             cause: "node",
-            sourceName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
-            targetName: node.name,
+            sourceName: node.name,
+            targetName: predefinedNodeMap[dependency]?.name ?? "[UNKNOWN NODE]",
           });
           continue;
         }
@@ -318,7 +332,11 @@ export default function Graph() {
     <div className="w-full flex flex-row min-h-screen min-w-full overflow-hidden">
       <SnackbarProvider />
       <Dialog open={showAddNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
-        <AddNode onSubmit={onNodeAdd} onError={onError} onSubmitPredefinedNode={onNodeAddPredefined} />
+        <AddNode
+          onSubmit={onNodeAdd}
+          onError={onError}
+          onSubmitPredefinedNode={onNodeAddPredefined}
+        />
       </Dialog>
       <Dialog open={showEditNode} onClose={onCancelDialog} maxWidth="md" fullWidth>
         <EditNode onSubmit={onNodeEdit} onError={onError} node={currNode?.data} />
@@ -361,51 +379,56 @@ export default function Graph() {
             <TextField
               value={title}
               onChange={onTitleInputChanged}
-              onKeyDown={onTitleChangeSubmit}
+              onKeyDown={onTitleKeyDown}
+              onBlur={onTitleBlur}
             ></TextField>
           </Panel>
           <Panel className="bg-transparent" position="top-left">
             <div className="flex flex-col space-y-2">
               {!disabled && (
                 <Tooltip title="Add Node" placement="right" arrow>
-                  <Button className="bg-orange border-none"
+                  <Button
+                    className="bg-orange border-none"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onAddNodeButtonClicked}
                   >
-                    <Add className="text-olive"/>
+                    <Add className="text-olive" />
                   </Button>
                 </Tooltip>
               )}
               {!disabled && (
                 <Tooltip title="Share" placement="right" arrow>
-                  <Button className="bg-pink border-none"
+                  <Button
+                    className="bg-pink border-none"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onShareButtonClicked}
                   >
-                    <Share className="text-olive"/>
+                    <Share className="text-olive" />
                   </Button>
                 </Tooltip>
               )}
               {!disabled && (
                 <Tooltip title="Verify Dependencies" placement="right" arrow>
-                  <Button className="bg-yellow border-none"
+                  <Button
+                    className="bg-yellow border-none"
                     variant="outlined"
                     sx={{ padding: "8px", minWidth: "32px" }}
                     onClick={onVerifyButtonClicked}
                   >
-                    <DoneAll className="text-olive"/>
+                    <DoneAll className="text-olive" />
                   </Button>
                 </Tooltip>
               )}
               <Tooltip title="Return" placement="right" arrow>
-                <Button className="bg-blue border-none"
+                <Button
+                  className="bg-blue border-none"
                   variant="outlined"
                   sx={{ padding: "8px", minWidth: "32px" }}
                   onClick={onReturnButtonClicked}
                 >
-                  <KeyboardReturn className="text-olive"/>
+                  <KeyboardReturn className="text-olive" />
                 </Button>
               </Tooltip>
             </div>
@@ -415,8 +438,12 @@ export default function Graph() {
         </ReactFlow>
       </div>
       <div className="flex max-w-screen max-h-screen h-full bg-beige basis-1/4">
-        <div className="flex bg-green bg-opacity-60 mt-5 mb-5 rounded-xl">
-          {<GraphComments />}
+        <div className="flex w-full bg-green bg-opacity-60 mt-5 mb-5 rounded-xl">
+          {currNode && currNode.data.predefined ? (
+            <NodeComments node={currNode} />
+          ) : (
+            <GraphComments />
+          )}
         </div>
       </div>
     </div>
