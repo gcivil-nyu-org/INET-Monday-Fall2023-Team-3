@@ -113,18 +113,23 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
             title={graph.title}>
           </CardHeader>
           <CardContent>
-            {edit &&
-              <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
-                <ClearIcon />
-              </IconButton>
-            }
-            <img src={imgUrl} alt="graph" />
+            {graph.createdBy !== user.email && showInfo ? (
+              <div className="top-0 left-0 right-0 bottom-0 text-olive text-xl bg-gray-800 text-white p-4 transition-opacity">
+                shared by {graph.createdBy}
+              </div>
+            ) : (
+              <>
+                {edit && (
+                  <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
+                    <ClearIcon />
+                  </IconButton>
+                )}
+                <img src={imgUrl} alt="graph" />
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
-      {graph.createdBy !== user.email && showInfo && <div
-      className="top-0 left-0 right-0 bottom-0 bg-gray-800 text-white p-4 transition-opacity">
-      shared by {graph.createdBy}</div>}
     </div >
   );
 }
