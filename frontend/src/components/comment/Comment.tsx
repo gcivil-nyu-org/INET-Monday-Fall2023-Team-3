@@ -4,6 +4,7 @@ import { useCombinedStore } from "src/store/combinedStore";
 import { useShallow } from "zustand/react/shallow";
 import { RequestMethods } from "src/utils/utils";
 import { BackendModels } from "src/utils/models";
+import { defaultAvatarSrc } from "src/utils/helpers";
 import CommentForm from "./CommentFrom";
 
 export interface CommentProps {
@@ -42,6 +43,7 @@ const Comment: React.FC<CommentProps> = ({
   );
   const [username, setUsername] = useState("");
   const [createdAt, setCreatedAt] = useState("");
+  const [avatarSrc, setAvatarSrc] = useState(defaultAvatarSrc);
   const isEditing =
     activeComment && activeComment.id === comment.id && activeComment.type === "editing";
   const isReplying =
@@ -60,6 +62,7 @@ const Comment: React.FC<CommentProps> = ({
         const result = await RequestMethods.userGet({ token: token, param: comment.createdBy });
         if (result.status) {
           const username = result.value.username;
+          setAvatarSrc(result.value.avatar)
           setUsername(username);
           setCreatedAt(new Date(comment.createdAt).toLocaleString());
         } else {
@@ -77,7 +80,7 @@ const Comment: React.FC<CommentProps> = ({
   return (
     <div key={comment.id} className="flex mb-7">
       <div className="mr-4">
-        <Avatar className="w-12 h-12" src="https://mui.com/static/images/avatar/1.jpg" />
+        <Avatar className="w-12 h-12" src={avatarSrc} />
       </div>
       <div className="w-full">
         <div className="flex">
