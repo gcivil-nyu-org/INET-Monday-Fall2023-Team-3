@@ -98,23 +98,33 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
     }
   }
 
+  const [showInfo, setShowInfo] = useState(false);
+
   return (
-    <div className="flex flex-1 h-64 w-64 m-4 overflow-auto flex-shrink-0 cursor-pointer" onClick={onGraphClicked}>
-      <Card className="relative m-4" style={getcardStyle()}>
-        <CardHeader
-          className="text-olive"
-          titleTypographyProps={{ style: { fontFamily: "Archivo Black", textAlign: "center" } }}
-          title={graph.title}>
-        </CardHeader>
-        <CardContent>
-          {edit &&
-            <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
-              <ClearIcon />
-            </IconButton>
-          }
-          <img src={imgUrl} alt="graph" />
-        </CardContent>
-      </Card>
-    </div>
+    <div className="flex flex-col h-64 w-64 m-4 overflow-auto flex-shrink-0 cursor-pointer" onClick={onGraphClicked}>
+      <div className=""
+        onMouseEnter={() => setShowInfo(true)}
+        onMouseLeave={() => setShowInfo(false)}
+      >
+        <Card className="relative m-4" style={getcardStyle()}>
+          <CardHeader
+            className="text-olive"
+            titleTypographyProps={{ style: { fontFamily: "Archivo Black", textAlign: "center" } }}
+            title={graph.title}>
+          </CardHeader>
+          <CardContent>
+            {edit &&
+              <IconButton color="default" className="absolute top-1 right-1" onClick={onDeleteClicked}>
+                <ClearIcon />
+              </IconButton>
+            }
+            <img src={imgUrl} alt="graph" />
+          </CardContent>
+        </Card>
+      </div>
+      {graph.createdBy !== user.email && showInfo && <div
+      className="top-0 left-0 right-0 bottom-0 bg-gray-800 text-white p-4 transition-opacity">
+      shared by {graph.createdBy}</div>}
+    </div >
   );
 }

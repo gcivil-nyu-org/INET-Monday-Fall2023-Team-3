@@ -2,6 +2,8 @@ import { BackendModels } from "src/utils/models";
 import GraphEntry from "./GraphEntry";
 import { Button } from "@mui/material";
 import { useState } from 'react';
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
 
 export type GraphListProp = {
   name: string;
@@ -14,8 +16,10 @@ export default function GraphList({ name, graphs }: GraphListProp) {
   const onEditClicked = () => {
     console.log("edit is clicked!");
     setEdit(true);
-
   };
+  const user = useCombinedStore(
+    useShallow((state) => state.user)
+  );
 
   const onDoneClicked = () => {
     console.log("done is clicked!");
@@ -27,19 +31,26 @@ export default function GraphList({ name, graphs }: GraphListProp) {
     <div className="flex flex-col self-stretch">
       <div className="h-16 m-4">
         <span className="text-2xl">{name}</span>
-        { !edit &&
-        <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
+        {!edit &&
+          <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
         border-2 border-solid border-olive text-olive m-5" onClick={onEditClicked}>
-          Edit
-        </Button>
+            Edit
+          </Button>
         }
-        { edit &&
-        <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
+        {edit &&
+          <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
         border-2 border-solid border-olive text-olive m-5" onClick={onDoneClicked}>
-          Done
-        </Button>
+            Done
+          </Button>
         }
       </div>
+      {/* <div className="flex flex-1 flex-row overflow-x-auto min-h-[16rem]">
+        {graphs.map((graph, index) => (
+          <div key={graph.id}>
+            <GraphEntry graph={graph} edit={edit} index={index} />
+          </div>
+        ))}
+      </div> */}
       <div className="flex flex-1 flex-row overflow-x-auto min-h-[16rem]">
         {graphs.map((graph, index) => (
           <div key={graph.id}>
