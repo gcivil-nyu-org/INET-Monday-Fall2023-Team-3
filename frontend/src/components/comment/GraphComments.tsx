@@ -214,7 +214,7 @@ const GraphComments: React.FC<CommentsProps> = ({}) => {
           > */}
           <div className="flex flex-col relative h-full w-full overflow-y-auto">
             <Box sx={{ p: 2, textAlign: "center" }}>
-              <Box className="text-olive font-sans text-2xl">DISCUSSION</Box>
+              <Box className="text-olive font-sans text-2xl">GRAPH DISCUSSION</Box>
               <CommentForm submitLabel="Write" handleSubmit={addComment} />
             </Box>
             {/* Scrollable comments area */}
