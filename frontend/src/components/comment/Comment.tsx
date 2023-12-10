@@ -42,6 +42,7 @@ const Comment: React.FC<CommentProps> = ({
   );
   const [username, setUsername] = useState("");
   const [createdAt, setCreatedAt] = useState("");
+  const [avatar, setAvatar] = useState("");
   const isEditing =
     activeComment && activeComment.id === comment.id && activeComment.type === "editing";
   const isReplying =
@@ -62,6 +63,7 @@ const Comment: React.FC<CommentProps> = ({
           const username = result.value.username;
           setUsername(username);
           setCreatedAt(new Date(comment.createdAt).toLocaleString());
+          setAvatar(result.value.avatar);
         } else {
           // Handle case where user details cannot be fetched
           console.error("error fetching user:", result.status);
@@ -77,7 +79,7 @@ const Comment: React.FC<CommentProps> = ({
   return (
     <div key={comment.id} className="flex mb-7">
       <div className="mr-4">
-        <Avatar className="w-12 h-12" src="https://mui.com/static/images/avatar/1.jpg" />
+          <Avatar className="w-16 h-16" src={avatar} />
       </div>
       <div className="w-full">
         <div className="flex">

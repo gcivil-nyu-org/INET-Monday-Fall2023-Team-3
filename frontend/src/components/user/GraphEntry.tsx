@@ -59,6 +59,8 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
       })
       console.log("post deletion graphs are", postDeletionGraphs)
       return;
+      // note that deleting a shared graph does not delete you from
+      // 'shared user' list from the other person's account
     }
     console.log(graph.id);
     console.log("Combined store state before delete:", useCombinedStore.getState())
