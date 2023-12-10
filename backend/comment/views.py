@@ -58,8 +58,7 @@ def node_comment_create(request: Request):
     if response.status_code == 200:
         print("success")
         data = json.loads(json.dumps(response.data, default=str))
-        print(data)
-        pusher_client.trigger("comments-channel", "new-comment", data)
+        pusher_client.trigger("comments-channel", "new-node-comment", data)
     return response
 
 
@@ -117,13 +116,17 @@ NODE_COMMENT_PATCH_PATH_FORMAT = "node/patch/{comment_id}/"
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def node_comment_patch(request: Request, comment_id: str):
-    return handle_patch(
+    response = handle_patch(
         model_class=NodeComment,
         instance_identifier={"id": comment_id},
         patch_data=request.data,
         patch_serializer_class=NodeCommentSerializer,
         not_found_response=NODE_COMMENT_PATCH_NOT_FOUND_RESPONSE,
     )
+    if response.status_code == 200:
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("comments-channel", "patch-node-comment", data)
+    return response
 
 
 NODE_COMMENT_DELETE_NOT_FOUND_MESSAGE = error("node_comment: not found")
@@ -140,11 +143,15 @@ NODE_COMMENT_DELETE_PATH_FORMAT = "node/delete/{comment_id}/"
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def node_comment_delete(request: Request, comment_id: str):
-    return handle_delete(
+    response = handle_delete(
         model_class=NodeComment,
         instance_identifier={"id": comment_id},
         not_found_response=NODE_COMMENT_DELETE_NOT_FOUND_RESPONSE,
     )
+    if response.status_code == 200:
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("comments-channel", "delete-node-comment", data)
+    return response
 
 
 GRAPH_COMMENT_CREATE_INVALID_FORMAT_MESSAGE = error("graph_comment: invalid format")
