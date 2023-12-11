@@ -470,8 +470,8 @@ export default function Graph() {
           <Background className="bg-beige" gap={16} />
         </ReactFlow>
       </div>
-      <div className="flex max-w-screen max-h-screen h-full bg-beige basis-1/4">
-        <div className="flex w-full bg-green bg-opacity-60 mt-5 mb-5 rounded-xl">
+      <div className="flex max-h-screen h-full bg-beige basis-1/4 p-5">
+        <div className="w-full bg-green bg-opacity-60 rounded-xl">
           {currNode && currNode.data.predefined ? (
             <NodeComments node={currNode} />
           ) : (
