@@ -29,7 +29,7 @@ export default function GraphList({ name, graphs }: GraphListProp) {
 
   return (
     <div className="flex flex-col self-stretch">
-      <div className="h-16 m-4">
+      <div className="h-16 ml-4 mt-2">
         <span className="text-2xl">{name}</span>
         {!edit &&
           <Button className="h-10 w-20 p-2 rounded-3xl font-sans rounded-full
@@ -51,7 +51,7 @@ export default function GraphList({ name, graphs }: GraphListProp) {
           </div>
         ))}
       </div> */}
-      <div className="flex flex-1 flex-row overflow-x-auto min-h-[16rem]">
+      <div className="flex flex-1 flex-row overflow-x-auto min-h-[16rem] m-0">
         {graphs.map((graph, index) => (
           <div key={graph.id}>
             <GraphEntry graph={graph} edit={edit} index={index} />

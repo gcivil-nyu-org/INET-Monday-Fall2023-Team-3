@@ -15,7 +15,7 @@ export type GraphEntryProp = {
 
 export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
   const imgUrl =
-    "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg";
+    "https://d2w9rnfcy7mm78.cloudfront.net/4915740/original_1e60e37889cacbc3fe3e7d1ec2ebfaf8.png?1567040829?bc=1";
   const navigate = useNavigate();
   const {
     user,
@@ -112,7 +112,7 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
   const [showInfo, setShowInfo] = useState(false);
 
   return (
-    <div className="flex flex-col h-64 w-64 m-4 overflow-auto flex-shrink-0 cursor-pointer" onClick={onGraphClicked}>
+    <div className="flex flex-col h-64 w-64 ml-2 mr-2 mb-4 overflow-auto flex-shrink-0 cursor-pointer" onClick={onGraphClicked}>
       <div className=""
         onMouseEnter={() => setShowInfo(true)}
         onMouseLeave={() => setShowInfo(false)}
