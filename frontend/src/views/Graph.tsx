@@ -284,7 +284,7 @@ export default function Graph() {
         }
 
         const correctEdge = graph.edges.find(
-          (edge) => edge.target === node.id && edge.source === node.id
+          (edge) => edge.target === node.id && edge.source === dependency
         );
 
         if (correctEdge === undefined) {
