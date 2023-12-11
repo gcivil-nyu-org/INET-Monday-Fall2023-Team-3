@@ -170,6 +170,9 @@ export default function Graph() {
   };
 
   const onEdgeAdd = async (connection: Connection) => {
+    if (disabled) {
+      return undefined;
+    }
     const addEdgeResult = await RequestMethods.edgeCreate({
       token: token,
       body: {
@@ -358,7 +361,7 @@ export default function Graph() {
           onNodeDoubleClick={onNodeDoubleClick}
           edges={edges}
           onEdgesChange={onEdgesChange}
-          onConnect={!disabled && onEdgeAdd}
+          onConnect={onEdgeAdd}
           onEdgesDelete={onEdgesDelete}
           onPaneClick={() => {
             setCurrNode(undefined);
