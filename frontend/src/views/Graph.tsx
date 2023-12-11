@@ -358,7 +358,7 @@ export default function Graph() {
           onNodeDoubleClick={onNodeDoubleClick}
           edges={edges}
           onEdgesChange={onEdgesChange}
-          onConnect={onEdgeAdd}
+          onConnect={!disabled && onEdgeAdd}
           onEdgesDelete={onEdgesDelete}
           onPaneClick={() => {
             setCurrNode(undefined);
@@ -370,7 +370,7 @@ export default function Graph() {
           nodesDraggable={!disabled}
           nodesConnectable={!disabled}
           nodesFocusable={!disabled}
-          // draggable={!disabled}
+          //draggable={!disabled}
           draggable={false}
           panOnDrag={!disabled}
           elementsSelectable={!disabled}
