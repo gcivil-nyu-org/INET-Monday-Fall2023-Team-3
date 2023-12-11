@@ -471,7 +471,7 @@ export default function Graph() {
         </ReactFlow>
       </div>
       <div className="flex max-h-screen h-full bg-beige basis-1/4 p-5">
-        <div className="w-full bg-green bg-opacity-60 rounded-xl">
+        <div className="w-full bg-green bg-opacity-60 rounded-xl overflow-hidden">
           {currNode && currNode.data.predefined ? (
             <NodeComments node={currNode} />
           ) : (

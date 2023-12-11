@@ -183,95 +183,93 @@ const GraphComments: React.FC<CommentsProps> = ({ }) => {
   };
 
   return (
-    <ThemeProvider theme={Theme}>
-      <CssBaseline />
-      <div className="h-screen">
-        <div className="flex flex-col justify-center items-center overflow-auto">
-          <div className="flex flex-col justify-center">
-            <div className="text-olive font-sans text-2xl mt-5">GRAPH DISCUSSION</div>
-            <CommentForm submitLabel="Write" handleSubmit={addComment} />
-          </div>
-          <div className="flex flex-col justify-center overflow-auto">
-            {rootComments.map((rootComment) => (
-              <Comment
-                key={rootComment.id}
-                comment={rootComment}
-                replies={getReplies(rootComment.id)}
-                activeComment={activeComment}
-                setActiveComment={setActiveComment}
-                addComment={addComment}
-                deleteComment={deleteComment}
-                updateComment={updateComment}
-                currentUserId={user.email}
-              />
-            ))}
-          </div>
-        </div>
+    <div className="h-screen flex flex-col justify-center items-center overflow-hidden">
+      <div className="mb-4">
+        <div className="text-olive font-sans text-2xl mt-5">GRAPH DISCUSSION</div>
+        <CommentForm submitLabel="Write" handleSubmit={addComment} />
       </div>
-    </ThemeProvider>
-    // <ThemeProvider theme={Theme}>
-    //   <CssBaseline />
-    //   <Box sx={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden" }}>
-    //     {/* Centered content block with overflow allowed on y-axis */}
-    //     <Box
-    //       sx={{
-    //         position: "relative",
-    //         zIndex: 3,
-    //         display: "flex",
-    //         justifyContent: "center",
-    //         alignItems: "center",
-    //         height: "100%",
-    //       }}
-    //     >
-    //       {/* <Paper
-    //         elevation={3}
-    //         sx={{
-    //           maxWidth: "600px",
-    //           width: "100%",
-    //           maxHeight: "calc(100vh - 64px)",
-    //           overflowY: "auto", // allows for vertical scrolling inside the paper
-    //           margin: "32px",
-    //           overflowX: "hidden",
-    //           backgroundColor: "rgba(255,255,255,0.3)",
-    //           display: "flex", // Use flex layout
-    //           flexDirection: "column", // Stack children vertically,
-    //           height: "100%",
-    //           position: "relative",
-    //         }}
-    //       > */}
-    //       <div className="flex flex-col relative h-full w-full overflow-y-auto">
-    //         <Box sx={{ p: 2, textAlign: "center" }}>
-    //           <Box className="text-olive font-sans text-2xl">GRAPH DISCUSSION</Box>
-    //           <CommentForm submitLabel="Write" handleSubmit={addComment} />
-    //         </Box>
-    //         {/* Scrollable comments area */}
-    //         <Box
-    //           sx={{
-    //             p: 2,
-    //             flex: 1,
-    //             overflowY: "auto", // Enable vertical scrolling for comments
-    //           }}
-    //         >
-    // {rootComments.map((rootComment) => (
-    //   <Comment
-    //     key={rootComment.id}
-    //     comment={rootComment}
-    //     replies={getReplies(rootComment.id)}
-    //     activeComment={activeComment}
-    //     setActiveComment={setActiveComment}
-    //     addComment={addComment}
-    //     deleteComment={deleteComment}
-    //     updateComment={updateComment}
-    //     currentUserId={user.email}
-    //   />
-    // ))}
-    //         </Box>
-    //       </div>
-    //       {/* </Paper> */}
-    //     </Box>
-    //   </Box>
-    // </ThemeProvider>
+
+      <div className="flex flex-col justify-start overflow-auto" style={{ height: 'calc(100% - 4rem)' }}>
+        {/* had to hard key this thing or it wont scroll */}
+        {rootComments.map((rootComment) => (
+          <Comment
+            key={rootComment.id}
+            comment={rootComment}
+            replies={getReplies(rootComment.id)}
+            activeComment={activeComment}
+            setActiveComment={setActiveComment}
+            addComment={addComment}
+            deleteComment={deleteComment}
+            updateComment={updateComment}
+            currentUserId={user.email}
+          />
+        ))}
+      </div>
+    </div>
   );
+
+  // <ThemeProvider theme={Theme}>
+  //   <CssBaseline />
+  //   <Box sx={{ position: "relative", width: "100%", height: "100vh", overflow: "hidden" }}>
+  //     {/* Centered content block with overflow allowed on y-axis */}
+  //     <Box
+  //       sx={{
+  //         position: "relative",
+  //         zIndex: 3,
+  //         display: "flex",
+  //         justifyContent: "center",
+  //         alignItems: "center",
+  //         height: "100%",
+  //       }}
+  //     >
+  //       {/* <Paper
+  //         elevation={3}
+  //         sx={{
+  //           maxWidth: "600px",
+  //           width: "100%",
+  //           maxHeight: "calc(100vh - 64px)",
+  //           overflowY: "auto", // allows for vertical scrolling inside the paper
+  //           margin: "32px",
+  //           overflowX: "hidden",
+  //           backgroundColor: "rgba(255,255,255,0.3)",
+  //           display: "flex", // Use flex layout
+  //           flexDirection: "column", // Stack children vertically,
+  //           height: "100%",
+  //           position: "relative",
+  //         }}
+  //       > */}
+  //       <div className="flex flex-col relative h-full w-full overflow-y-auto">
+  //         <Box sx={{ p: 2, textAlign: "center" }}>
+  //           <Box className="text-olive font-sans text-2xl">GRAPH DISCUSSION</Box>
+  //           <CommentForm submitLabel="Write" handleSubmit={addComment} />
+  //         </Box>
+  //         {/* Scrollable comments area */}
+  //         <Box
+  //           sx={{
+  //             p: 2,
+  //             flex: 1,
+  //             overflowY: "auto", // Enable vertical scrolling for comments
+  //           }}
+  //         >
+  // {rootComments.map((rootComment) => (
+  //   <Comment
+  //     key={rootComment.id}
+  //     comment={rootComment}
+  //     replies={getReplies(rootComment.id)}
+  //     activeComment={activeComment}
+  //     setActiveComment={setActiveComment}
+  //     addComment={addComment}
+  //     deleteComment={deleteComment}
+  //     updateComment={updateComment}
+  //     currentUserId={user.email}
+  //   />
+  // ))}
+  //         </Box>
+  //       </div>
+  //       {/* </Paper> */}
+  //     </Box>
+  //   </Box>
+  // </ThemeProvider>
 };
 
 export default GraphComments;
