@@ -19,14 +19,14 @@ from shared.view_helper import (
     ok,
 )
 
-from .models import Graph, NodePosition, NodeColor
+from .models import Graph, NodeColor, NodePosition
+from .pusher import pusher_client
 from .serializers import (
     GraphPatchSerializer,
     GraphSerializer,
-    NodePositionSerializer,
     NodeColorSerializer,
+    NodePositionSerializer,
 )
-from .pusher import pusher_client
 
 GRAPH_PING_OK_MESSAGE = ok("graph: ok")
 GRAPH_PING_OK_RESPONSE = Response(GRAPH_PING_OK_MESSAGE, status=status.HTTP_200_OK)
@@ -134,6 +134,7 @@ def graph_delete(request: Request, graph_id: str):
     for edge in graph.edges.all():
         edge.delete()
     graph.delete()
+    pusher_client.trigger("graph-channel", "graph-delete", {})
     return Response(ok({}), status=status.HTTP_200_OK)
 
 

@@ -345,6 +345,17 @@ export default function Graph() {
     }
   });
 
+  // Subscribe to Pusher channel and events
+  usePusher("graph-channel", "graph-delete", async () => {
+    console.log("usePusher");
+    const resp = await RequestMethods.userGetSelf({
+      token,
+    });
+    if (resp.status) {
+      setUser({ sharedGraphs: resp.value.sharedGraphs });
+    }
+  });
+
   return (
     <div className="w-full flex flex-row min-h-screen min-w-full overflow-hidden">
       <SnackbarProvider />

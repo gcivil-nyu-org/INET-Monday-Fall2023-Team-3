@@ -53,10 +53,21 @@ export default function User() {
   usePusher("graph-channel", "new-graph-share", async () => {
     console.log("usePusher");
     const resp = await RequestMethods.userGetSelf({
-      token
+      token,
     });
     if (resp.status) {
-      setUser({ sharedGraphs: resp.value.sharedGraphs })
+      setUser({ sharedGraphs: resp.value.sharedGraphs });
+    }
+  });
+
+  // Subscribe to Pusher channel and events
+  usePusher("graph-channel", "graph-delete", async () => {
+    console.log("usePusher");
+    const resp = await RequestMethods.userGetSelf({
+      token,
+    });
+    if (resp.status) {
+      setUser({ sharedGraphs: resp.value.sharedGraphs });
     }
   });
 
@@ -113,11 +124,11 @@ export default function User() {
           </Button>
         </div>
         <div className="ml-5 mr-auto">
-          <span className="inline-block w-10 h-12 bg-pink mt-6 mr-5" ></span>
-          <span className="inline-block w-10 h-12 bg-green mt-6 mr-5" ></span>
-          <span className="inline-block w-10 h-12 bg-orange mt-6 mr-5" ></span>
-          <span className="inline-block w-10 h-12 bg-blue mt-6 mr-5" ></span>
-          <span className="inline-block w-10 h-12 bg-yellow mt-6 mr-5" ></span>
+          <span className="inline-block w-10 h-12 bg-pink mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-green mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-orange mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-blue mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-yellow mt-6 mr-5"></span>
         </div>
       </div>
       <div>
