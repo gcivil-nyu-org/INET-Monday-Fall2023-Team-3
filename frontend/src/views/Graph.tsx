@@ -332,9 +332,18 @@ export default function Graph() {
     //  console.log("Comments are only available for NYU courses.");
     //  return;
     //}
-    setShowNodeDiscussion(true);
-    setClickNode(node);
-    setCurrNode(node);
+    const clearNodeSec = async () => {
+      setShowNodeDiscussion(false);
+      setClickNode(undefined);
+      setCurrNode(undefined);
+    };
+
+    clearNodeSec().then((result) => {
+      setShowNodeDiscussion(true);
+      setClickNode(node);
+      setCurrNode(node);
+    });
+
   };
 
   const onNodeDoubleClick = (_event: React.MouseEvent, node: Node<BackendModels.INode>) => {
