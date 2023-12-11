@@ -15,7 +15,10 @@ export type GraphEntryProp = {
 
 export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
   const imgUrl =
-    "https://d2w9rnfcy7mm78.cloudfront.net/4915740/original_1e60e37889cacbc3fe3e7d1ec2ebfaf8.png?1567040829?bc=1";
+    // "https://d2w9rnfcy7mm78.cloudfront.net/4915740/original_1e60e37889cacbc3fe3e7d1ec2ebfaf8.png?1567040829?bc=1";
+    // "https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/HD_transparent_picture.png/800px-HD_transparent_picture.png";
+    // "https://images.unsplash.com/photo-1626624340240-aadc087844fa?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    "https://d2w9rnfcy7mm78.cloudfront.net/9350247/original_1bffd070b7853ce7b9aa70cb8705852d.jpg?1604333425?bc=0"
   const navigate = useNavigate();
   const {
     user,
@@ -57,7 +60,22 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
       setUser({
         sharedGraphs: postDeletionGraphs.map(g => g.id)
       })
-      console.log("post deletion graphs are", postDeletionGraphs)
+      console.log("post deletion graphs are", postDeletionGraphs);
+
+      console.log("this graph was shared with", graph.sharedWith);
+      const newSharedWith = graph.sharedWith.filter((email) => email !== user.email)
+      RequestMethods.graphShare({
+        param: graph.id,
+        token: token,
+        body: {
+          sharedWith: newSharedWith,
+        },
+      }).then((result) => {
+        if (result.status) {
+          setGraph({sharedWith: newSharedWith})
+        }
+      });
+      console.log("this graph is now shared with", graph.sharedWith);
       return;
       // note that deleting a shared graph does not delete you from
       // 'shared user' list from the other person's account
@@ -134,7 +152,7 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
                 shared by {graph.createdBy}
               </div>
             ) : (
-                <img src={imgUrl} alt="graph" />
+                <img src={imgUrl} alt="graph" className="h-32 w-48"/>
             )}
           </CardContent>
         </Card>
