@@ -140,8 +140,55 @@ export default function Graph() {
     }
   };
 
+  const autoDependencyGeneration = async (node: BackendModels.INode) => {
+    const onCanvasPredefinedNodes = graph.nodes.filter((node) => node.predefined);
+    const onCanvasPredefinedNodeIds = onCanvasPredefinedNodes.map((node) => node.id);
+    const dependencies = node.dependencies;
+    for (let i = 0; i < dependencies.length; i++) {
+      const dependency = dependencies[i];
+      // first, we check if newly added node's prerequisite is already on the canvas
+      // if so, we create an edge between the two nodes
+      if (onCanvasPredefinedNodeIds.includes(dependencies[i])) {
+        const addEdgeResult = await RequestMethods.edgeCreate({
+          token: token,
+          body: {
+            source: dependency,
+            target: node.id,
+          },
+        });
+
+        if (addEdgeResult.status) {
+          addEdge(addEdgeResult.value);
+        } else {
+          onError(addEdgeResult.detail);
+        }
+      }
+    }
+    // Then, we check whether the newly added node is a prerequisite for any other nodes
+    // If so, we create an edge between the two nodes
+    for (let i = 0; i < onCanvasPredefinedNodes.length; i++) {
+      const curNode = onCanvasPredefinedNodes[i];
+      if (curNode.dependencies.includes(node.id)) {
+        const addEdgeResult = await RequestMethods.edgeCreate({
+          token: token,
+          body: {
+            source: node.id,
+            target: curNode.id,
+          },
+        });
+
+        if (addEdgeResult.status) {
+          addEdge(addEdgeResult.value);
+        } else {
+          onError(addEdgeResult.detail);
+        }
+      }
+    }
+  };
+
   const onNodeAddPredefined = async (id: string) => {
     addNode(predefinedNodeMap[id]);
+    autoDependencyGeneration(predefinedNodeMap[id]);
     setShowAddNode(false);
   };
 
