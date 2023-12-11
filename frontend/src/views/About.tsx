@@ -57,10 +57,16 @@ export default function About() {
               developed a passion for tattoos, having gotten three within the past month😆 !
             </p>
           </div>
-          <div className="flex flex-col h-80 w-full bg-orange mb-10 mr-10 shadow-lg">
+          <div className="flex flex-col w-full bg-orange mb-10 mr-10 shadow-lg">
             <h2 className="mt-5 ml-5 font-sans text-olive text-2xl">SAHIL</h2>
             <Avatar className="w-20 h-20 place-self-center border-olive p-1"
               src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/004.png" />
+            <p className="m-5">
+            Hi! I am Sahil, a first-year master’s student majoring in computer science.
+            I have had a great experience working on this project with my teammates and learning new concepts.
+            My hobbies include watching documentaries, and videos on history, technology, etc. I enjoy traveling,
+            adventure sports, and spending time with my friends.
+            </p>
           </div>
           <div className="flex flex-col w-full bg-yellow mb-10 mr-10 shadow-lg">
             <h2 className="mt-5 ml-5 font-sans text-olive text-2xl">SIYAN</h2>
