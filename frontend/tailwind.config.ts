@@ -20,6 +20,7 @@ export default {
       'green': '#9EDF76',
       'beige': '#F9F4EB',
       'olive': '#2B5413',
+      "darkolive": "#142b07",
     },
     fontFamily: {
       sans: ['Archivo Black', 'sans-serif'],

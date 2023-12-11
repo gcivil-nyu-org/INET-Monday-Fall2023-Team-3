@@ -62,7 +62,7 @@ const Comment: React.FC<CommentProps> = ({
         if (result.status) {
           const username = result.value.username;
           setUsername(username);
-          setCreatedAt(new Date(comment.createdAt).toLocaleString());
+          setCreatedAt(new Date(comment.createdAt).toDateString());
           setAvatar(result.value.avatar);
         } else {
           // Handle case where user details cannot be fetched
@@ -77,17 +77,17 @@ const Comment: React.FC<CommentProps> = ({
     fetchData();
   }, [comment.createdAt, comment.createdBy]); // Empty dependency array means this effect will only run once on mount
   return (
-    <div key={comment.id} className="flex mb-7">
+    <div key={comment.id} className="flex">
       <div className="mr-4">
           <Avatar className="w-16 h-16" src={avatar} />
       </div>
       <div className="w-full">
-        <div className="flex">
-          <div className="mr-4 text-md text-white">{username}</div>
-          <div className="text-gray-600">{createdAt}</div>
+        <div className="flex text-olive">
+          <div className="mr-4 text-md">{username}</div>
+          <div>{createdAt}</div>
         </div>
         {!isEditing && (
-          <div className="text-lg text-black bg-white mt-2 rounded-lg p-4">{comment.body}</div>
+          <div className="text-lg text-darkolive bg-white mt-2 rounded-lg">{comment.body}</div>
         )}
         {isEditing && (
           <CommentForm
@@ -100,7 +100,7 @@ const Comment: React.FC<CommentProps> = ({
             }}
           />
         )}
-        <div className="flex text-sm text-white cursor-pointer mt-4">
+        <div className="flex text-sm text-darkolive italic cursor-pointer mt-4">
           {canReply && (
             <div
               className="mr-4 hover:underline"

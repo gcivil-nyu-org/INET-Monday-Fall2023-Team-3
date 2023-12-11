@@ -183,26 +183,28 @@ const GraphComments: React.FC<CommentsProps> = ({ }) => {
   };
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center overflow-hidden">
+    <div className="h-screen flex flex-col justify-center items-center">
       <div className="mb-4">
         <div className="text-olive font-sans text-2xl mt-5">GRAPH DISCUSSION</div>
         <CommentForm submitLabel="Write" handleSubmit={addComment} />
       </div>
 
-      <div className="flex flex-col justify-start overflow-auto" style={{ height: 'calc(100% - 4rem)' }}>
+      <div className="flex flex-col justify-start overflow-auto mb-16" style={{ height: 'calc(100% - 4rem)' }}>
         {/* had to hard key this thing or it wont scroll */}
         {rootComments.map((rootComment) => (
-          <Comment
-            key={rootComment.id}
-            comment={rootComment}
-            replies={getReplies(rootComment.id)}
-            activeComment={activeComment}
-            setActiveComment={setActiveComment}
-            addComment={addComment}
-            deleteComment={deleteComment}
-            updateComment={updateComment}
-            currentUserId={user.email}
-          />
+          <div className="m-4">
+            <Comment
+              key={rootComment.id}
+              comment={rootComment}
+              replies={getReplies(rootComment.id)}
+              activeComment={activeComment}
+              setActiveComment={setActiveComment}
+              addComment={addComment}
+              deleteComment={deleteComment}
+              updateComment={updateComment}
+              currentUserId={user.email}
+            />
+          </div>
         ))}
       </div>
     </div>
