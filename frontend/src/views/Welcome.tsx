@@ -38,7 +38,7 @@ export default function Welcome() {
   return (
     <div className="bg-beige w-full h-full overflow-hidden">
       <div className="bg-beige flex flex-row w-full">
-        <div className="basis-1/2 m-5">
+        <div className="basis-1/2 m-5 flex-wrap">
           <div className="font-sans font-bold text-3xl">
             <span className="text-blue">SMOOTH</span>
             <span className="text-olive"> IS A </span>
