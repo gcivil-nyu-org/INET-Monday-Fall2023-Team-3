@@ -36,14 +36,14 @@ export default function SignUp() {
   };
 
   const onSignUpButtonClicked = async () => {
-    console.log(`user: ${JSON.stringify(signUpData)}`);
+    // console.log(`user: ${JSON.stringify(signUpData)}`);
     if (!validateSignUp()) return;
 
     const result = await RequestMethods.userSignUp({ body: signUpData });
 
     if (result.status) {
       setError("");
-      console.log(result.value);
+      // console.log(result.value);
       // sessionStorage.setItem("token", result.value.token);
       // sessionStorage.setItem("email", signUpData.email);
       // store user information in store

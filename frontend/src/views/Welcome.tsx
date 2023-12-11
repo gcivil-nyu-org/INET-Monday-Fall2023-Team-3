@@ -89,11 +89,11 @@ export default function Welcome() {
             </div>
           </div>
           <div className="flex justify-center mt-10">
-            {/* <span className="bg-orange">...</span>
+            <span className="bg-orange">...</span>
             <span className="bg-pink">....</span>
             <span className="bg-green">....</span>
             <span className="bg-yellow">....</span>
-            <span className="bg-blue">....</span> */}
+            <span className="bg-blue">....</span>
           </div>
         </div>
       </div>
