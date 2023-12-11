@@ -60,7 +60,22 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
       setUser({
         sharedGraphs: postDeletionGraphs.map(g => g.id)
       })
-      console.log("post deletion graphs are", postDeletionGraphs)
+      console.log("post deletion graphs are", postDeletionGraphs);
+
+      console.log("this graph was shared with", graph.sharedWith);
+      const newSharedWith = graph.sharedWith.filter((email) => email !== user.email)
+      RequestMethods.graphShare({
+        param: graph.id,
+        token: token,
+        body: {
+          sharedWith: newSharedWith,
+        },
+      }).then((result) => {
+        if (result.status) {
+          setGraph({sharedWith: newSharedWith})
+        }
+      });
+      console.log("this graph is now shared with", graph.sharedWith);
       return;
       // note that deleting a shared graph does not delete you from
       // 'shared user' list from the other person's account
