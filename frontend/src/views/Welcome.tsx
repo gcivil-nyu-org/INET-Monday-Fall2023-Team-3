@@ -37,8 +37,6 @@ export default function Welcome() {
 
   return (
     <div className="bg-beige w-full h-full overflow-hidden">
-      <img src="https://d2w9rnfcy7mm78.cloudfront.net/25175049/original_15c464c1ccf991fd739f7ed8f13c564e.png?1702328768?bc=0"
-            className="h-2/3 absolute end-10"></img>
       <div className="bg-beige flex flex-row w-full">
         <div className="basis-1/2 m-5">
           <div className="font-sans font-bold text-3xl">
