@@ -1,219 +1,289 @@
-# Create your views here.
+import json
+
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
     permission_classes,
 )
-from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-
-from .serializers import GraphSerializer
-from .models import Graph
-
-
-def detail(msg: str):
-    return {"detail": msg}
-
-
-GRAPH_400_RESPONSE = Response(
-    detail("invalid request"), status=status.HTTP_400_BAD_REQUEST
+from rest_framework.request import Request
+from rest_framework.response import Response
+from shared.view_helper import (
+    error,
+    handle_create,
+    handle_delete,
+    handle_get,
+    handle_patch,
+    ok,
 )
-GRAPH_401_RESPONSE = Response(
-    detail("user unauthorized to view graph"), status=status.HTTP_401_UNAUTHORIZED
+
+from .models import Graph, NodeColor, NodePosition
+from .pusher import pusher_client
+from .serializers import (
+    GraphPatchSerializer,
+    GraphSerializer,
+    NodeColorSerializer,
+    NodePositionSerializer,
 )
-GRAPH_404_RESPONSE = Response(
-    detail("graph does not exist on server"), status=status.HTTP_404_NOT_FOUND
-)
-GRAPH_409_RESPONSE = Response(
-    detail("graph already exists"), status=status.HTTP_409_CONFLICT
-)
+
+GRAPH_PING_OK_MESSAGE = ok("graph: ok")
+GRAPH_PING_OK_RESPONSE = Response(GRAPH_PING_OK_MESSAGE, status=status.HTTP_200_OK)
+
+# ping endpoint
+GRAPH_PING_PATH = "ping/"
 
 
 @api_view(["GET"])
-def ping(request):
-    return Response(data={"message": "pong"}, status=status.HTTP_200_OK)
+@authentication_classes([])
+@permission_classes([AllowAny])
+def graph_ping(request: Request):
+    return GRAPH_PING_OK_RESPONSE
 
 
-@api_view(["GET"])
-@permission_classes(
-    [AllowAny]
-)  # Or use IsAuthenticated if you want to restrict it to logged-in users only.
-def graph_list(request):
-    graphs = Graph.objects.all()
-    serializer = GraphSerializer(graphs, many=True)
-    return Response(serializer.data, status=status.HTTP_200_OK)
+GRAPH_CREATE_INVALID_FORMAT_MESSAGE = error("graph: invalid format")
+GRAPH_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    GRAPH_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
 
-
-@api_view(["GET"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_get(request, graph_id):
-    try:
-        graph = Graph.objects.get(pk=graph_id)
-        serializer = GraphSerializer(instance=graph)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
+# create endpoint
+GRAPH_CREATE_PATH = "create/"
 
 
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
-# @authentication_classes([AllowAny])
 @permission_classes([IsAuthenticated])
-# @permission_classes([AllowAny])
-def graph_create(request):
-    serializer = GraphSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    else:
-        print(serializer.errors)
-    return GRAPH_400_RESPONSE
+def graph_create(request: Request):
+    return handle_create(
+        create_data=request.data,
+        serializer_class=GraphSerializer,
+        invalid_format_response=GRAPH_CREATE_INVALID_FORMAT_RESPONSE,
+    )
+
+
+GRAPH_GET_NOT_FOUND_MESSAGE = error("graph: not found")
+GRAPH_GET_NOT_FOUND_RESPONSE = Response(
+    GRAPH_GET_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# get endpoint
+GRAPH_GET_PATH = "get/<str:graph_id>/"
+GRAPH_GET_PATH_FORMAT = "get/{graph_id}/"
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_get(request: Request, graph_id: str):
+    return handle_get(
+        model_class=Graph,
+        instance_identifier={"id": graph_id},
+        serializer_class=GraphSerializer,
+        not_found_response=GRAPH_GET_NOT_FOUND_RESPONSE,
+    )
+
+
+GRAPH_PATCH_NOT_FOUND_MESSAGE = error("graph: not found")
+GRAPH_PATCH_NOT_FOUND_RESPONSE = Response(
+    GRAPH_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+GRAPH_PATCH_PATH = "patch/<str:graph_id>/"
+GRAPH_PATCH_PATH_FORMAT = "patch/{graph_id}/"
+
+
+@api_view(["PATCH"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_patch(request: Request, graph_id: str):
+    return handle_patch(
+        model_class=Graph,
+        instance_identifier={"id": graph_id},
+        patch_data=request.data,
+        patch_serializer_class=GraphPatchSerializer,
+        result_serializer_class=GraphSerializer,
+        not_found_response=GRAPH_PATCH_NOT_FOUND_RESPONSE,
+    )
+
+
+GRAPH_DELETE_NOT_FOUND_MESSAGE = error("graph: not found")
+GRAPH_DELETE_NOT_FOUND_RESPONSE = Response(
+    GRAPH_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+GRAPH_DELETE_PATH = "delete/<str:graph_id>/"
+GRAPH_DELETE_PATH_FORMAT = "delete/{graph_id}/"
 
 
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def graph_delete(request, graph_id):
-    try:
-        graph_to_be_deleted = Graph.objects.get(pk=graph_id)
-        nodes = graph_to_be_deleted.nodes.all()
-        edges = graph_to_be_deleted.edges.all()
-        for node in nodes:
-            # not passing a request through the node_delete endpoint
-            # because it is not necessary
-            if node.predefined:  # if the node is predefined, do not delete it
-                continue
+def graph_delete(request: Request, graph_id: str):
+    graph = Graph.objects.filter(id=graph_id).first()
+    # graph not found -> not found response
+    if graph is None:
+        return GRAPH_DELETE_NOT_FOUND_RESPONSE
+    # delete nodes in graph
+    for node in graph.nodes.all():
+        if not node.predefined:
             node.delete()
-        for edge in edges:
-            edge.delete()
-        graph_to_be_deleted.delete()
-        return Response(status=status.HTTP_200_OK)
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
+    # delete edges in graph
+    for edge in graph.edges.all():
+        edge.delete()
+    graph.delete()
+    pusher_client.trigger("graph-channel", "graph-delete", {})
+    return Response(ok({}), status=status.HTTP_200_OK)
 
 
-@api_view(["PUT"])
+# share endpoint
+GRAPH_SHARE_PATH = "share/<str:graph_id>/"
+GRAPH_SHARE_PATH_FORMAT = "share/{graph_id}/"
+
+
+@api_view(["PATCH"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def graph_update_add(request):
-    # the request data contains the graph id and entire nodes or edges
-    # need the ids only
-    data = request.data
-    print(data)
-    if "nodes" in request.data:
-        # strip out the ids from the nodes
-        data["nodes"] = [node["id"] for node in request.data["nodes"]]
-    if "edges" in request.data:
-        # strip out the ids from the edges
-        data["edges"] = [edge["id"] for edge in request.data["edges"]]
-    graph_id = data.get("id")
-    try:
-        instance = Graph.objects.get(id=graph_id)
-        if "nodes" in data:
-            # if the request is for adding a new node
-            new_nodes = data.get("nodes")
-            instance.nodes.add(*new_nodes)
-        if "edges" in data:
-            # if the request is for adding a new edge
-            new_edges = data.get("edges")
-            instance.edges.add(*new_edges)
-        instance.save()
-        return Response(status=status.HTTP_200_OK)
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
-
-
-@api_view(["PUT"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_update_delete(request):
-    data = request.data
-    if "nodes" in request.data:
-        # strip out the ids from the nodes
-        data["nodes"] = [node["id"] for node in request.data["nodes"]]
-    if "edges" in request.data:
-        # strip out the ids from the edges
-        data["edges"] = [edge["id"] for edge in request.data["edges"]]
-    graph_id = data.get("id")
-
-    try:
-        instance = Graph.objects.get(id=graph_id)
-        if "nodes" in data:
-            # if the request is for adding a new node
-            nodes_to_be_deleted = data.get("nodes")
-            for node in nodes_to_be_deleted:
-                instance.nodes.remove(node)
-        if "edges" in data:
-            # if the request is for adding a new edge
-            edges_to_be_deleted = data.get("edges")
-            for edge in edges_to_be_deleted:
-                instance.edges.remove(edge)
-        instance.save()
-        return Response(status=status.HTTP_200_OK)
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
-
-
-@api_view(["Get"])
-@authentication_classes([TokenAuthentication])
-@permission_classes([IsAuthenticated])
-def graph_list_get(request, user_email):
-    graph_id_title_list = Graph.objects.filter(user__email=user_email).values_list(
-        "id",
-        "title",
+def graph_share(request: Request, graph_id: str):
+    response = handle_patch(
+        model_class=Graph,
+        instance_identifier={"id": graph_id},
+        patch_data=request.data,
+        patch_serializer_class=GraphPatchSerializer,
+        result_serializer_class=GraphSerializer,
+        not_found_response=GRAPH_PATCH_NOT_FOUND_RESPONSE,
     )
-    graph_id_title_list = list(graph_id_title_list)
-    for i in range(len(graph_id_title_list)):
-        graph_id_title_list[i] = [
-            str(graph_id_title_list[i][0]),
-            graph_id_title_list[i][1],
-        ]
-    print(graph_id_title_list)
-    return Response({"graph_list": graph_id_title_list}, status=status.HTTP_200_OK)
+    if response.status_code == 200:
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("graph-channel", "new-graph-share", data)
+    return response
 
 
-@api_view(["PUT"])
+NODE_POSITION_CREATE_INVALID_FORMAT_MESSAGE = error("node_position: invalid format")
+NODE_POSITION_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    NODE_POSITION_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
+
+# create endpoint
+NODE_POSITION_CREATE_PATH = "node-position/create/"
+
+
+@api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def node_position_set(request):
-    new_node_position = request.data
-    try:
-        graph_instance = Graph.objects.get(id=new_node_position["graph_id"])
-        node_position_list = graph_instance.node_positions
-
-        flag = False
-        for d in node_position_list:
-            if d["id"] == new_node_position["node_id"]:
-                flag = True
-                d["x"] = new_node_position["x"]
-                d["y"] = new_node_position["y"]
-        if not flag:  # new node
-            node_position_list.append(
-                {
-                    "id": new_node_position["node_id"],
-                    "x": new_node_position["x"],
-                    "y": new_node_position["y"],
-                }
-            )
-        graph_instance.node_positions = node_position_list
-        graph_instance.save()
-        return Response(status=status.HTTP_200_OK)
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
+def node_position_create(request: Request):
+    return handle_create(
+        create_data=request.data,
+        serializer_class=NodePositionSerializer,
+        invalid_format_response=NODE_POSITION_CREATE_INVALID_FORMAT_RESPONSE,
+    )
 
 
-@api_view(["PUT"])
+NODE_POSITION_PATCH_NOT_FOUND_MESSAGE = error("node_position: not found")
+NODE_POSITION_PATCH_NOT_FOUND_RESPONSE = Response(
+    NODE_POSITION_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+NODE_POSITION_PATCH_PATH = "node-position/patch/<str:graph_id>/<str:node_id>/"
+NODE_POSITION_PATCH_PATH_FORMAT = "node-position/patch/{graph_id}/{node_id}/"
+
+
+@api_view(["PATCH"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def graph_title_set(request):
-    new_title = request.data["title"]
-    try:
-        graph_instance = Graph.objects.get(id=request.data["id"])
-        graph_instance.title = new_title
-        graph_instance.save()
-        return Response(status=status.HTTP_200_OK)
-    except Graph.DoesNotExist:
-        return GRAPH_404_RESPONSE
+def node_position_patch(request: Request, graph_id: str, node_id: str):
+    return handle_patch(
+        model_class=NodePosition,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        patch_data=request.data,
+        patch_serializer_class=NodePositionSerializer,
+        not_found_response=NODE_POSITION_PATCH_NOT_FOUND_RESPONSE,
+    )
+
+
+NODE_POSITION_DELETE_NOT_FOUND_MESSAGE = error("node_position: not found")
+NODE_POSITION_DELETE_NOT_FOUND_RESPONSE = Response(
+    NODE_POSITION_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+NODE_POSITION_DELETE_PATH = "node-position/delete/<str:graph_id>/<str:node_id>/"
+NODE_POSITION_DELETE_PATH_FORMAT = "node-position/delete/{graph_id}/{node_id}/"
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_position_delete(request: Request, graph_id: str, node_id: str):
+    return handle_delete(
+        model_class=NodePosition,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        not_found_response=NODE_POSITION_DELETE_NOT_FOUND_RESPONSE,
+    )
+
+
+NODE_COLOR_CREATE_INVALID_FORMAT_MESSAGE = error("node_color: invalid format")
+NODE_COLOR_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    NODE_COLOR_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
+
+# create endpoint
+NODE_COLOR_CREATE_PATH = "node-color/create/"
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_color_create(request: Request):
+    return handle_create(
+        create_data=request.data,
+        serializer_class=NodeColorSerializer,
+        invalid_format_response=NODE_COLOR_CREATE_INVALID_FORMAT_RESPONSE,
+    )
+
+
+NODE_COLOR_PATCH_NOT_FOUND_MESSAGE = error("node_color: not found")
+NODE_COLOR_PATCH_NOT_FOUND_RESPONSE = Response(
+    NODE_COLOR_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+NODE_COLOR_PATCH_PATH = "node-color/patch/<str:graph_id>/<str:node_id>/"
+NODE_COLOR_PATCH_PATH_FORMAT = "node-color/patch/{graph_id}/{node_id}/"
+
+
+@api_view(["PATCH"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_color_patch(request: Request, graph_id: str, node_id: str):
+    return handle_patch(
+        model_class=NodeColor,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        patch_data=request.data,
+        patch_serializer_class=NodeColorSerializer,
+        not_found_response=NODE_COLOR_PATCH_NOT_FOUND_RESPONSE,
+    )
+
+
+NODE_COLOR_DELETE_NOT_FOUND_MESSAGE = error("node_color: not found")
+NODE_COLOR_DELETE_NOT_FOUND_RESPONSE = Response(
+    NODE_COLOR_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+NODE_COLOR_DELETE_PATH = "node-color/delete/<str:graph_id>/<str:node_id>/"
+NODE_COLOR_DELETE_PATH_FORMAT = "node-color/delete/{graph_id}/{node_id}/"
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def node_color_delete(request: Request, graph_id: str, node_id: str):
+    return handle_delete(
+        model_class=NodeColor,
+        instance_identifier={"graph_id": graph_id, "node_id": node_id},
+        not_found_response=NODE_COLOR_DELETE_NOT_FOUND_RESPONSE,
+    )

@@ -1,69 +1,131 @@
-import { IMessage, IToken, IUser, INode, IEdge, IComment, IGraph, INodePosition, IGraphList } from "./models";
+import { BackendModels } from "./models";
+import { AwareOmit } from "./utils";
 
-// Responses
-// user
-export type IUserPingResponse = IMessage;
+/**
+ * Responses from backend
+ */
+export namespace Responses {
+  /**
+   * User related responses
+   */
+  export namespace User {
+    // user ping
+    export type Ping = string;
+    // user sign up
+    export type SignUp = AwareOmit<BackendModels.IUser, "password"> & BackendModels.IUserToken;
+    // user login
+    export type Login = AwareOmit<BackendModels.IUser, "password"> & BackendModels.IUserToken;
+    // user patch
+    export type Patch = AwareOmit<BackendModels.IUser, "password">;
+    // user get
+    export type Get = AwareOmit<BackendModels.IUser, "password">;
+    // user get self
+    export type GetSelf = AwareOmit<BackendModels.IUser, "password">;
+    // user get all
+    export type GetAll = AwareOmit<BackendModels.IUser, "password">[];
+  }
 
-export type IUserCreateResponse = IToken;
+  /**
+   * Node related responses
+   */
+  export namespace Node {
+    // node ping
+    export type Ping = string;
+    // node create
+    export type Create = BackendModels.INode;
+    // node get
+    export type Get = BackendModels.INode;
+    // node patch
+    export type Patch = BackendModels.INode;
+    // node delete
+    export type Delete = {};
+    // node get predefined
+    export type Predefined = BackendModels.INode[];
+  }
 
-export type IUserLoginResponse = IToken;
+  /**
+   * Edge related response
+   */
+  export namespace Edge {
+    // edge ping
+    export type Ping = string;
+    // edge create
+    export type Create = BackendModels.IEdge;
+    // edge get
+    export type Get = BackendModels.IEdge;
+    // edge patch
+    export type Patch = BackendModels.IEdge;
+    // edge delete
+    export type Delete = {};
+  }
 
-export type IUserGetResponse = Omit<IUser, "password">;
+  /**
+   * Graph related response
+   */
+  export namespace Graph {
+    // graph ping
+    export type Ping = string;
+    // graph create
+    export type Create = BackendModels.IGraph;
+    // graph get
+    export type Get = BackendModels.IGraph;
+    // graph patch
+    export type Patch = BackendModels.IGraph;
+    // graph delete
+    export type Delete = {};
+    // graph share
+    export type Share = BackendModels.IGraph;
+  }
 
-export type IUserUpdateResponse = Omit<IUser, "password">;
+  /**
+   * Node position related response
+   */
+  export namespace NodePosition {
+    // node position create
+    export type Create = BackendModels.INodePosition;
+    // node position patch
+    export type Patch = BackendModels.INodePosition;
+    // node position delete
+    export type Delete = {};
+  }
 
-// node
-export type INodePingResponse = IMessage;
+  /**
+   * Comment related response
+   */
+  export namespace Comment {
+    // comment ping
+    export type Ping = string;
+  }
 
-export type INodeCreateResponse = INode;
+  /**
+   * Node comment related response
+   */
+  export namespace NodeComment {
+    // node comment create
+    export type Create = BackendModels.IComment;//BackendModels.INodeComment;
+    // node comment get
+    export type Get = BackendModels.IComment;//BackendModels.INodeComment;
 
-export type INodeGetResponse = INode;
+    export type GetByNode = BackendModels.IComment[];//BackendModels.INodeComment;
+    // node comment patch
+    export type Patch = BackendModels.IComment;//BackendModels.INodeComment;
+    // node comment delete
+    export type Delete = {};
+  }
 
-export type INodesGetResponse = INode[];
+  /**
+   * Graph comment related response
+   */
+  export namespace GraphComment {
+    // graph comment create
+    export type Create = BackendModels.IComment;// BackendModels.IGraphComment;
+    // graph comment get
+    export type Get = BackendModels.IComment;// BackendModels.IGraphComment;
 
-export type INodeUpdateResponse = INode;
-
-export type INodeDeleteResponse = undefined;
-
-// edge
-export type IEdgePingResponse = IMessage;
-
-export type IEdgeCreateResponse = IEdge;
-
-export type IEdgeGetResponse = IEdge;
-
-export type IEdgeUpdateResponse = IEdge;
-
-export type IEdgeDeleteResponse = undefined;
-
-// comment
-export type ICommentPingResponse = IMessage;
-
-export type ICommentCreateResponse = IComment;
-
-export type ICommentGetResponse = IComment;
-
-export type ICommentsGetResponse = IComment[];
-
-export type ICommentUpdateResponse = IComment;
-
-export type ICommentDeleteResponse = Partial<IComment>;
-
-// graph
-
-export type IGraphPingResponse = IMessage;
-
-export type IGraphCreateResponse = IGraph;
-
-export type IGraphGetResponse = IGraph;
-
-export type IGraphUpdateResponse = undefined;
-
-export type IGraphDeleteResponse = undefined;
-
-export type INodePositionResponse = INodePosition;
-
-export type IGraphListResponse = IGraphList;
-
-export type IGraphTitleResponse = undefined;
-
+    export type GetByGraph = BackendModels.IComment[];//BackendModels.INodeComment;
+    // graph comment patch
+    export type Patch = BackendModels.IComment;// BackendModels.IGraphComment;
+    // graph comment delete
+    export type Delete = {};
+  }
+}

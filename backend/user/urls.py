@@ -1,14 +1,15 @@
 from django.urls import path
 
-from .views import ping, user_create, user_get, user_login, user_update, user_get_name
+from . import views
 
-app_user = "user"
+app_name = "user"
 
 urlpatterns = [
-    path("ping/", ping, name="ping"),
-    path("create/", user_create, name="create"),
-    path("login/", user_login, name="login"),
-    path("get/", user_get, name="get"),
-    path("update/", user_update, name="update"),
-    path("get-name/<str:email>/", user_get_name, name="get-name"),
+    path(views.USER_PING_PATH, views.user_ping, name="ping"),
+    path(views.USER_SIGNUP_PATH, views.user_sign_up, name="signup"),
+    path(views.USER_LOGIN_PATH, views.user_login, name="login"),
+    path(views.USER_PATCH_PATH, views.user_patch, name="patch"),
+    path(views.USER_GET_PATH, views.user_get, name="get"),
+    path(views.USER_GET_SELF_PATH, views.user_get_self, name="get-self"),
+    path(views.USER_GET_ALL_PATH, views.user_get_all, name="all"),
 ]

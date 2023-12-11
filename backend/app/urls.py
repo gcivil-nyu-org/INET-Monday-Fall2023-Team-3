@@ -15,20 +15,19 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
-
+from django.urls import include, path
 from django.views.static import serve
 
-from .settings import STATIC_URL
-
+from .settings import BACKEND_URL_ENDPOINT, STATIC_URL
 
 urlpatterns = [
-    path("backend/admin/", admin.site.urls),
-    path("backend/user/", include("user.urls")),
-    path("backend/node/", include("node.urls")),
-    path("backend/edge/", include("edge.urls")),
-    path("backend/graph/", include("graph.urls")),
-    path("backend/comment/", include("comment.urls")),
+    path("admin/", admin.site.urls),
+    path(f"{BACKEND_URL_ENDPOINT}/user/", include("user.urls")),
+    path(f"{BACKEND_URL_ENDPOINT}/node/", include("node.urls")),
+    path(f"{BACKEND_URL_ENDPOINT}/edge/", include("edge.urls")),
+    path(f"{BACKEND_URL_ENDPOINT}/graph/", include("graph.urls")),
+    path(f"{BACKEND_URL_ENDPOINT}/comment/", include("comment.urls")),
+    # frontend endpoints
     path("", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("user/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),
     path("graph/", serve, kwargs={"path": "index.html", "document_root": STATIC_URL}),

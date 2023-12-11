@@ -1,106 +1,121 @@
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
     permission_classes,
 )
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
+from shared.view_helper import (
+    error,
+    handle_create,
+    handle_delete,
+    handle_get,
+    handle_patch,
+    ok,
+)
 
-from .serializers import EdgeSerializer
 from .models import Edge
+from .serializers import EdgeSerializer
+
+EDGE_PING_OK_MESSAGE = ok("edge: ok")
+EDGE_PING_OK_RESPONSE = Response(EDGE_PING_OK_MESSAGE, status=status.HTTP_200_OK)
+
+# ping endpoint
+EDGE_PING_PATH = "ping/"
 
 
-# Create your views here.
-def detail(msg: str):
-    return {"detail": msg}
-
-
-EDGE_PONG_MSG = detail("pong")
-EDGE_INVALID_FORMAT_MSG = detail("edge format invalid")
-EDGE_ID_ALREADY_EXISTS_MSG = detail("edge with same id already exists")
-EDGE_NOT_FOUND_MSG = detail("edge not found")
-
-EDGE_PONG_RESPONSE = Response(EDGE_PONG_MSG, status=status.HTTP_200_OK)
-EDGE_INVALID_FORMAT_RESPONSE = Response(
-    EDGE_INVALID_FORMAT_MSG, status=status.HTTP_400_BAD_REQUEST
-)
-EDGE_ID_ALREADY_EXISTS_RESPONSE = Response(
-    EDGE_ID_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT
-)
-EDGE_NOT_FOUND_RESPONSE = Response(EDGE_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND)
-
-
-# Ping
 @api_view(["GET"])
-def ping(request):
-    return EDGE_PONG_RESPONSE
+@authentication_classes([])
+@permission_classes([AllowAny])
+def edge_ping(request: Request):
+    return EDGE_PING_OK_RESPONSE
 
 
-# Create edge
+EDGE_CREATE_INVALID_FORMAT_MESSAGE = error("edge: invalid format")
+EDGE_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    EDGE_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
+
+# create endpoint
+EDGE_CREATE_PATH = "create/"
+
+
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def edge_create(request):
-    serializer = EdgeSerializer(data=request.data)
-
-    if not serializer.is_valid():
-        return EDGE_INVALID_FORMAT_RESPONSE
-
-    edge_id = serializer.validated_data.get("id")
-    if Edge.objects.filter(id=edge_id).exists():
-        return EDGE_ID_ALREADY_EXISTS_RESPONSE
-
-    serializer.save()
-    return Response(serializer.data, status=status.HTTP_200_OK)
+def edge_create(request: Request):
+    return handle_create(
+        create_data=request.data,
+        serializer_class=EdgeSerializer,
+        invalid_format_response=EDGE_CREATE_INVALID_FORMAT_RESPONSE,
+    )
 
 
-# Get edge
+EDGE_GET_NOT_FOUND_MESSAGE = error("edge: not found")
+EDGE_GET_NOT_FOUND_RESPONSE = Response(
+    EDGE_GET_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# get endpoint
+EDGE_GET_PATH = "get/<str:edge_id>/"
+EDGE_GET_PATH_FORMAT = "get/{edge_id}/"
+
+
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def edge_get(request, edge_id):
-    try:
-        edge = Edge.objects.get(id=edge_id)
+def edge_get(request: Request, edge_id: str):
+    return handle_get(
+        model_class=Edge,
+        instance_identifier={"id": edge_id},
+        serializer_class=EdgeSerializer,
+        not_found_response=EDGE_GET_NOT_FOUND_RESPONSE,
+    )
 
-        serializer = EdgeSerializer(instance=edge)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Edge.DoesNotExist:
-        return EDGE_NOT_FOUND_RESPONSE
+
+EDGE_PATCH_NOT_FOUND_MESSAGE = error("edge: not found")
+EDGE_PATCH_NOT_FOUND_RESPONSE = Response(
+    EDGE_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+EDGE_PATCH_PATH = "patch/<str:edge_id>/"
+EDGE_PATCH_PATH_FORMAT = "patch/{edge_id}/"
 
 
-# Update edge
-@api_view(["PUT"])
+@api_view(["PATCH"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def edge_update(request):
-    serializer = EdgeSerializer(data=request.data)
-
-    if not serializer.is_valid():
-        return EDGE_INVALID_FORMAT_RESPONSE
-    edge_id = serializer.validated_data.get("id")
-
-    try:
-        instance = Edge.objects.get(id=edge_id)
-
-        serializer.instance = instance
-        serializer.save()
-
-        serializer = EdgeSerializer(instance=serializer.instance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Edge.DoesNotExist:
-        return EDGE_NOT_FOUND_RESPONSE
+def edge_patch(request: Request, edge_id: str):
+    return handle_patch(
+        model_class=Edge,
+        instance_identifier={"id": edge_id},
+        patch_data=request.data,
+        patch_serializer_class=EdgeSerializer,
+        not_found_response=EDGE_PATCH_NOT_FOUND_RESPONSE,
+    )
 
 
-# Delete edge
+EDGE_DELETE_NOT_FOUND_MESSAGE = error("edge: not found")
+EDGE_DELETE_NOT_FOUND_RESPONSE = Response(
+    EDGE_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+
+# delete endpoint
+EDGE_DELETE_PATH = "delete/<str:edge_id>/"
+EDGE_DELETE_PATH_FORMAT = "delete/{edge_id}/"
+
+
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def edge_delete(request, edge_id):
-    try:
-        edge = Edge.objects.get(id=edge_id)
-        edge.delete()
-        return Response(status=status.HTTP_200_OK)
-    except Edge.DoesNotExist:
-        return EDGE_NOT_FOUND_RESPONSE
+def edge_delete(request: Request, edge_id: str):
+    return handle_delete(
+        model_class=Edge,
+        instance_identifier={"id": edge_id},
+        not_found_response=EDGE_DELETE_NOT_FOUND_RESPONSE,
+    )

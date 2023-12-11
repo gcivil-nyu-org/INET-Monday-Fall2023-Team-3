@@ -1,128 +1,276 @@
-# Create your views here.
+import json
+
 from rest_framework import status
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.decorators import (
     api_view,
     authentication_classes,
     permission_classes,
 )
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-
-from .serializers import CommentSerializer
-from .models import Comment, Node
-
-
-# Helper function to create a detail message
-def detail(msg: str):
-    return {"detail": msg}
-
-
-# Constant messages and responses
-COMMENT_PONG_MSG = detail("pong")
-COMMENT_INVALID_FORMAT_MSG = detail("comment format invalid")
-COMMENT_ID_ALREADY_EXISTS_MSG = detail("comment with the same id already exists")
-COMMENT_NOT_FOUND_MSG = detail("comment not found")
-
-COMMENT_PONG_RESPONSE = Response(COMMENT_PONG_MSG, status=status.HTTP_200_OK)
-COMMENT_INVALID_FORMAT_RESPONSE = Response(
-    COMMENT_INVALID_FORMAT_MSG, status=status.HTTP_400_BAD_REQUEST
-)
-COMMENT_ID_ALREADY_EXISTS_RESPONSE = Response(
-    COMMENT_ID_ALREADY_EXISTS_MSG, status=status.HTTP_409_CONFLICT
-)
-COMMENT_NOT_FOUND_RESPONSE = Response(
-    COMMENT_NOT_FOUND_MSG, status=status.HTTP_404_NOT_FOUND
+from shared.view_helper import (
+    error,
+    handle_create,
+    handle_delete,
+    handle_get,
+    handle_patch,
+    ok,
 )
 
+from .models import Graph, GraphComment, Node, NodeComment
+from .pusher import pusher_client
+from .serializers import GraphCommentSerializer, NodeCommentSerializer
 
-# Ping
+COMMENT_PING_OK_MESSAGE = ok("comment: ok")
+COMMENT_PING_OK_RESPONSE = Response(COMMENT_PING_OK_MESSAGE, status=status.HTTP_200_OK)
+
+# ping endpoint
+COMMENT_PING_PATH = "ping/"
+
+
 @api_view(["GET"])
-def ping(request):
-    return COMMENT_PONG_RESPONSE
+@authentication_classes([])
+@permission_classes([AllowAny])
+def comment_ping(request: Request):
+    return COMMENT_PING_OK_RESPONSE
 
 
-# Create comment
+NODE_COMMENT_CREATE_INVALID_FORMAT_MESSAGE = error("node_comment: invalid format")
+NODE_COMMENT_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    NODE_COMMENT_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
+
+# create endpoint
+NODE_COMMENT_CREATE_PATH = "node/create/"
+
+
 @api_view(["POST"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def comment_create(request):
-    serializer = CommentSerializer(data=request.data, partial=True)
-    if not serializer.is_valid():
-        return COMMENT_INVALID_FORMAT_RESPONSE
+def node_comment_create(request: Request):
+    response = handle_create(
+        create_data=request.data,
+        serializer_class=NodeCommentSerializer,
+        invalid_format_response=NODE_COMMENT_CREATE_INVALID_FORMAT_RESPONSE,
+    )
+    if response.status_code == 200:
+        print("success")
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("comments-channel", "new-node-comment", data)
+    return response
 
-    comment_id = serializer.validated_data.get("id")
-    if comment_id and Comment.objects.filter(id=comment_id).exists():
-        return COMMENT_ID_ALREADY_EXISTS_RESPONSE
 
-    serializer.save()  # Assuming the user is assigned from the request
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+NODE_COMMENT_GET_NOT_FOUND_MESSAGE = error("node_comment: not found")
+NODE_COMMENT_GET_NOT_FOUND_RESPONSE = Response(
+    NODE_COMMENT_GET_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# get endpoint
+NODE_COMMENT_GET_PATH = "node/get/<str:comment_id>/"
+NODE_COMMENT_GET_PATH_FORMAT = "node/get/{comment_id}/"
 
 
-# Get comment
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def comment_get(request, comment_id):
-    print(comment_id)
-    try:
-        comment = Comment.objects.get(id=comment_id)
-        serializer = CommentSerializer(comment)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Comment.DoesNotExist:
-        return COMMENT_NOT_FOUND_RESPONSE
+def node_comment_get(request: Request, comment_id: str):
+    return handle_get(
+        model_class=NodeComment,
+        instance_identifier={"id": comment_id},
+        serializer_class=NodeCommentSerializer,
+        not_found_response=NODE_COMMENT_GET_NOT_FOUND_RESPONSE,
+    )
 
 
-# Get comments by Node ID
+# get endpoint
+NODE_COMMENT_GET_BY_NODE_PATH = "node/get-by-node/<str:node_id>/"
+NODE_COMMENT_GET_BY_NODE_PATH_FORMAT = "node/get-by-node/{node_id}/"
+
+
 @api_view(["GET"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def comments_by_node(request, node_id):
+def node_comment_get_by_node(request: Request, node_id: str):
     try:
         node = Node.objects.get(id=node_id)
     except Node.DoesNotExist:
         return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    comments = Comment.objects.filter(related_to_node=node)
-    serializer = CommentSerializer(comments, many=True)
-    data = serializer.data
-    for item in data:
-        item["createdAt"] = item.pop("created_at")
-        item["relatedToNode"] = item.pop("related_to_node")
-    print(data)
-    return Response(data, status=status.HTTP_200_OK)
+    comments = NodeComment.objects.filter(belongs_to=node)
+    serializer = NodeCommentSerializer(comments, many=True)
+    return Response(ok(serializer.data), status=status.HTTP_200_OK)
 
 
-# Update comment
-@api_view(["PUT"])
+NODE_COMMENT_PATCH_NOT_FOUND_MESSAGE = error("node_comment: not found")
+NODE_COMMENT_PATCH_NOT_FOUND_RESPONSE = Response(
+    NODE_COMMENT_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+NODE_COMMENT_PATCH_PATH = "node/patch/<str:comment_id>/"
+NODE_COMMENT_PATCH_PATH_FORMAT = "node/patch/{comment_id}/"
+
+
+@api_view(["PATCH"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def comment_update(request):
-    print(request)
-    serializer = CommentSerializer(data=request.data, partial=True)
-    if not serializer.is_valid():
-        return COMMENT_INVALID_FORMAT_RESPONSE
-    comment_id = request.data.get("id")
-    try:
-        instance = Comment.objects.get(id=comment_id)
-        serializer.instance = instance
-        serializer.save()
-        serializer = CommentSerializer(instance=serializer.instance)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    except Comment.DoesNotExist:
-        return COMMENT_NOT_FOUND_RESPONSE
+def node_comment_patch(request: Request, comment_id: str):
+    response = handle_patch(
+        model_class=NodeComment,
+        instance_identifier={"id": comment_id},
+        patch_data=request.data,
+        patch_serializer_class=NodeCommentSerializer,
+        not_found_response=NODE_COMMENT_PATCH_NOT_FOUND_RESPONSE,
+    )
+    if response.status_code == 200:
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("comments-channel", "patch-node-comment", data)
+    return response
 
 
-# Delete comment
+NODE_COMMENT_DELETE_NOT_FOUND_MESSAGE = error("node_comment: not found")
+NODE_COMMENT_DELETE_NOT_FOUND_RESPONSE = Response(
+    NODE_COMMENT_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+NODE_COMMENT_DELETE_PATH = "node/delete/<str:comment_id>/"
+NODE_COMMENT_DELETE_PATH_FORMAT = "node/delete/{comment_id}/"
+
+
 @api_view(["DELETE"])
 @authentication_classes([TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def comment_delete(request, comment_id):
+def node_comment_delete(request: Request, comment_id: str):
+    response = handle_delete(
+        model_class=NodeComment,
+        instance_identifier={"id": comment_id},
+        not_found_response=NODE_COMMENT_DELETE_NOT_FOUND_RESPONSE,
+    )
+    if response.status_code == 200:
+        data = json.loads(json.dumps(response.data, default=str))
+        pusher_client.trigger("comments-channel", "delete-node-comment", data)
+    return response
+
+
+GRAPH_COMMENT_CREATE_INVALID_FORMAT_MESSAGE = error("graph_comment: invalid format")
+GRAPH_COMMENT_CREATE_INVALID_FORMAT_RESPONSE = Response(
+    GRAPH_COMMENT_CREATE_INVALID_FORMAT_MESSAGE, status=status.HTTP_400_BAD_REQUEST
+)
+
+# create endpoint
+GRAPH_COMMENT_CREATE_PATH = "graph/create/"
+
+
+@api_view(["POST"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_comment_create(request: Request):
+    response = handle_create(
+        create_data=request.data,
+        serializer_class=GraphCommentSerializer,
+        invalid_format_response=GRAPH_COMMENT_CREATE_INVALID_FORMAT_RESPONSE,
+    )
+    if response.status_code == 200:
+        print("create pusher")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "new-graph-comment", data)
+    return response
+
+
+GRAPH_COMMENT_GET_NOT_FOUND_MESSAGE = error("graph_comment: not found")
+GRAPH_COMMENT_GET_NOT_FOUND_RESPONSE = Response(
+    GRAPH_COMMENT_GET_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# get endpoint
+GRAPH_COMMENT_GET_PATH = "graph/get/<str:comment_id>/"
+GRAPH_COMMENT_GET_PATH_FORMAT = "graph/get/{comment_id}/"
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_comment_get(request: Request, comment_id: str):
+    return handle_get(
+        model_class=GraphComment,
+        instance_identifier={"id": comment_id},
+        serializer_class=GraphCommentSerializer,
+        not_found_response=GRAPH_COMMENT_GET_NOT_FOUND_RESPONSE,
+    )
+
+
+# get endpoint
+GRAPH_COMMENT_GET_BY_GRAPH_PATH = "graph/get-by-graph/<str:graph_id>/"
+GRAPH_COMMENT_GET_BY_GRAPH_PATH_FORMAT = "graph/get-by-graph/{graph_id}/"
+
+
+@api_view(["GET"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_comment_get_by_graph(request: Request, graph_id: str):
     try:
-        comment = Comment.objects.get(id=comment_id)
-        serializer = CommentSerializer(comment)  # Serialize the comment
-        comment.delete()
-        serializer.data.id = comment_id
-        return Response({"id": comment_id}, status=status.HTTP_200_OK)
-    except Comment.DoesNotExist:
-        return COMMENT_NOT_FOUND_RESPONSE
+        node = Graph.objects.get(id=graph_id)
+    except Graph.DoesNotExist:
+        return Response({"detail": "Node not found"}, status=status.HTTP_404_NOT_FOUND)
+    comments = GraphComment.objects.filter(belongs_to=node)
+    serializer = GraphCommentSerializer(comments, many=True)
+    return Response(ok(serializer.data), status=status.HTTP_200_OK)
+
+
+GRAPH_COMMENT_PATCH_NOT_FOUND_MESSAGE = error("graph: not found")
+GRAPH_COMMENT_PATCH_NOT_FOUND_RESPONSE = Response(
+    GRAPH_COMMENT_PATCH_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# patch endpoint
+GRAPH_COMMENT_PATCH_PATH = "graph/patch/<str:comment_id>/"
+GRAPH_COMMENT_PATCH_PATH_FORMAT = "graph/patch/{comment_id}/"
+
+
+@api_view(["PATCH"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_comment_patch(request: Request, comment_id: str):
+    response = handle_patch(
+        model_class=GraphComment,
+        instance_identifier={"id": comment_id},
+        patch_data=request.data,
+        patch_serializer_class=GraphCommentSerializer,
+        not_found_response=GRAPH_COMMENT_PATCH_NOT_FOUND_RESPONSE,
+    )
+    if response.status_code == 200:
+        print("patch pusher")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "patch-graph-comment", data)
+    return response
+
+
+GRAPH_COMMENT_DELETE_NOT_FOUND_MESSAGE = error("graph_comment: not found")
+GRAPH_COMMENT_DELETE_NOT_FOUND_RESPONSE = Response(
+    GRAPH_COMMENT_DELETE_NOT_FOUND_MESSAGE, status=status.HTTP_404_NOT_FOUND
+)
+
+# delete endpoint
+GRAPH_COMMENT_DELETE_PATH = "graph/delete/<str:comment_id>/"
+GRAPH_COMMENT_DELETE_PATH_FORMAT = "graph/delete/{comment_id}/"
+
+
+@api_view(["DELETE"])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def graph_comment_delete(request: Request, comment_id: str):
+    response = handle_delete(
+        model_class=GraphComment,
+        instance_identifier={"id": comment_id},
+        not_found_response=GRAPH_COMMENT_DELETE_NOT_FOUND_RESPONSE,
+    )
+    if response.status_code == 200:
+        print("delete pusher")
+        data = json.loads(json.dumps(response.data, default=str))
+        print(data)
+        pusher_client.trigger("comments-channel", "delete-graph-comment", data)
+    return response

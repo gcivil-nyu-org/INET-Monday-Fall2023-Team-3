@@ -1,52 +1,49 @@
-import { useState, ChangeEvent } from "react";
-import { Button, TextField, Alert } from "@mui/material";
+import { Button, TextField } from "@mui/material";
+import { ChangeEvent, useState } from "react";
+import { BackendModels } from "src/utils/models";
+import { Requests } from "src/utils/requests";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
 
-import { INode } from "utils/models";
-import { nodeUpdate } from "utils/backendRequests";
 
 export type EditNodeProp = {
-  node: INode;
-  onSubmit: (node: INode) => void;
-  onError: (err: string) => void;
+  node: BackendModels.INode | undefined;
+  onSubmit: (id: string, node: Requests.Node.Patch) => void;
+  onError: (message: string) => void;
 };
 
 export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
-  const [name, setName] = useState(node.name);
-  const [description, setDescription] = useState(node.description);
-  const [errorMessage, setErrorMessage] = useState("");
+  const {
+    user,
+    graph,
+  } = useCombinedStore(
+    useShallow((state) => ({
+      user: state.user,
+      graph: state.graph,
+    }))
+  );
+  const disabled = user.email !== graph.createdBy;
+  console.log(disabled);
+  const [name, setName] = useState(node?.name ?? "");
+  const [description, setDescription] = useState(node?.description ?? "");
 
   const onNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
+    setName(event.target.value.trim());
   };
 
   const onDescriptionInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
     setDescription(event.target.value);
   };
 
-  const onSave = () => {
-    // nothing changed
-    if (name === node.name && description === node.description) {
+  const onSaveButtonClicked = () => {
+    if (name === "" || description === "") {
+      onError("name or description cannot be empty!");
       return;
     }
 
-    const cleanName = name.trim();
-    const cleanDescription = description.trim();
-
-    if (cleanName === "") {
-      setErrorMessage("name cannot be empty");
-      return;
-    }
-
-    nodeUpdate(
-      { id: node.id, name: cleanName, description: cleanDescription },
-      sessionStorage.getItem("token")!
-    ).then((result) => {
-      const nextNode = { ...node, name: cleanName, description: cleanDescription };
-      if (result.status) {
-        onSubmit(nextNode);
-      } else {
-        onError(result.error);
-      }
+    onSubmit(node?.id ?? "", {
+      name,
+      description,
     });
   };
 
@@ -60,7 +57,7 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
           variant="outlined"
           onChange={onNameInputChanged}
           required
-          disabled={node.predefined}
+          disabled={(node?.predefined ?? true) || disabled}
         />
       </div>
       <div className="w-full flex my-4">
@@ -71,25 +68,18 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
           variant="outlined"
           onChange={onDescriptionInputChanged}
           required
-          disabled={node.predefined}
+          disabled={(node?.predefined ?? true) || disabled}
           multiline
           rows={4}
         />
       </div>
-      {errorMessage !== "" && (
-        <div className="w-full my-4">
-          <Alert className="h-16 w-full m-4" severity="error">
-            {errorMessage}
-          </Alert>
-        </div>
-      )}
       <div className="w-full flex">
         <Button
           className="w-64 h-16 m-auto my-4 bg-blue-400"
           size="large"
           variant="contained"
-          onClick={onSave}
-          disabled={node.predefined}
+          onClick={onSaveButtonClicked}
+          disabled={(node?.predefined ?? true) || disabled}
         >
           Save
         </Button>

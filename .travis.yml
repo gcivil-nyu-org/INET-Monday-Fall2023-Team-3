@@ -42,7 +42,7 @@ before_script:
   - mkdir static
   - cd ..
   # copy frontend files to backend
-  - cp -r ./frontend/build/* ./backend/static
+  - cp -r ./frontend/dist/* ./backend/static/
   # backend migration
   - cd ./backend
   - python manage.py makemigrations
@@ -56,7 +56,7 @@ script:
   - black . --check
   - flake8 .
   # backend coverage report
-  - coverage run --source=app,user,node,edge manage.py test
+  - coverage run --source=app,user,node,edge,graph,comment manage.py test
   - coverage xml
   - ../tools/coveralls report --repo-token=$COVERALLS_REPO_TOKEN ./coverage.xml
   - cd ..

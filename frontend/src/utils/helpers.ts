@@ -1,120 +1,65 @@
-import { Result } from "./models";
+import { ResponseModels } from "./models";
 
-/**
- * Convert input camel case string to snake case string
- *
- * @param str string you want to convert
- * @returns string converted to snake case
- */
-const snakeCase = (str: string) => {
-  return str
-    .replace(/-/g, "_")
-    .replace(/.[A-Z]+/g, (str) => str[0] + "_" + str.slice(1).toLowerCase());
+const backendPrefix = "/backend";
+
+const pokemonAvatarSrc = "https://assets.pokemon.com/assets/cms2/img/pokedex/full/";
+
+export const defaultAvatarSrc = `${pokemonAvatarSrc}001.png`;
+
+export const refreshPokemonAvatar = () => {
+  const avatarIndex = String(Math.floor(Math.random() * 99) + 1).padStart(3, "0");
+  const avatarSrc = `${pokemonAvatarSrc}${avatarIndex}.png`;
+  console.log(`avatar refreshed to ${avatarSrc}`);
+  return avatarSrc;
 };
 
-/**
- * Convert input snake case string to camel case string
- *
- * @param str string you want to convert
- * @returns string converted to camel case
- */
-const camelCase = (str: string) => {
-  return str.replace(/[_-][a-z]/g, (str) => str.slice(1).toUpperCase());
-};
-
-/**
- * Make actual request to the endpoint with provided params
- *
- * @param url endpoint url
- * @param method request method, e.g. POST
- * @param body the request body, can be undefined
- * @param token the request authentication token, can be undefined
- * @returns the fetch promise
- */
 export const fetchRestful = <T extends {}>(
   url: string,
   method: string,
   body?: T,
   token?: string
 ) => {
-  const headers: Record<string, string> =
-    token === undefined
-      ? {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=UTF-8",
-        }
-      : {
-          Accept: "application/json",
-          "Content-Type": "application/json; charset=UTF-8",
-          Authorization: `Token ${token}`,
-        };
-
-  if (body === undefined) {
-    // no body, plain request
-    return fetch(url, {
-      method: method,
-      headers: headers,
-    });
-  } else {
-    // convert the camel cased keys in the give body
-    // to snake case to make django happy
-    const snakeCasedBody: Record<string, unknown> = {};
-    Object.entries(body).forEach(([key, value]) => {
-      snakeCasedBody[snakeCase(key)] = value;
-    });
-
-    return fetch(url, {
-      method: method,
-      headers: headers,
-      body: JSON.stringify(snakeCasedBody),
-    });
+  const headers: Record<string, string> = {
+    Accept: "application/json",
+    "Content-Type": "application/json; charset=UTF-8",
+  };
+  if (token !== undefined) {
+    headers["Authorization"] = `Token ${token}`;
   }
+
+  const requestParam: RequestInit = {
+    method: method,
+    headers: headers,
+  };
+
+  if (body !== undefined) {
+    requestParam.body = JSON.stringify(body);
+  }
+
+  return fetch(`${backendPrefix}${url}`, requestParam);
 };
 
-export const parseResponse = async <ResultType extends {} | undefined>(
+export const parseResponse = async <ResultType extends {}>(
   response: Response | undefined
-): Promise<Result<ResultType>> => {
+): Promise<ResponseModels.Result<ResultType>> => {
   if (response === undefined) {
     return {
       status: false,
-      error: "Unexpected error during request",
+      detail: "failed to fetch response",
     };
   }
 
-  // When calling graphUpdateAdd, the server will return 200 with empty body
-  if (response.headers.get("content-length") === "0" || !response.ok) {
-    return {
-      status: true,
-      value: {} as ResultType,
-    };
-  }
-
-  const responseObject = await response.json().catch((err) => {
+  const body = await response.json().catch((err) => {
     console.error(err);
     return undefined;
   });
 
-  if (responseObject === undefined) {
+  if (body === undefined) {
     return {
       status: false,
-      error: "Unexpected error during json parsing",
+      detail: "failed to parse response body",
     };
   }
 
-  const camelCasedBody: Record<string, unknown> = {};
-  Object.entries(responseObject).forEach(([key, value]) => {
-    camelCasedBody[camelCase(key)] = value;
-  });
-
-  if (response.ok) {
-    return {
-      status: true,
-      value: camelCasedBody as ResultType,
-    };
-  }
-
-  return {
-    status: false,
-    error: `Server side error ${camelCasedBody.detail}`,
-  };
+  return body;
 };
