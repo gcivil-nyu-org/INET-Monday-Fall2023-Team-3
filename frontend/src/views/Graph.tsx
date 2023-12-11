@@ -177,6 +177,61 @@ export default function Graph() {
     if (disabled) {
       return undefined;
     }
+
+    // check cycle
+    // check cycle : check incomers of source
+    const srcNode = nodes.find((n) => n.id === connection.source);
+    const targetNode = nodes.find((n) => n.id === connection.target);
+    if (srcNode == null) {
+      console.error("source node not found");
+      return undefined;
+    }
+    if (targetNode == null) {
+      console.error("target node not found");
+      return undefined;
+    }
+
+    const hasCycle = async ({
+      source,
+      target,
+    }: {
+      source: Node;
+      target: Node;
+    }): Promise<boolean> => {
+      const stack = [source];
+
+      while (stack.length > 0) {
+        const currentNode = stack.pop();
+        // If the current node is the target, we have a cycle.
+        if (!currentNode) {
+          continue;
+        }
+        if (currentNode === target) {
+          return true;
+        }
+
+        const incomers = await getIncomers(currentNode, nodes, edges);
+        // Add all incomers to the stack for further processing
+        for (let incomer of incomers) {
+          stack.push(incomer);
+        }
+      }
+
+      // If we exhaust all nodes without finding the target, there's no cycle
+      return false;
+    };
+
+    const cycleDetected = await hasCycle({
+      source: srcNode,
+      target: targetNode,
+    });
+
+    if (cycleDetected) {
+      // issue error
+      onError("There is a cycle detected");
+      return undefined;
+    }
+
     const addEdgeResult = await RequestMethods.edgeCreate({
       token: token,
       body: {
@@ -467,7 +522,7 @@ export default function Graph() {
               </Tooltip>
             </div>
           </Panel>
-          <Controls showInteractive={!disabled}/>
+          <Controls showInteractive={!disabled} />
           <Background className="bg-beige" gap={16} />
         </ReactFlow>
       </div>
