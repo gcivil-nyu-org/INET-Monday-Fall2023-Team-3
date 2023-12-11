@@ -1,278 +1,100 @@
-import {
-  IEdgeCreateBody,
-  IEdgeDeleteBody,
-  IEdgeGetBody,
-  IEdgePingBody,
-  IEdgeUpdateBody,
-  IGraphCreateBody,
-  IGraphGetBody,
-  IGraphPingBody,
-  IGraphUpdateBody,
-  IGraphDeleteBody,
-  INodeCreateBody,
-  INodeDeleteBody,
-  INodeGetBody,
-  INodesGetBody,
-  INodePingBody,
-  INodeUpdateBody,
-  IUserCreateBody,
-  IUserGetBody,
-  IUserLoginBody,
-  IUserPingBody,
-  IUserUpdateBody,
-  ICommentsGetBody,
-  ICommentCreateBody,
-  ICommentUpdateBody,
-  ICommentDeleteBody,
-  INodePositionBody,
-  IGraphListBody,
-  IGraphTitleBody,
-} from "./bodies";
-import { IGraphList } from "./models";
-import {
-  IEdgeCreateResponse,
-  IEdgeDeleteResponse,
-  IEdgeGetResponse,
-  IEdgePingResponse,
-  IEdgeUpdateResponse,
-  IGraphCreateResponse,
-  IGraphGetResponse,
-  IGraphPingResponse,
-  IGraphUpdateResponse,
-  IGraphDeleteResponse,
-  INodeCreateResponse,
-  INodeDeleteResponse,
-  INodeGetResponse,
-  INodesGetResponse,
-  INodePingResponse,
-  INodeUpdateResponse,
-  IUserCreateResponse,
-  IUserGetResponse,
-  IUserLoginResponse,
-  IUserPingResponse,
-  IUserUpdateResponse,
-  ICommentsGetResponse,
-  ICommentCreateResponse,
-  ICommentUpdateResponse,
-  ICommentDeleteResponse,
-  INodePositionResponse,
-  IGraphListResponse,
-  IGraphTitleResponse,
-} from "./responses";
+import { BackendModels } from "./models";
+import { AwareOmit } from "./utils";
 
-// add endpoints to this type to enable code autocomplete
-// and type inference
-// param indicates if the endpoint requires path params
-export type Endpoints = {
-  "/user/ping/": {
-    param: false;
-    authenticate: false;
-    method: "GET";
-    bodyType: IUserPingBody;
-    resultType: IUserPingResponse;
-  };
-  "/user/create/": {
-    param: false;
-    authenticate: false;
-    method: "POST";
-    bodyType: IUserCreateBody;
-    resultType: IUserCreateResponse;
-  };
-  "/user/login/": {
-    param: false;
-    authenticate: false;
-    method: "POST";
-    bodyType: IUserLoginBody;
-    resultType: IUserLoginResponse;
-  };
-  "/user/get/": {
-    param: false;
-    authenticate: true;
-    method: "GET";
-    bodyType: IUserGetBody;
-    resultType: IUserGetResponse;
-  };
-  "/user/get-name/": {
-    param: true;
-    authenticate: true;
-    method: "GET";
-    bodyType: IUserGetBody;
-    resultType: IUserGetResponse;
-  };
-  "/user/update/": {
-    param: false;
-    authenticate: true;
-    method: "POST";
-    bodyType: IUserUpdateBody;
-    resultType: IUserUpdateResponse;
-  };
+/**
+ * Requests to backend
+ */
+export namespace Requests {
+  /**
+   * User related requests
+   */
+  export namespace User {
+    export type Ping = undefined;
+    export type SignUp = Pick<BackendModels.IUser, "email" | "username" | "password">;
+    export type Login = Pick<BackendModels.IUser, "email" | "password">;
+    export type Patch = Partial<BackendModels.IUser>; // need to update avatar too
+    export type Get = undefined;
+    export type GetSelf = undefined;
+    export type GetAll = undefined;
+  }
 
-  "/node/ping/": {
-    param: false;
-    authenticate: false;
-    method: "GET";
-    bodyType: INodePingBody;
-    resultType: INodePingResponse;
-  };
-  "/node/create/": {
-    param: false;
-    authenticate: true;
-    method: "POST";
-    bodyType: INodeCreateBody;
-    resultType: INodeCreateResponse;
-  };
-  "/node/get/": {
-    param: true;
-    authenticate: true;
-    method: "GET";
-    bodyType: INodeGetBody;
-    resultType: INodeGetResponse;
-  };
-  "/node/update/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: INodeUpdateBody;
-    resultType: INodeUpdateResponse;
-  };
-  "/node/delete/": {
-    param: true;
-    authenticate: true;
-    method: "DELETE";
-    bodyType: INodeDeleteBody;
-    resultType: INodeDeleteResponse;
-  };
-  "/node/predefined-nodes/": {
-    param: false;
-    authenticate: true;
-    method: "GET";
-    bodyType: INodesGetBody;
-    resultType: INodesGetResponse;
-  };
-  "/edge/ping/": {
-    param: false;
-    authenticate: false;
-    method: "GET";
-    bodyType: IEdgePingBody;
-    resultType: IEdgePingResponse;
-  };
-  "/edge/create/": {
-    param: false;
-    authenticate: true;
-    method: "POST";
-    bodyType: IEdgeCreateBody;
-    resultType: IEdgeCreateResponse;
-  };
-  "/edge/get/": {
-    param: true;
-    authenticate: true;
-    method: "GET";
-    bodyType: IEdgeGetBody;
-    resultType: IEdgeGetResponse;
-  };
-  "/edge/update/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: IEdgeUpdateBody;
-    resultType: IEdgeUpdateResponse;
-  };
-  "/edge/delete/": {
-    param: true;
-    authenticate: true;
-    method: "DELETE";
-    bodyType: IEdgeDeleteBody;
-    resultType: IEdgeDeleteResponse;
-  };
-  "/comment/get-by-node/": {
-    param: true;
-    authenticate: true;
-    method: "GET";
-    bodyType: ICommentsGetBody;
-    resultType: ICommentsGetResponse;
-  };
-  "/comment/create/": {
-    param: false;
-    authenticate: true;
-    method: "POST";
-    bodyType: ICommentCreateBody;
-    resultType: ICommentCreateResponse;
-  };
-  "/comment/update/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: ICommentUpdateBody;
-    resultType: ICommentUpdateResponse;
-  };
-  "/comment/delete/": {
-    param: true;
-    authenticate: true;
-    method: "DELETE";
-    bodyType: ICommentDeleteBody;
-    resultType: ICommentDeleteResponse;
-  };
-  "/graph/ping/": {
-    param: false;
-    authenticate: false;
-    method: "GET";
-    bodyType: IGraphPingBody;
-    resultType: IGraphPingResponse;
-  };
-  "/graph/create/": {
-    param: false;
-    authenticate: true;
-    method: "POST";
-    bodyType: IGraphCreateBody;
-    resultType: IGraphCreateResponse;
-  };
-  "/graph/get/": {
-    param: true;
-    authenticate: true;
-    method: "GET";
-    bodyType: IGraphGetBody;
-    resultType: IGraphGetResponse;
-  };
-  "/graph/update-add/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: IGraphUpdateBody;
-    resultType: IGraphUpdateResponse;
-  };
-  "/graph/update-delete/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: IGraphUpdateBody;
-    resultType: IGraphUpdateResponse;
-  };
-  "/graph/delete/": {
-    param: true;
-    authenticate: true;
-    method: "DELETE";
-    bodyType: IGraphDeleteBody;
-    resultType: IGraphDeleteResponse;
-  };
-  "/graph/node-position/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: INodePositionBody;
-    resultType: INodePositionResponse;
-  };
-  "/graph/list-get/": {
-    param: true;
-    authenticate: true;
-    method: "GET";
-    bodyType: IGraphListBody;
-    resultType: IGraphListResponse;
-  };
-  "/graph/title-set/": {
-    param: false;
-    authenticate: true;
-    method: "PUT";
-    bodyType: IGraphTitleBody;
-    resultType: IGraphTitleResponse;
-  };
+  /**
+   * Node related requests
+   */
+  export namespace Node {
+    export type Ping = undefined;
+    export type Create = Pick<BackendModels.INode, "name"> &
+      Partial<AwareOmit<BackendModels.INode, "id">>;
+    export type Get = undefined;
+    export type Patch = Partial<AwareOmit<BackendModels.INode, "id">>;
+    export type Delete = undefined;
+    export type Predefined = undefined;
+  }
+
+  /**
+   * Edge related requests
+   */
+  export namespace Edge {
+    export type Ping = undefined;
+    export type Create = AwareOmit<BackendModels.IEdge, "id">;
+    export type Get = undefined;
+    export type Patch = Partial<AwareOmit<BackendModels.IEdge, "id">>;
+    export type Delete = undefined;
+  }
+
+  /**
+   * Graph related requests
+   */
+  export namespace Graph {
+    export type Ping = undefined;
+    export type Create = Pick<BackendModels.IGraph, "createdBy">;
+    export type Get = undefined;
+    export type Patch = Partial<
+      Pick<BackendModels.IGraph, "sharedWith" | "title"> & { nodes: string[]; edges: string[] }
+    >;
+    export type Delete = undefined;
+    export type Share = Partial<
+    Pick<BackendModels.IGraph, "sharedWith" | "title"> & { shared_with: string[] }
+  >;
+  }
+
+  /**
+   * Node position related requests
+   */
+  export namespace NodePosition {
+    export type Create = BackendModels.INodePosition;
+    export type Patch = Partial<AwareOmit<BackendModels.INodePosition, "graphId" | "nodeId">>;
+    export type Delete = undefined;
+  }
+
+  /**
+   * Comment related requests
+   */
+  export namespace Comment {
+    export type Ping = undefined;
+  }
+
+  /**
+   * Node comment related requests
+   */
+  export namespace NodeComment {
+    export type Create = Pick<BackendModels.INodeComment, "body" | "createdBy" | "belongsTo"> &
+      Partial<Pick<BackendModels.INodeComment, "parent">>;
+    export type Get = undefined;
+    export type GetByNode = undefined;
+    export type Patch = Partial<Pick<BackendModels.INodeComment, "body" | "createdAt">>;
+    export type Delete = undefined;
+  }
+
+  /**
+   * Graph comment related requests
+   */
+  export namespace GraphComment {
+    export type Create = Pick<BackendModels.IGraphComment, "body" | "createdBy" | "belongsTo"> &
+      Partial<Pick<BackendModels.IGraphComment, "parent">>;
+    export type Get = undefined;
+    export type GetByGraph = undefined;
+    export type Patch = Partial<Pick<BackendModels.IGraphComment, "body" | "createdAt">>;
+    export type Delete = undefined;
+  }
 }

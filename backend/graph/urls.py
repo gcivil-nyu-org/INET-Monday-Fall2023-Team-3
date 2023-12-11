@@ -1,19 +1,44 @@
 from django.urls import path
+
 from . import views
 
 app_name = "graph"
 
 urlpatterns = [
-    path("ping/", views.ping, name="ping"),
-    path("graphs/", views.graph_list, name="graph-list"),
-    path("get/<str:graph_id>/", views.graph_get, name="get"),
-    path("create/", views.graph_create, name="graph-create"),
-    path("delete/<str:graph_id>/", views.graph_delete, name="graph-delete"),
-    path("update-add/", views.graph_update_add, name="graph-update-add"),
-    path("update-delete/", views.graph_update_delete, name="graph-update-delete"),
-    # get a list of ids of graphs owned by the user
-    path("list-get/<str:user_email>/", views.graph_list_get, name="graph-get-list"),
-    path("node-position/", views.node_position_set, name="graph-node-position"),
-    path("title-set/", views.graph_title_set, name="graph-title-set")
-    # path("add_node/<str:graph_id>/", views.graph_add_node, name="graph-add-node"),
+    path(views.GRAPH_PING_PATH, views.graph_ping, name="ping"),
+    path(views.GRAPH_CREATE_PATH, views.graph_create, name="create"),
+    path(views.GRAPH_GET_PATH, views.graph_get, name="get"),
+    path(views.GRAPH_PATCH_PATH, views.graph_patch, name="patch"),
+    path(views.GRAPH_DELETE_PATH, views.graph_delete, name="delete"),
+    path(views.GRAPH_SHARE_PATH, views.graph_share, name="share"),
+    path(
+        views.NODE_POSITION_CREATE_PATH,
+        views.node_position_create,
+        name="node-position-create",
+    ),
+    path(
+        views.NODE_POSITION_PATCH_PATH,
+        views.node_position_patch,
+        name="node-position-patch",
+    ),
+    path(
+        views.NODE_POSITION_DELETE_PATH,
+        views.node_position_delete,
+        name="node-position-delete",
+    ),
+    path(
+        views.NODE_COLOR_CREATE_PATH,
+        views.node_color_create,
+        name="node-color-create",
+    ),
+    path(
+        views.NODE_COLOR_PATCH_PATH,
+        views.node_color_patch,
+        name="node-color-patch",
+    ),
+    path(
+        views.NODE_COLOR_DELETE_PATH,
+        views.node_color_delete,
+        name="node-color-delete",
+    ),
 ]

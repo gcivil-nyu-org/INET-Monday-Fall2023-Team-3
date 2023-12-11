@@ -1,193 +1,181 @@
 import uuid
 
-from rest_framework.test import APITestCase
-from rest_framework import status
-from rest_framework.authtoken.models import Token
+# from rest_framework import status
+from shared.test_helper import CustomTestCase, get_actual_endpoint
+from user.models import User
 
-from user.models import CustomUser
-from .models import Node
+from . import views
 
-from .views import (
-    NODE_PONG_MSG,
-    NODE_INVALID_FORMAT_MSG,
-    NODE_ALREADY_EXISTS_MSG,
-    NODE_NOT_FOUND_MSG,
-    NODE_ID_REQUIRED_MSG,
-)
+# from .models import Node
+from .urls import app_name
 
-# Create your tests here.
+valid_node_1 = {
+    "name": "test node 1",
+    "description": "test node 1 description",
+}
 
-test_user = {
-    "email": "test@gmail.com",
-    "username": "test",
-    "password": "testpassword",
+valid_node_2 = {
+    "name": "test node 2",
+    "description": "test node 2 description",
+}
+
+valid_node_3 = {
+    "name": "test node 3",
+    "description": "test node 3 description",
+}
+
+valid_predefined_node = {
+    "name": "test node predefined",
+    "description": "test node predefined description",
+    "predefined": True,
+}
+
+invalid_node = {
+    "bob": "peter",
 }
 
 
-class NodeAPITest(APITestCase):
-    def setUp(self) -> None:
-        user = CustomUser.objects.create(**test_user)
-        token = Token.objects.create(user=user)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
+actual_endpoint = get_actual_endpoint(app_name=app_name)
 
-    def test_ping(self):
-        response = self.client.get("/backend/node/ping/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, NODE_PONG_MSG)
+
+class NodeTest(CustomTestCase):
+    user_model = User
+
+    def test_node_ping(self):
+        ping_endpoint = actual_endpoint(views.NODE_PING_PATH)
+        # test ping response
+        response = self.client.get(ping_endpoint)
+        self.assertResponseEqual(expect=views.NODE_PING_OK_RESPONSE, response=response)
 
     def test_node_create(self):
-        invalid_data = {"bob": "peter"}
-        response = self.client.post(
-            "/backend/node/create/", invalid_data, format="json"
+        create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
+        # test for invalid format
+        response = self.client.post(create_endpoint, data=invalid_node)
+        self.assertResponseEqual(
+            expect=views.NODE_CREATE_INVALID_FORMAT_RESPONSE, response=response
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, NODE_INVALID_FORMAT_MSG)
-
-        valid_data = {"name": "CSE 101", "description": "CSE 101 class"}
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsNotNone(response.data["id"])
-        self.assertEqual(response.data["name"], valid_data["name"])
-        self.assertEqual(response.data["description"], valid_data["description"])
-
-        valid_data["id"] = response.data["id"]
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-        self.assertEqual(response.data, NODE_ALREADY_EXISTS_MSG)
-
-    def test_node_create_with_dependencies(self):
-        valid_data1 = {
-            "name": "ECE297",
-            "description": "Design & Communication",
-        }
-        valid_data2 = {
-            "name": "ECE361",
-            "description": "Computer Networks",
-        }
-        node1 = Node.objects.create(**valid_data1)
-        node2 = Node.objects.create(**valid_data2)
-        valid_data = {
-            "name": "CSE 101",
-            "description": "CSE 101 class",
-            "dependencies": [node1.id, node2.id],
-        }
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsNotNone(response.data["id"])
-        self.assertEqual(response.data["name"], valid_data["name"])
-        self.assertEqual(response.data["description"], valid_data["description"])
-        self.assertEqual(
-            sorted(response.data["dependencies"]), sorted([node1.id, node2.id])
+        # test for success create
+        response = self.client.post(create_endpoint, data=valid_node_1)
+        self.assertResponseDataKeyEqual(
+            key="name", expect=valid_node_1, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="description", expect=valid_node_1, response=response
         )
 
     def test_node_get(self):
-        response = self.client.get("/backend/node/")
-        self.assertNotEqual(response.status_code, status.HTTP_200_OK)
+        create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
+        get_endpoint = actual_endpoint(views.NODE_GET_PATH_FORMAT)
+        # test unknown node
+        response = self.client.get(get_endpoint.format(node_id=uuid.uuid4()))
+        self.assertResponseEqual(
+            expect=views.NODE_GET_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success get
+        response = self.client.post(create_endpoint, data=valid_node_1)
+        node_data = response.data["value"]
 
-        response = self.client.get(f"/backend/node/get/{uuid.uuid4()}/")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, NODE_NOT_FOUND_MSG)
+        response = self.client.get(get_endpoint.format(node_id=node_data["id"]))
+        self.assertResponseOk(response=response)
+        node_data = response.data["value"]
 
-        valid_data = {"name": "CSE 101", "description": "CSE 101 class"}
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-        node = response.data
-        response = self.client.get(f"/backend/node/get/{node['id']}/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, node)
-
-    def test_node_update(self):
-        invalid_data = {"bob": "peter"}
-        response = self.client.put("/backend/node/update/", invalid_data, format="json")
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, NODE_ID_REQUIRED_MSG)
-
-        response = self.client.put(
-            "/backend/node/update/", {"id": uuid.uuid4(), "name": "test"}, format="json"
+        self.assertResponseDataKeyEqual(
+            key="name", expect=valid_node_1, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="description", expect=valid_node_1, response=response
         )
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, NODE_NOT_FOUND_MSG)
-
-        valid_data = {"name": "CSE 101", "description": "CSE 101 class"}
-
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-        node1_id = response.data["id"]
-
-        response = self.client.get(f"/backend/node/get/{node1_id}/")
-
-        self.assertEqual(response.data["name"], valid_data["name"])
-        self.assertEqual(response.data["description"], valid_data["description"])
-
-        valid_data["name"] = "CSE 102"
-        valid_data["description"] = "CSE 102 class"
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-        node2_id = response.data["id"]
-
-        response = self.client.put(
-            "/backend/node/update/",
-            {"id": node1_id, "name": "CSE 101", "dependencies": [node2_id]},
-            format="json",
+    def test_node_patch(self):
+        create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
+        # get_endpoint = actual_endpoint(views.NODE_GET_PATH_FORMAT)
+        patch_endpoint = actual_endpoint(views.NODE_PATCH_PATH_FORMAT)
+        # test for unknown patch
+        response = self.client.patch(
+            patch_endpoint.format(node_id=uuid.uuid4()), data={}
         )
-
-        self.assertEqual(len(response.data["dependencies"]), 1)
-        self.assertEqual(str(response.data["dependencies"][0]), node2_id)
-
-        response = self.client.put(
-            "/backend/node/update/",
-            {
-                "id": node1_id,
-                "name": "CSE 163",
-                "description": "CSE 163 class(Updated)",
-            },
-            format="json",
+        self.assertResponseEqual(
+            expect=views.NODE_PATCH_NOT_FOUND_RESPONSE, response=response
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["name"], "CSE 163")
-        self.assertEqual(response.data["id"], node1_id)
+        # test for success patch
+        response = self.client.post(create_endpoint, data=valid_node_1)
+        node_1_data = response.data["value"]
+
+        patch_data = {"name": "patched node name"}
+        response = self.client.patch(
+            patch_endpoint.format(node_id=node_1_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="name", expect=patch_data, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="description", expect=valid_node_1, response=response
+        )
+        # test for patch dependency
+        response = self.client.post(create_endpoint, data=valid_node_2)
+        node_2_data = response.data["value"]
+        response = self.client.post(create_endpoint, data=valid_node_3)
+        node_3_data = response.data["value"]
+        # test set 1 dependency
+        patch_data = {"dependencies": [node_2_data["id"]]}
+        response = self.client.patch(
+            patch_endpoint.format(node_id=node_1_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        dependencies = response.data["value"]["dependencies"]
+        self.assertEqual(1, len(dependencies))
+        self.assertEqual(node_2_data["id"], str(dependencies[0]))
+
+        patch_data = {"dependencies": [node_3_data["id"]]}
+        response = self.client.patch(
+            patch_endpoint.format(node_id=node_1_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        dependencies = response.data["value"]["dependencies"]
+        self.assertEqual(1, len(dependencies))
+        self.assertEqual(node_3_data["id"], str(dependencies[0]))
+        # test set 2 dependencies
+        patch_data = {"dependencies": [node_2_data["id"], node_3_data["id"]]}
+        response = self.client.patch(
+            patch_endpoint.format(node_id=node_1_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        dependencies = response.data["value"]["dependencies"]
+        self.assertEqual(2, len(dependencies))
+        self.assertIn(uuid.UUID(node_2_data["id"]), dependencies)
+        self.assertIn(uuid.UUID(node_3_data["id"]), dependencies)
 
     def test_node_delete(self):
-        response = self.client.delete(f"/backend/node/delete/{uuid.uuid4()}/")
+        create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
+        get_endpoint = actual_endpoint(views.NODE_GET_PATH_FORMAT)
+        delete_endpoint = actual_endpoint(views.NODE_DELETE_PATH_FORMAT)
+        # test for unknown delete
+        response = self.client.delete(delete_endpoint.format(node_id=uuid.uuid4()))
+        self.assertResponseEqual(
+            expect=views.NODE_DELETE_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success delete
+        response = self.client.post(create_endpoint, data=valid_node_1)
+        node_data = response.data["value"]
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, NODE_NOT_FOUND_MSG)
+        response = self.client.delete(delete_endpoint.format(node_id=node_data["id"]))
+        self.assertResponseOk(response=response)
 
-        valid_data = {"name": "CSE 101", "description": "CSE 101 class"}
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-        node_id = response.data["id"]
+        response = self.client.get(get_endpoint.format(node_id=node_data["id"]))
+        self.assertResponseEqual(
+            expect=views.NODE_GET_NOT_FOUND_RESPONSE, response=response
+        )
 
-        response = self.client.delete(f"/backend/node/delete/{response.data['id']}/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        response = self.client.delete(f"/backend/node/delete/{node_id}/")
-
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, NODE_NOT_FOUND_MSG)
-
-    def test_node_get_predefined(self):
-        response = self.client.get("/backend/node/predefined-nodes/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)  # Only two nodes are predefined
-
-        # Create some predefined nodes
-        valid_data1 = {
-            "name": "ECE244",
-            "description": "Programming Fundamentals",
-            "predefined": True,
-        }
-        valid_data2 = {
-            "name": "ECE311",
-            "description": "Control System I",
-            "predefined": True,
-        }
-        Node.objects.create(**valid_data1)
-        Node.objects.create(**valid_data2)
-
-        valid_data = {"name": "CSE 101", "description": "CSE 101 class"}
-        response = self.client.post("/backend/node/create/", valid_data, format="json")
-
-        response = self.client.get("/backend/node/predefined-nodes/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 2)  # Only two nodes are predefined
+    def test_predefined_node_get(self):
+        create_endpoint = actual_endpoint(views.NODE_CREATE_PATH)
+        get_predefined_endpoint = actual_endpoint(views.NODE_GET_PREDEFINED_PATH)
+        # test for empty get
+        response = self.client.get(get_predefined_endpoint)
+        self.assertResponseOk(response=response)
+        self.assertEqual(0, len(response.data["value"]))
+        # test for success get
+        response = self.client.post(create_endpoint, data=valid_predefined_node)
+        response = self.client.get(get_predefined_endpoint)
+        self.assertResponseOk(response=response)
+        self.assertEqual(1, len(response.data["value"]))

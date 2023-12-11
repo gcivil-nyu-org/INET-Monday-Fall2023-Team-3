@@ -1,103 +1,113 @@
-import { Button, Avatar, Dialog, DialogTitle } from "@mui/material";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GraphList from "components/user/GraphList";
-import Update from "components/user/Update";
-import { graphCreate, userGet, graphListGet} from "utils/backendRequests";
+import { useEffect, useState } from "react";
+import { Button, Avatar, Dialog } from "@mui/material";
+import { RequestMethods } from "src/utils/utils";
+
+import GraphList from "src/components/user/GraphList";
+import Update from "src/components/user/Update";
+import { BackendModels } from "src/utils/models";
+import { defaultAvatarSrc } from "src/utils/helpers";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
+
+import usePusher from "src/components/pusher/usePusher";
 
 export default function User() {
   const navigate = useNavigate();
   const [update, setUpdate] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
-  const [graphList, setGraphList] = useState<string[][]>([]);
-  const storedAvatarSrc = localStorage.getItem("storedAvatarSrc");
-  console.log("storedAvatarSrc: " + storedAvatarSrc);
-  const [avatarSrc, setAvatarSrc] = useState(storedAvatarSrc || "https://assets.pokemon.com/assets/cms2/img/pokedex/full/001.png");
+  const {
+    user,
+    setUser,
+    token,
+    createdGraphs,
+    fetchCreatedGraphs,
+    sharedGraphs,
+    fetchSharedGraphs,
+    setGraph,
+  } = useCombinedStore(
+    useShallow((state) => ({
+      user: state.user,
+      setUser: state.setUser,
+      token: state.token,
+      createdGraphs: state.createdGraphs,
+      fetchCreatedGraphs: state.fetchCreatedGraphs,
+      sharedGraphs: state.sharedGraphs,
+      fetchSharedGraphs: state.fetchSharedGraphs,
+      setGraph: state.setGraph,
+    }))
+  );
+  const [avatarSrc, setAvatarSrc] = useState(
+    // localStorage.getItem("smooth/avatar") ??
+    user.avatar == null ? defaultAvatarSrc : user.avatar
+  );
 
+  // when user content changed, we
+  // fetch graphs again
   useEffect(() => {
-    userGet(sessionStorage.getItem("token")!).then((result) => {
-      if (result.status) {
-        setUserEmail(result.value.email);
-      } else {
-        console.log("Cannot get current user");
-      }
+    console.log(user);
+    fetchCreatedGraphs();
+    fetchSharedGraphs();
+  }, [user]);
+
+  // Subscribe to Pusher channel and events
+  usePusher("graph-channel", "new-graph-share", async () => {
+    console.log("usePusher");
+    const resp = await RequestMethods.userGetSelf({
+      token,
     });
-  }, []);
-
-  useEffect(() => {
-    if(userEmail !== ""){
-      graphListGet(userEmail, sessionStorage.getItem("token")!).then((result) => {
-        if (result.status) {
-          if (result.value.graphList) {
-            setGraphList(result.value.graphList);
-            console.log("returned Graph list: ");
-            console.log(result.value.graphList);
-          }
-          else{
-            console.log("graph list is undefiend!");
-          }
-        } else {
-          console.log("could not get graph");
-        }
-      });
+    if (resp.status) {
+      setUser({ sharedGraphs: resp.value.sharedGraphs });
     }
-  }, [userEmail]); // when userEmail changes, update the graphList
+  });
 
+  // Subscribe to Pusher channel and events
+  usePusher("graph-channel", "graph-delete", async () => {
+    console.log("usePusher");
+    const resp = await RequestMethods.userGetSelf({
+      token,
+    });
+    if (resp.status) {
+      setUser({ sharedGraphs: resp.value.sharedGraphs });
+    }
+  });
 
   const onUpdateCancelled = () => {
+    console.log("user avatar is:", user.avatar);
     console.log("update cancelled");
     setUpdate(false);
   };
 
   const onCreateGraphButtonClicked = async () => {
-    console.log("Create graph button clicked");
-    try {
-      const result = await userGet(sessionStorage.getItem("token")!);
-      if (result.status) {
-        const user = result.value;
-        setUserEmail(user.email);
-        console.log("Current user email: " + user.email);
+    console.log("create graph button clicked");
 
-        // Wait until the user email is set before creating the graph
-        const graphResult = await graphCreate(
-          {user: user.email, editingEnabled: true},
-          sessionStorage.getItem("token")!
-        );
+    const createGraphResult = await RequestMethods.graphCreate({
+      body: {
+        createdBy: user.email,
+      },
+      token,
+    });
 
-        if (graphResult.status) {
-          sessionStorage.setItem("graphId", graphResult.value.id);
-          console.log("Graph created");
-          navigate(`/graph/${graphResult.value.id}`);
-        } else {
-          console.log("Cannot create graph");
-        }
-      } else {
-        console.log("Cannot get current user");
-      }
-    } catch (error) {
-      console.error("An error occurred:", error);
+    if (createGraphResult.status) {
+      setUser({ createdGraphs: [...user.createdGraphs, createGraphResult.value.id] });
+      setGraph(createGraphResult.value);
+      navigate(`/graph`);
+    } else {
+      console.error(`error creating graph ${createGraphResult.detail}`);
     }
   };
 
-  const graphDataArray = graphList.map(graphInfo => ({
-    id: graphInfo[0],
-    title: graphInfo[1],
-    imgUrl: "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg"
-  }));
-
-  const onAvatarChange = (newUrl:string) => {
-    setAvatarSrc(newUrl);
+  const onAvatarChanged = (src: string) => {
+    setAvatarSrc(src);
     setUpdate(false);
-  }
-
-
+  };
 
   return (
-    <div className="w-full h-full flex flex-col min-h-screen">
-      <div className="flex h-24 flex-row ml-auto">
+    <div className="bg-beige w-full h-auto">
+      <div className="bg-beige flex flex-row-reverse w-full">
         <div className="flex h-16 m-4">
           <Button
-            className="w-60 mr-4 bg-gray-500"
+            className="w-60 mr-4 bg-beige text-olive font-sans rounded-full
+            border-2 border-solid"
             size="large"
             variant="contained"
             onClick={onCreateGraphButtonClicked}
@@ -106,37 +116,30 @@ export default function User() {
           </Button>
 
           <Button
-            className="h-16 w-16 p-2 rounded-lg bg-white bg-opacity-60"
+            className="h-16 w-16 p-2 bg-beige text-olive font-sans rounded-full
+            border-2 border-solid shadow-lg"
             onClick={() => setUpdate(true)}
           >
             <Avatar className="w-12 h-12" src={avatarSrc} />
           </Button>
         </div>
+        <div className="ml-5 mr-auto">
+          <span className="inline-block w-10 h-12 bg-pink mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-green mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-orange mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-blue mt-6 mr-5"></span>
+          <span className="inline-block w-10 h-12 bg-yellow mt-6 mr-5"></span>
+        </div>
       </div>
-
-      <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
-         <Update
-          onAvatarChanged={onAvatarChange}
-          avatarSrc={avatarSrc}
-         />
-      </Dialog>
-
-      <GraphList
-        name="My Graph"
-        graphs={graphDataArray}
-      />
-
-      <GraphList
-        name="Shared Graph"
-        graphs={[
-          {
-            id: "id-1",
-            title: "dummy",
-            imgUrl:
-              "https://dfstudio-d420.kxcdn.com/wordpress/wp-content/uploads/2019/06/digital_camera_photo-1080x675.jpg",
-          },
-        ]}
-      />
+      <div>
+        <Dialog open={update} onClose={onUpdateCancelled} maxWidth="sm" fullWidth={true}>
+          <Update onAvatarChanged={onAvatarChanged} avatarSrc={avatarSrc} />
+        </Dialog>
+      </div>
+      <div className="font-sans text-olive">
+        <GraphList name="MY GRAPHS" graphs={createdGraphs} />
+        <GraphList name="SHARED GRAPHS" graphs={sharedGraphs} />
+      </div>
     </div>
   );
 }

@@ -1,168 +1,328 @@
-# Create your tests here.
+import uuid
 
-from rest_framework import status
-from rest_framework.test import APITestCase
-from rest_framework.authtoken.models import Token
-from user.models import CustomUser
-from .models import Graph
-from node.models import Node
 from edge.models import Edge
+from node.models import Node
 
-# from node.models import Node
-# from edge.models import Edge
+# from rest_framework import status
+from shared.test_helper import CustomTestCase, get_actual_endpoint
+from user.models import User
 
-test_user = {
+from . import serializers, views
+
+# from .models import Graph, NodePosition
+from .urls import app_name
+
+valid_user = {
     "email": "test@gmail.com",
     "username": "test",
-    "password": "testpassword",
+    "password": "5p#:)=+}",
 }
 
 
-class GraphTests(APITestCase):
-    def setUp(self) -> None:
-        self.user = CustomUser.objects.create(**test_user)
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
+valid_user_shared_with = {
+    "email": "shared_with@gmail.com",
+    "username": "shared with user",
+    "password": "3ReNz3m?",
+}
 
-    def test_ping(self):
-        # Test the ping view
-        response = self.client.get("/backend/graph/ping/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, {"message": "pong"})
+valid_graph = {
+    "title": "Test Graph",
+    "created_by": valid_user["email"],
+}
 
-    def test_create(self):
-        request_data = {"user": self.user.email}
-        response = self.client.post("/backend/graph/create/", request_data)
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+invalid_graph = {
+    "bob": "peter",
+}
 
-    def test_graph_list(self):
-        # Test the graph_list view
-        response = self.client.get("/backend/graph/graphs/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        Graph.objects.create(user=self.user)
-        Graph.objects.create(user=self.user)
-        response = self.client.get("/backend/graph/graphs/")
-        self.assertEqual(len(response.data), 2)
+valid_node_1 = {
+    "name": "test node 1",
+    "description": "test node 1 description",
+}
+
+valid_node_2 = {
+    "name": "test node 2",
+    "description": "test node 2 description",
+}
+
+invalid_node_position = {
+    "bob": "peter",
+}
+
+actual_endpoint = get_actual_endpoint(app_name=app_name)
+
+
+class GraphTest(CustomTestCase):
+    user_model = User
+
+    def setUp(self):
+        User.objects.create(**valid_user)
+        super().setUp()
+
+    def test_graph_ping(self):
+        ping_endpoint = actual_endpoint(views.GRAPH_PING_PATH)
+        # test ping response
+        response = self.client.get(ping_endpoint)
+        self.assertResponseEqual(expect=views.GRAPH_PING_OK_RESPONSE, response=response)
+
+    def test_graph_create(self):
+        create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
+        # test for invalid format
+        response = self.client.post(create_endpoint, data=invalid_graph)
+        self.assertResponseEqual(
+            expect=views.GRAPH_CREATE_INVALID_FORMAT_RESPONSE, response=response
+        )
+        # test for success create
+        serializer = serializers.GraphSerializer(data=valid_graph)
+        serializer.is_valid(raise_exception=True)
+        response = self.client.post(create_endpoint, data=valid_graph)
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="title", expect=valid_graph, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="created_by", expect=valid_graph, response=response
+        )
 
     def test_graph_get(self):
-        Graph.objects.create(user=self.user)
-        graph1 = Graph.objects.create(user=self.user)
-        response = self.client.get(f"/backend/graph/get/{graph1.id}/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["id"], str(graph1.id))
+        create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
+        get_endpoint = actual_endpoint(views.GRAPH_GET_PATH_FORMAT)
+        # test for unknown graph
+        response = self.client.get(get_endpoint.format(graph_id=uuid.uuid4()))
+        self.assertResponseEqual(
+            expect=views.GRAPH_GET_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success get
+        response = self.client.post(create_endpoint, data=valid_graph)
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        response = self.client.get(get_endpoint.format(graph_id=graph_data["id"]))
+        self.assertResponseDataKeyEqual(
+            key="title", expect=valid_graph, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="created_by", expect=valid_graph, response=response
+        )
+
+    def test_graph_patch(self):
+        create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
+        # get_endpoint = actual_endpoint(views.GRAPH_GET_PATH_FORMAT)
+        patch_endpoint = actual_endpoint(views.GRAPH_PATCH_PATH_FORMAT)
+        # test for unknown graph
+        response = self.client.patch(
+            patch_endpoint.format(graph_id=uuid.uuid4()), data={}
+        )
+        self.assertResponseEqual(
+            expect=views.GRAPH_PATCH_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success patch
+        # test for patch title
+        response = self.client.post(create_endpoint, data=valid_graph)
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        patch_data = {"title": "Patched Title"}
+        response = self.client.patch(
+            patch_endpoint.format(graph_id=graph_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="title", expect=patch_data, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="created_by", expect=valid_graph, response=response
+        )
+        # test for patch nodes
+        node_1 = Node.objects.create(**valid_node_1)
+        node_2 = Node.objects.create(**valid_node_2)
+        patch_data = {"nodes": [node_1.id, node_2.id]}
+
+        response = self.client.patch(
+            patch_endpoint.format(graph_id=graph_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        self.assertEqual(2, len(graph_data["nodes"]))
+        # test for patch edge
+        edge_data = {"source": node_1, "target": node_2}
+        edge = Edge.objects.create(**edge_data)
+        patch_data = {"edges": [edge.id]}
+
+        response = self.client.patch(
+            patch_endpoint.format(graph_id=graph_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        self.assertEqual(1, len(graph_data["edges"]))
+        # test for patch shared_with
+        user = User.objects.create(**valid_user_shared_with)
+        patch_data = {"shared_with": [user.email]}
+
+        response = self.client.patch(
+            patch_endpoint.format(graph_id=graph_data["id"]), data=patch_data
+        )
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        self.assertEqual(1, len(graph_data["shared_with"]))
+        self.assertIn(user.email, graph_data["shared_with"])
 
     def test_graph_delete(self):
-        # testing if an empty graph can be deleted
-        graph1 = Graph.objects.create(user=self.user)
-        self.assertEqual(len(Graph.objects.all()), 1)
-        response = self.client.delete(f"/backend/graph/delete/{graph1.id}/")
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(Graph.objects.all()), 0)
+        create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
+        get_endpoint = actual_endpoint(views.GRAPH_GET_PATH_FORMAT)
+        delete_endpoint = actual_endpoint(views.GRAPH_DELETE_PATH_FORMAT)
+        # test for unknown graph
+        response = self.client.delete(delete_endpoint.format(graph_id=uuid.uuid4()))
+        self.assertResponseEqual(
+            expect=views.GRAPH_DELETE_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success delete
+        response = self.client.post(create_endpoint, data=valid_graph)
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
 
-        # testing if a graph with nodes can be deleted,
-        # without impacting predefined nodes
-        graph2 = Graph.objects.create(user=self.user)
-        node1 = Node.objects.create(name="node1", predefined=True)
-        node2 = Node.objects.create(name="node2", predefined=False)
-        node1_id, node2_id = node1.id, node2.id
-        graph2.nodes.add(node1)
-        graph2.nodes.add(node2)
-        self.assertEqual(len(Node.objects.all()), 2)
-        response1 = self.client.delete(f"/backend/graph/delete/{graph2.id}/")
-        response2 = self.client.get(f"/backend/node/get/{node1_id}/")
-        response3 = self.client.get(f"/backend/node/get/{node2_id}/")
-        self.assertEqual(response1.status_code, status.HTTP_200_OK)
-        self.assertEqual(response2.status_code, status.HTTP_200_OK)
-        self.assertNotEqual(response3.status_code, status.HTTP_200_OK)
+        response = self.client.delete(delete_endpoint.format(graph_id=graph_data["id"]))
+        self.assertResponseOk(response=response)
 
-    def test_graph_update(self):
-        # tests both add and delete operations
-        graph1 = Graph.objects.create(user=self.user)
-        valid_data1 = {
-            "name": "ECE244",
-            "description": "Programming Fundamentals",
+        response = self.client.get(get_endpoint.format(graph_id=graph_data["id"]))
+        self.assertResponseEqual(
+            expect=views.GRAPH_GET_NOT_FOUND_RESPONSE, response=response
+        )
+
+    def test_node_position_create(self):
+        node_position_create_endpoint = actual_endpoint(views.NODE_POSITION_CREATE_PATH)
+        create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
+        # test for invalid format
+        response = self.client.post(
+            node_position_create_endpoint, data=invalid_node_position
+        )
+        self.assertResponseEqual(
+            expect=views.NODE_POSITION_CREATE_INVALID_FORMAT_RESPONSE, response=response
+        )
+        # test for success create
+        node_1 = Node.objects.create(**valid_node_1)
+
+        response = self.client.post(create_endpoint, data=valid_graph)
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        valid_node_position = {
+            "graph_id": uuid.UUID(graph_data["id"]),
+            "node_id": node_1.id,
+            "x": 100,
+            "y": 50,
         }
-        valid_data2 = {
-            "name": "ECE311",
-            "description": "Control System I",
+        response = self.client.post(
+            node_position_create_endpoint, data=valid_node_position
+        )
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="graph_id", expect=valid_node_position, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="node_id", expect=valid_node_position, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="x", expect=valid_node_position, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="y", expect=valid_node_position, response=response
+        )
+
+    def test_node_position_patch(self):
+        node_position_create_endpoint = actual_endpoint(views.NODE_POSITION_CREATE_PATH)
+        node_color_create_endpoint = actual_endpoint(views.NODE_COLOR_CREATE_PATH)
+        create_endpoint = actual_endpoint(views.GRAPH_CREATE_PATH)
+        # patch_endpoint = actual_endpoint(views.GRAPH_PATCH_PATH_FORMAT)
+        node_position_patch_endpoint = actual_endpoint(
+            views.NODE_POSITION_PATCH_PATH_FORMAT
+        )
+        node_color_patch_endpoint = actual_endpoint(views.NODE_COLOR_PATCH_PATH_FORMAT)
+        # test for unknown graph_id
+        response = self.client.patch(
+            node_position_patch_endpoint.format(
+                graph_id=uuid.uuid4(), node_id=uuid.uuid4()
+            ),
+            data={},
+        )
+        self.assertResponseEqual(
+            expect=views.NODE_POSITION_PATCH_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for unknown node_id
+        response = self.client.post(create_endpoint, data=valid_graph)
+        self.assertResponseOk(response=response)
+        graph_data = response.data["value"]
+
+        response = self.client.patch(
+            node_position_patch_endpoint.format(
+                graph_id=graph_data["id"], node_id=uuid.uuid4()
+            ),
+            data={},
+        )
+        self.assertResponseEqual(
+            expect=views.NODE_POSITION_PATCH_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success patch
+        node_1 = Node.objects.create(**valid_node_1)
+
+        valid_node_position = {
+            "graph_id": graph_data["id"],
+            "node_id": node_1.id,
+            "x": 100,
+            "y": 50,
         }
-        node1 = Node.objects.create(**valid_data1)
-        node2 = Node.objects.create(**valid_data2)
-        valid_data1["id"] = str(node1.id)
-        valid_data2["id"] = str(node2.id)
-
-        graph_id = str(graph1.id)
-        request_data = {"id": graph_id, "nodes": [valid_data1, valid_data2]}
-        response = self.client.put(
-            "/backend/graph/update-add/", request_data, format="json"
+        response = self.client.post(
+            node_position_create_endpoint, data=valid_node_position
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        nodes_from_graph = sorted(graph1.nodes.all().values_list("id", flat=True))
-        expected_node_ids = sorted([node1.id, node2.id])
-        self.assertEqual(nodes_from_graph, expected_node_ids)
+        self.assertResponseOk(response=response)
 
-        # edge1 will be added
-        valid_data3 = {
-            "source": str(node1.id),
-            "target": str(node2.id),
+        node_position_data = response.data["value"]
+        patch_data = {"x": 200, "y": 100}
+
+        response = self.client.patch(
+            node_position_patch_endpoint.format(
+                graph_id=graph_data["id"], node_id=node_1.id
+            ),
+            data=patch_data,
+        )
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="graph_id", expect=node_position_data, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="node_id", expect=node_position_data, response=response
+        )
+        self.assertResponseDataKeyEqual(key="x", expect=patch_data, response=response)
+        self.assertResponseDataKeyEqual(key="y", expect=patch_data, response=response)
+
+        valid_node_color = {
+            "graph_id": graph_data["id"],
+            "node_id": node_1.id,
+            "color": "#FFA500",
         }
-        edge1 = Edge.objects.create(source=node1, target=node2)
-        valid_data3["id"] = str(edge1.id)
 
-        request_data = {"id": graph_id, "edges": [valid_data3]}
-        response = self.client.put(
-            "/backend/graph/update-add/", request_data, format="json"
+        response = self.client.post(node_color_create_endpoint, data=valid_node_color)
+        self.assertResponseOk(response=response)
+
+        node_color_data = response.data["value"]
+        patch_data = {"color": "#808080"}
+
+        response = self.client.patch(
+            node_color_patch_endpoint.format(
+                graph_id=graph_data["id"], node_id=node_1.id
+            ),
+            data=patch_data,
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(graph1.edges.all()), 1)
 
-        # edge1 will be deleted
-        response = self.client.put(
-            "/backend/graph/update-delete/", request_data, format="json"
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="graph_id", expect=node_color_data, response=response
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(graph1.edges.all()), 0)
-
-        # node1 will be deleted
-        request_data = {"id": graph_id, "nodes": [valid_data1]}
-        response = self.client.put(
-            "/backend/graph/update-delete/", request_data, format="json"
+        self.assertResponseDataKeyEqual(
+            key="node_id", expect=node_color_data, response=response
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        nodes_from_graph = sorted(graph1.nodes.all().values_list("id", flat=True))
-        expected_node_ids = sorted([node2.id])
-        self.assertEqual(nodes_from_graph, expected_node_ids)
-
-    def test_node_position(self):
-        graph = Graph.objects.create(user=self.user)
-        valid_data1 = {
-            "name": "ECE244",
-            "description": "Programming Fundamentals",
-        }
-        node1 = Node.objects.create(**valid_data1)
-        graph_id = str(graph.id)
-        request_data = {"graph_id": graph_id, "node_id": str(node1.id), "x": 1, "y": 2}
-        response = self.client.put(
-            "/backend/graph/node-position/", request_data, format="json"
+        self.assertResponseDataKeyEqual(
+            key="color", expect=patch_data, response=response
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        request_data = {"graph_id": graph_id, "node_id": str(node1.id), "x": 3, "y": 4}
-        response = self.client.put(
-            "/backend/graph/node-position/", request_data, format="json"
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_graph_title_set(self):
-        graph = Graph.objects.create(user=self.user)
-        request_data = {"id": str(graph.id), "title": "test"}
-        response = self.client.put(
-            "/backend/graph/title-set/", request_data, format="json"
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_graph_list_get(self):
-        graph = Graph.objects.create(user=self.user, title="test")
-        response = self.client.get(f"/backend/graph/list-get/{self.user.email}/")
-        assert response.data == {"graph_list": [[str(graph.id), graph.title]]}
-        assert response.status_code == status.HTTP_200_OK

@@ -1,149 +1,116 @@
 import { useState, ChangeEvent } from "react";
-import { Button, TextField, Alert, Typography } from "@mui/material";
-import { INode } from "utils/models";
-import { nodeCreate } from "utils/backendRequests";
-import { ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
-import Theme from "./Theme"; // Import your theme configuration
+import { Button, TextField } from "@mui/material";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
+import { Requests } from "src/utils/requests";
 
 export type AddNodeProp = {
-  predefinedNodes: INode[];
-  onCanvasNodeIds: string[];
-  onSubmit: (node: INode) => void;
-  onError: (err: string) => void;
+  onSubmitPredefinedNode: (id: string) => void;
+  onSubmit: (node: Requests.Node.Create) => void;
+  onError: (message: string) => void;
 };
 
-export default function AddNode({
-  predefinedNodes,
-  onCanvasNodeIds,
-  onSubmit,
-  onError,
-}: AddNodeProp) {
+export default function AddNode({ onSubmit, onError, onSubmitPredefinedNode }: AddNodeProp) {
+  const [graph, predefinedNodeMap] = useCombinedStore(
+    useShallow((state) => [state.graph, state.predefinedNodeMap])
+  );
+
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredNodes: INode[] = predefinedNodes
-    ? predefinedNodes.filter((node) => node.name.toLowerCase().includes(searchTerm.toLowerCase()))
-    : [];
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+  const [addNodeData, setAddNodeData] = useState({
+    name: "",
+    description: "",
+  });
 
-  const onAddButtonClicked = (node: INode) => {
-    onSubmit(node);
-  };
+  const onSaveButtonClicked = () => {
+    if (addNodeData.name === "") {
+      onError("name cannot be empty");
+      return;
+    }
 
-  const onSearchChanged = (event: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(event.target.value);
+    onSubmit(addNodeData);
   };
 
   const onNameInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
-
-  const onDescriptionInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
-    setDescription(event.target.value);
-  };
-
-  const onSave = () => {
-    const cleanName = name.trim();
-    const cleanDescription = description.trim();
-
-    if (cleanName === "") {
-      setErrorMessage("name cannot be empty");
-      return;
-    }
-    nodeCreate(
-      { name: cleanName, description: cleanDescription },
-      sessionStorage.getItem("token")!
-    ).then((result) => {
-      if (result.status) {
-        onSubmit(result.value);
-      } else {
-        onError(result.error);
-      }
+    setAddNodeData({
+      ...addNodeData,
+      name: event.target.value.trim(),
     });
   };
 
-  return (
-    <ThemeProvider theme={Theme}>
-      <CssBaseline />
-      <div className="w-full flex">
-        <div className="w-1/3 flex flex-col items-center bg-gray-200" style={{ flexGrow: 1 }}>
-          <div className="h-24 w-full flex">
-            <TextField
-              className="h-16 m-4 flex-1"
-              label="Search"
-              variant="outlined"
-              fullWidth
-              onChange={onSearchChanged}
-            />
-          </div>
-          <div
-            className="w-full flex flex-col items-center bg-gray-200 overflow-y-auto max-h-[20rem]"
-            style={{ flexGrow: 1 }}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-4 w-full">
-              {filteredNodes.map((node) => {
-                if (onCanvasNodeIds.includes(node.id)) {
-                  return null; // Skip rendering if node's ID is in nodeIds
-                }
-                return (
-                  <Button
-                    className="flex items-center justify-center min-h-[6rem] min-w-[6rem] bg-white rounded-md p-4 text-center overflow-hidden mx-2"
-                    key={node.name}
-                    onClick={() => onAddButtonClicked(node)}
-                  >
-                    <span className="whitespace-normal text-sm">{node.name}</span>
-                  </Button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+  const onDescriptionInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+    setAddNodeData({
+      ...addNodeData,
+      description: event.target.value.trim(),
+    });
+  };
 
-        {/* AddNode Component */}
-        <div className="w-2/3 flex flex-col items-center bg-white" style={{ flexGrow: 1 }}>
-          <Typography variant="h6" component="h3" className="w-full text-center my-4">
-            Add Node
-          </Typography>
-          <div className="my-4 w-full flex">
-            <TextField
-              className="m-4 flex-1"
-              label="Course Name"
-              variant="outlined"
-              onChange={onNameInputChanged}
-              required
-            />
-          </div>
-          <div className="w-full flex my-4">
-            <TextField
-              className="flex-1 mx-4 min-h-[6rem]"
-              label="Description"
-              variant="outlined"
-              onChange={onDescriptionInputChanged}
-              required
-              multiline
-              rows={4}
-            />
-          </div>
-          {errorMessage !== "" && (
-            <div className="w-full my-4">
-              <Alert className="h-16 w-full m-4" severity="error">
-                {errorMessage}
-              </Alert>
+  const onSearchTermInputChanged = (event: ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(event.target.value);
+  };
+
+  const getSearchingNodes = () => {
+    return Object.values(predefinedNodeMap).filter(
+      (node) =>
+        node.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        !graph.nodes.some((existingNode) => existingNode.id === node.id)
+    );
+  };
+
+  return (
+    <div className="w-full flex flex-row bg-beige">
+      <div className="w-1/3 flex flex-col items-center max-h-96 overflow-auto">
+        <div className="h-14 w-full flex sticky top-0 z-10">
+          <TextField
+            label="Search"
+            variant="filled"
+            fullWidth
+            onChange={onSearchTermInputChanged}
+          />
+        </div>
+        <div className="w-full flex flex-col flex-1 overflow-auto max-h-min">
+          {getSearchingNodes().map((node) => (
+            <div key={node.id} className="w-full h-24 p-6 cursor-pointer">
+              <div className="w-full h-20 text-center bg-white" onClick={() => onSubmitPredefinedNode(node.id)}>
+                {node.name}
+              </div>
             </div>
-          )}
-          <div className="w-full flex my-4">
-            <Button
-              className="w-64 h-16 m-auto bg-blue-400 my-4"
-              size="large"
-              variant="contained"
-              onClick={onSave}
-            >
-              Save
-            </Button>
-          </div>
+          ))}
         </div>
       </div>
-    </ThemeProvider>
+      <div className="w-2/3 flex flex-col items-center">
+        <div className="w-full flex p-8 pb-0">
+          <TextField
+            className="flex-1"
+            label="Name"
+            variant="outlined"
+            onChange={onNameInputChanged}
+          />
+        </div>
+        <div className="w-full flex p-8 pb-0">
+          <TextField
+            className="flex-1"
+            label="Description"
+            variant="outlined"
+            multiline
+            rows={10}
+            onChange={onDescriptionInputChanged}
+          />
+        </div>
+        <div className="w-full flex m-8 pb-0">
+          <Button
+            className="w-64 h-16 m-auto bg-beige text-olive border-2 border-solid rounded-full"
+            size="large"
+            variant="contained"
+            onClick={onSaveButtonClicked}
+          >
+            Save
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
+
+
+
+

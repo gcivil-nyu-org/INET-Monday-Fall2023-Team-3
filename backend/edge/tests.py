@@ -1,186 +1,166 @@
 import uuid
 
-from rest_framework.test import APITestCase
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-
-from user.models import CustomUser
 from node.models import Node
 
-from .views import (
-    EDGE_PONG_MSG,
-    EDGE_INVALID_FORMAT_MSG,
-    EDGE_ID_ALREADY_EXISTS_MSG,
-    EDGE_NOT_FOUND_MSG,
-)
+# from rest_framework import status
+from shared.test_helper import CustomTestCase, get_actual_endpoint
+from user.models import User
 
+from . import views
 
-test_user = {
-    "email": "test@gmail.com",
-    "username": "test",
-    "password": "testpassword",
+# from .models import Edge
+from .urls import app_name
+
+valid_node_1 = {
+    "name": "test node 1",
+    "description": "test node 1 description",
 }
 
+valid_node_2 = {
+    "name": "test node 2",
+    "description": "test node 2 description",
+}
 
-class EdgeAPITest(APITestCase):
-    def setUp(self) -> None:
-        # set up authentication
-        user = CustomUser.objects.create(**test_user)
-        token = Token.objects.create(user=user)
-        self.client.credentials(HTTP_AUTHORIZATION="Token " + token.key)
+valid_node_3 = {
+    "name": "test node 3",
+    "description": "test node 3 description",
+}
 
-    def test_ping(self):
-        # test ping works
-        response = self.client.get("/backend/edge/ping/")
+invalid_edge = {
+    "bob": "peter",
+}
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, EDGE_PONG_MSG)
+actual_endpoint = get_actual_endpoint(app_name=app_name)
+
+
+class EdgeTest(CustomTestCase):
+    user_model = User
+
+    def get_valid_edge(self, source: Node, target: Node):
+        return {
+            "source": source.id,
+            "target": target.id,
+        }
+
+    def test_edge_ping(self):
+        ping_endpoint = actual_endpoint(views.EDGE_PING_PATH)
+        # test ping response
+        response = self.client.get(ping_endpoint)
+        self.assertResponseEqual(expect=views.EDGE_PING_OK_RESPONSE, response=response)
 
     def test_edge_create(self):
-        # test invalid data raise format error
-        invalid_data = {"bob": "peter"}
-        response = self.client.post(
-            "/backend/edge/create/", data=invalid_data, format="json"
+        create_endpoint = actual_endpoint(views.EDGE_CREATE_PATH)
+        # test for invalid format
+        response = self.client.post(create_endpoint, data=invalid_edge)
+        self.assertResponseEqual(
+            expect=views.EDGE_CREATE_INVALID_FORMAT_RESPONSE, response=response
         )
+        # test for success create
+        node_1 = Node.objects.create(**valid_node_1)
+        node_2 = Node.objects.create(**valid_node_2)
+        valid_edge = self.get_valid_edge(source=node_1, target=node_2)
 
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, EDGE_INVALID_FORMAT_MSG)
-
-        # test invalid node id (missing node instance) raise format error
-        invalid_id1 = uuid.uuid4()
-        invalid_id2 = uuid.uuid4()
-
-        invalid_data = {"source": invalid_id1, "target": invalid_id2}
-        response = self.client.post(
-            "/backend/edge/create/", data=invalid_data, format="json"
+        response = self.client.post(create_endpoint, data=valid_edge)
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="source", expect=valid_edge, response=response
         )
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, EDGE_INVALID_FORMAT_MSG)
-
-        # test edge creation ok
-        valid_data1 = {"name": "CSE 101", "description": "CSE 101 class"}
-        valid_data2 = {"name": "CSE 102", "description": "CSE 102 class"}
-
-        node1 = Node.objects.create(**valid_data1)
-        node2 = Node.objects.create(**valid_data2)
-
-        valid_edge = {"source": node1.id, "target": node2.id}
-        response = self.client.post(
-            "/backend/edge/create/", data=valid_edge, format="json"
+        self.assertResponseDataKeyEqual(
+            key="target", expect=valid_edge, response=response
         )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["source"], node1.id)
-        self.assertEqual(response.data["target"], node2.id)
-
-        # test recreate same edge raise already exist error
-        edge_data = response.data
-
-        response = self.client.post(
-            "/backend/edge/create/", data=edge_data, format="json"
-        )
-
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-        self.assertEqual(response.data, EDGE_ID_ALREADY_EXISTS_MSG)
 
     def test_edge_get(self):
-        # test get nonexisting edge raise not found error
-        response = self.client.get(f"/backend/edge/get/{uuid.uuid4()}/")
+        create_endpoint = actual_endpoint(views.EDGE_CREATE_PATH)
+        get_endpoint = actual_endpoint(views.EDGE_GET_PATH_FORMAT)
+        # test for unknown edge
+        response = self.client.get(get_endpoint.format(edge_id=uuid.uuid4()))
+        self.assertResponseEqual(
+            expect=views.EDGE_GET_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for success get
+        node_1 = Node.objects.create(**valid_node_1)
+        node_2 = Node.objects.create(**valid_node_2)
+        valid_edge = self.get_valid_edge(source=node_1, target=node_2)
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, EDGE_NOT_FOUND_MSG)
+        response = self.client.post(create_endpoint, data=valid_edge)
+        edge_data = response.data["value"]
 
-        # test get existing edge ok
-        valid_data1 = {"name": "CSE 101", "description": "CSE 101 class"}
-        valid_data2 = {"name": "CSE 102", "description": "CSE 102 class"}
-
-        node1 = Node.objects.create(**valid_data1)
-        node2 = Node.objects.create(**valid_data2)
-
-        valid_edge = {"source": node1.id, "target": node2.id}
-        response = self.client.post(
-            "/backend/edge/create/", data=valid_edge, format="json"
+        response = self.client.get(get_endpoint.format(edge_id=edge_data["id"]))
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="source", expect=valid_edge, response=response
+        )
+        self.assertResponseDataKeyEqual(
+            key="target", expect=valid_edge, response=response
         )
 
-        edge_id = response.data["id"]
-
-        response = self.client.get(f"/backend/edge/get/{edge_id}/")
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["source"], node1.id)
-        self.assertEqual(response.data["target"], node2.id)
-
-    def test_edge_update(self):
-        # test invalid data raise format error
-        invalid_data = {"bob": "peter"}
-        response = self.client.put(
-            "/backend/edge/update/", data=invalid_data, format="json"
+    def test_edge_patch(self):
+        create_endpoint = actual_endpoint(views.EDGE_CREATE_PATH)
+        # get_endpoint = actual_endpoint(views.EDGE_GET_PATH_FORMAT)
+        patch_endpoint = actual_endpoint(views.EDGE_PATCH_PATH_FORMAT)
+        # test for unknown edge
+        response = self.client.patch(
+            patch_endpoint.format(edge_id=uuid.uuid4()), data={}
         )
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, EDGE_INVALID_FORMAT_MSG)
-
-        # test nonexisting edge raise not found error
-        valid_data1 = {"name": "CSE 101", "description": "CSE 101 class"}
-        valid_data2 = {"name": "CSE 102", "description": "CSE 102 class"}
-
-        node1 = Node.objects.create(**valid_data1)
-        node2 = Node.objects.create(**valid_data2)
-
-        invalid_data = {"id": uuid.uuid4(), "source": node1.id, "target": node2.id}
-        response = self.client.put(
-            "/backend/edge/update/", data=invalid_data, format="json"
+        self.assertResponseEqual(
+            expect=views.EDGE_PATCH_NOT_FOUND_RESPONSE, response=response
         )
+        # test for success patch
+        node_1 = Node.objects.create(**valid_node_1)
+        node_2 = Node.objects.create(**valid_node_2)
+        node_3 = Node.objects.create(**valid_node_3)
+        valid_edge = self.get_valid_edge(source=node_1, target=node_2)
 
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-        self.assertEqual(response.data, EDGE_NOT_FOUND_MSG)
+        response = self.client.post(create_endpoint, data=valid_edge)
+        edge_data = response.data["value"]
 
-        # test update edge ok
-        valid_edge = {"source": node1.id, "target": node2.id}
-        response = self.client.post(
-            "/backend/edge/create/", data=valid_edge, format="json"
+        patch_data = {"source": node_3.id}
+        response = self.client.patch(
+            patch_endpoint.format(edge_id=edge_data["id"]), data=patch_data
         )
-
-        valid_data3 = {"name": "CSE 103", "description": "CSE 103 class"}
-        node3 = Node.objects.create(**valid_data3)
-
-        valid_edge["id"] = response.data["id"]
-        valid_edge["source"] = node3.id
-        response = self.client.put(
-            "/backend/edge/update/", data=valid_edge, format="json"
+        self.assertResponseOk(response=response)
+        self.assertResponseDataKeyEqual(
+            key="source", expect=patch_data, response=response
         )
-
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data["source"], node3.id)
-        self.assertEqual(response.data["target"], node2.id)
-
-        # test invalid node id (missing node instance) raise format error
-        valid_edge["source"] = uuid.uuid4()
-        response = self.client.put(
-            "/backend/edge/update/", data=valid_edge, format="json"
+        self.assertResponseDataKeyEqual(
+            key="target", expect=valid_edge, response=response
         )
-
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data, EDGE_INVALID_FORMAT_MSG)
 
     def test_edge_delete(self):
-        # test nonexisting edge raise not found error
-        response = self.client.delete(f"/backend/edge/delete/{uuid.uuid4()}/")
-
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
-        # test delete ok
-        valid_data1 = {"name": "CSE 101", "description": "CSE 101 class"}
-        valid_data2 = {"name": "CSE 102", "description": "CSE 102 class"}
-
-        node1 = Node.objects.create(**valid_data1)
-        node2 = Node.objects.create(**valid_data2)
-
-        valid_edge = {"source": node1.id, "target": node2.id}
-        response = self.client.post(
-            "/backend/edge/create/", data=valid_edge, format="json"
+        create_endpoint = actual_endpoint(views.EDGE_CREATE_PATH)
+        get_endpoint = actual_endpoint(views.EDGE_GET_PATH_FORMAT)
+        delete_endpoint = actual_endpoint(views.EDGE_DELETE_PATH_FORMAT)
+        # test for unknown edge
+        response = self.client.delete(delete_endpoint.format(edge_id=uuid.uuid4()))
+        self.assertResponseEqual(
+            expect=views.EDGE_DELETE_NOT_FOUND_RESPONSE, response=response
         )
-        response = self.client.delete(f"/backend/edge/delete/{response.data['id']}/")
+        # test for success delete
+        node_1 = Node.objects.create(**valid_node_1)
+        node_2 = Node.objects.create(**valid_node_2)
+        valid_edge = self.get_valid_edge(source=node_1, target=node_2)
 
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.post(create_endpoint, data=valid_edge)
+        edge_data = response.data["value"]
+
+        response = self.client.delete(delete_endpoint.format(edge_id=edge_data["id"]))
+        self.assertResponseOk(response=response)
+
+        response = self.client.get(get_endpoint.format(edge_id=edge_data["id"]))
+        self.assertResponseEqual(
+            expect=views.EDGE_GET_NOT_FOUND_RESPONSE, response=response
+        )
+        # test for cascade delete
+        node_1 = Node.objects.create(**valid_node_1)
+        node_2 = Node.objects.create(**valid_node_2)
+        valid_edge = self.get_valid_edge(source=node_1, target=node_2)
+
+        response = self.client.post(create_endpoint, data=valid_edge)
+        edge_data = response.data["value"]
+
+        node_1.delete()
+
+        response = self.client.get(get_endpoint.format(edge_id=edge_data["id"]))
+        self.assertResponseEqual(
+            expect=views.EDGE_GET_NOT_FOUND_RESPONSE, response=response
+        )
