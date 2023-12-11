@@ -40,6 +40,7 @@ import FaultyDependency, { IFaultyDependency } from "src/components/node/FaultyD
 import Comments from "components/comment/Comments";
 import GraphComments from "components/comment/GraphComments";
 import NodeComments from "src/components/comment/NodeComments";
+import usePusher from "src/components/pusher/usePusher";
 
 const nodeTypes = {
   smoothNode: SmoothNode,
@@ -49,6 +50,7 @@ export default function Graph() {
   const navigate = useNavigate();
   const {
     user,
+    setUser,
     token,
     predefinedNodeMap,
     fetchPredefinedNodes,
@@ -69,6 +71,7 @@ export default function Graph() {
     udpateTitle,
   } = useCombinedStore((state) => ({
     user: state.user,
+    setUser: state.setUser,
     token: state.token,
     predefinedNodeMap: state.predefinedNodeMap,
     fetchPredefinedNodes: state.fetchPredefinedNodes,
@@ -330,6 +333,17 @@ export default function Graph() {
   const onError = (message: string) => {
     enqueueSnackbar(message, { variant: "error" });
   };
+
+  // Subscribe to Pusher channel and events
+  usePusher("graph-channel", "new-graph-share", async () => {
+    console.log("usePusher");
+    const resp = await RequestMethods.userGetSelf({
+      token,
+    });
+    if (resp.status) {
+      setUser({ sharedGraphs: resp.value.sharedGraphs });
+    }
+  });
 
   return (
     <div className="w-full flex flex-row min-h-screen min-w-full overflow-hidden">
