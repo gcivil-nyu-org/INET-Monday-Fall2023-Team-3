@@ -105,6 +105,7 @@ export default function Graph() {
         position: graph.nodePositions.find((nodePosition) => nodePosition.nodeId === node.id)!,
         type: "smoothNode",
         data: node,
+        className: "nopan",
       }))
     );
 
@@ -466,7 +467,7 @@ export default function Graph() {
               </Tooltip>
             </div>
           </Panel>
-          <Controls />
+          <Controls showInteractive={!disabled}/>
           <Background className="bg-beige" gap={16} />
         </ReactFlow>
       </div>

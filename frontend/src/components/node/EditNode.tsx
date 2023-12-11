@@ -2,6 +2,9 @@ import { Button, TextField } from "@mui/material";
 import { ChangeEvent, useState } from "react";
 import { BackendModels } from "src/utils/models";
 import { Requests } from "src/utils/requests";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
+
 
 export type EditNodeProp = {
   node: BackendModels.INode | undefined;
@@ -10,6 +13,17 @@ export type EditNodeProp = {
 };
 
 export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
+  const {
+    user,
+    graph,
+  } = useCombinedStore(
+    useShallow((state) => ({
+      user: state.user,
+      graph: state.graph,
+    }))
+  );
+  const disabled = user.email !== graph.createdBy;
+  console.log(disabled);
   const [name, setName] = useState(node?.name ?? "");
   const [description, setDescription] = useState(node?.description ?? "");
 
@@ -43,7 +57,7 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
           variant="outlined"
           onChange={onNameInputChanged}
           required
-          disabled={node?.predefined ?? true}
+          disabled={(node?.predefined ?? true) || disabled}
         />
       </div>
       <div className="w-full flex my-4">
@@ -54,7 +68,7 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
           variant="outlined"
           onChange={onDescriptionInputChanged}
           required
-          disabled={node?.predefined ?? true}
+          disabled={(node?.predefined ?? true) || disabled}
           multiline
           rows={4}
         />
@@ -65,7 +79,7 @@ export default function EditNode({ node, onSubmit, onError }: EditNodeProp) {
           size="large"
           variant="contained"
           onClick={onSaveButtonClicked}
-          disabled={node?.predefined ?? true}
+          disabled={(node?.predefined ?? true) || disabled}
         >
           Save
         </Button>

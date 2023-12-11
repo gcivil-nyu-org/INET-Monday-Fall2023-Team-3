@@ -34,7 +34,7 @@ export default function GraphEntry({ graph, edit, index }: GraphEntryProp) {
       setGraph: state.setGraph,
     }))
   );
-  const disabled = user.email !== graph.createdBy;
+  // const disabled = user.email !== graph.createdBy;
   // const displayName = user.email === graph.createdBy ? "" : "@" + graph.createdBy;
 
   const onGraphClicked = () => {

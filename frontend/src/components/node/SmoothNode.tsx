@@ -6,12 +6,24 @@ import MenuItem from "@mui/material/MenuItem";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { BackendModels } from "src/utils/models";
+import { useCombinedStore } from "src/store/combinedStore";
+import { useShallow } from "zustand/react/shallow";
 
 export type SmoothNodeProp = {
   data: BackendModels.INode;
 };
 
 export default function SmoothNode({ data }: SmoothNodeProp) {
+  const {
+    user,
+    graph,
+  } = useCombinedStore(
+    useShallow((state) => ({
+      user: state.user,
+      graph: state.graph,
+    }))
+  );
+  const disabled = user.email !== graph.createdBy;
   const nodeId = data.id;
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
   const [nodeColor, setNodeColor] = useState<string>(() => {
@@ -26,6 +38,9 @@ export default function SmoothNode({ data }: SmoothNodeProp) {
   }, [nodeId, nodeColor]);
 
   const handleContextMenu = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (disabled) {
+      return undefined;
+    }
     event.preventDefault();
 
     // Check if the right mouse button was clicked. 2 refers to right click
