@@ -29,6 +29,12 @@ export default function About() {
               </img>
             </a>
           </span>
+          <span className="h-12 w-12 ml-5">
+            <a href="http://smooth-dev.us-west-2.elasticbeanstalk.com/">
+              <img src="https://www.svgrepo.com/show/354521/vitejs.svg" alt="live site">
+              </img>
+            </a>
+          </span>
         </div>
         <div className="basis-4/6 m-5 flex flex-row w-full">
           <div className="flex flex-col w-full bg-pink mb-10 mr-10 shadow-lg">
