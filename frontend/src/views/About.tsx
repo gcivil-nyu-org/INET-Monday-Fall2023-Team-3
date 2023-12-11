@@ -42,9 +42,9 @@ export default function About() {
             <Avatar className="w-20 h-20 place-self-center border-olive p-1"
               src="https://assets.pokemon.com/assets/cms2/img/pokedex/full/039.png" />
             <p className="m-5">
-              Hi, this is Yulin from China. I am a tech lover and AI enthusiast.
-              I contributed to both frontend and backend, focusing on graph interaction
-              and user management features. It's a great journey to collaborate with my lovely teammates!
+              Hi, this is Yulin! I am first-year master student at NYU MSCS, and previouly I finished my BS in CS from FDU.
+              I am a tech lover and AI enthusiast, and I am passionate about building cool and Impactful software. 
+              It's a great journey to collaborate with my lovely teammates, and I've learned a lot from both my teammates and the project.
             </p>
           </div>
           <div className="flex flex-col w-full bg-green mb-10 mr-10 shadow-lg">
